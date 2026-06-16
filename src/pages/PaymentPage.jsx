@@ -182,14 +182,8 @@ function PaymentPage() {
         pincode: primaryAddress?.pincode || "",
         city: primaryAddress?.city || ""
       };
-      const selectedTestOrPackage = paymentItems.map((item) => `${item.name || item.title} x ${item.quantity}`).join(", ");
-      const payloadItems = paymentItems.map((item) => ({
-        ...item,
-        itemId: item.itemId || item._id || item.id || item.testId || item.packageId,
-        itemType: item.itemType || item.type || "test",
-        payableAmount: Number(item.price || item.discountedPrice || item.finalPrice || 0) * Number(item.quantity || 1)
-      }));
-      const bookingPayload = {
+      const selectedTestOrPackage = checkoutData.items.map((item) => `${item.name || item.title} x ${item.quantity}`).join(", ");
+      const response = await createBookingLead({
         fullName: bookingCustomer.name,
         mobile: bookingCustomer.phone.replace(/\D/g, "").slice(-10),
         email: bookingCustomer.email,
@@ -274,51 +268,31 @@ function PaymentPage() {
           bookingData: razorpayBookingData
         });
 
-        const booking = createBookingData({
-          items: paymentItems,
-          summary: checkoutData.summary,
-          status: "paid",
-          paymentMode,
-          paymentId: verification.paymentId,
-          razorpayOrderId: verification.orderId,
-          bookingId: verification.booking?.bookingId,
-          bookingStatus: "Confirmed",
-          customer: bookingCustomer
-        });
+      const booking = createBookingData({
+        items: checkoutData.items,
+        summary: checkoutData.summary,
+        status: "paid",
+        paymentMode,
+        paymentId: verification.paymentId,
+        razorpayOrderId: verification.orderId
+      });
 
         saveBookingData(booking);
         navigate("/booking-confirmation");
         return;
       }
 
-      const response = await createBookingLead({
-        ...bookingPayload,
-        paymentMethod: "Cash on Delivery",
-        paymentStatus: "COD",
-        bookingStatus: "Confirmed",
-        source: "cash-on-delivery-checkout"
+      const failedBooking = createBookingData({
+        items: checkoutData.items,
+        summary: checkoutData.summary,
+        status: "failed",
+        paymentMode,
+        failureReason: message
       });
 
-      const booking = {
-        ...createBookingData({
-          items: paymentItems,
-          summary: checkoutData.summary,
-          status: "pending",
-          paymentMode: "Cash on Delivery",
-          paymentId: "COD",
-          bookingId: response.data?.bookingId,
-          bookingStatus: "Confirmed",
-          customer: bookingCustomer
-        }),
-        paymentStatus: "COD"
-      };
-
-      saveBookingData(booking);
-      openBookingWhatsApp(booking, checkoutData.summary);
-      navigate("/booking-confirmation");
-      return;
-    } catch (error) {
-      setPaymentError(getPaymentErrorMessage(error));
+      savePaymentFailureData(failedBooking);
+      navigate("/payment-failed");
+    } finally {
       setLoading(false);
       return;
     }
