@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upchar Pathology</title>
+    <script>
+      fetch("/index.html")
+        .then(function (response) {
+          return response.text();
+        })
+        .then(function (html) {
+          document.open();
+          document.write(html);
+          document.close();
+        });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

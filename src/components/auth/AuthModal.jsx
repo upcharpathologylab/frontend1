@@ -39,8 +39,8 @@ function AuthModal({ isOpen, mode, onModeChange, onClose, onSuccess, onSignupSuc
             role="dialog"
             aria-modal="true"
             aria-label={mode === "signin" ? "Sign in" : "Sign up"}
-            className={`relative max-h-[92vh] w-full overflow-y-auto rounded-2xl border border-blue-100 bg-white p-6 shadow-2xl sm:p-10 ${
-              mode === "signin" ? "max-w-[650px]" : "max-w-[760px]"
+            className={`relative max-h-[94vh] w-full overflow-y-auto rounded-2xl bg-white shadow-2xl ${
+              mode === "signin" ? "max-w-[900px]" : "max-w-[680px]"
             }`}
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -60,7 +60,7 @@ function AuthModal({ isOpen, mode, onModeChange, onClose, onSuccess, onSignupSuc
             {mode === "signin" ? (
               <SignInForm onModeChange={onModeChange} onSuccess={onSuccess} />
             ) : (
-              <SignUpForm onModeChange={onModeChange} onSignupSuccess={onSignupSuccess} />
+              <SignUpForm onModeChange={onModeChange} onSuccess={onSuccess} onSignupSuccess={onSignupSuccess} />
             )}
           </motion.div>
         </motion.div>

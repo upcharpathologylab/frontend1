@@ -1,30 +1,99 @@
-import { Check, Mail } from "lucide-react";
-import { useState } from "react";
-import { loginUser } from "../../api/api.js";
-import PasswordInput from "./PasswordInput.jsx";
-import SocialLoginButton from "./SocialLoginButton.jsx";
+import { ChevronDown, Eye, EyeOff, LockKeyhole, Phone } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { loginUser, resetPasswordWithOTP, sendResetOTP, verifyResetOTP } from "../../api/api.js";
 import { storeAuthSession } from "./authStorage.js";
 
 const initialValues = {
-  identifier: "",
+  phone: "",
   password: "",
-  remember: true
+  resetOtp: Array(6).fill(""),
+  newPassword: ""
 };
 
-function validate(values) {
-  const errors = {};
+const cleanPhone = (value) => String(value || "").replace(/\D/g, "").slice(-10);
+const otpValue = (otp) => otp.join("");
 
-  if (!values.identifier.trim()) {
-    errors.identifier = "Email or phone number is required.";
-  }
+function FieldLabel({ children }) {
+  return <span className="mb-3 block text-base font-black text-navy-950 md:text-xl">{children}</span>;
+}
 
-  if (!values.password) {
-    errors.password = "Password is required.";
-  } else if (values.password.length < 8) {
-    errors.password = "Password must be at least 8 characters.";
-  }
+function PhoneField({ value, onChange, error }) {
+  return (
+    <label>
+      <FieldLabel>Phone Number</FieldLabel>
+      <div className={`flex h-14 overflow-hidden rounded-lg border bg-white md:h-[74px] ${error ? "border-red-300" : "border-blue-100"}`}>
+        <div className="flex w-24 items-center justify-center gap-2 border-r border-blue-100 text-base font-black text-navy-950 md:w-36 md:text-xl">
+          +91 <ChevronDown className="h-5 w-5" />
+        </div>
+        <input name="phone" value={value} onChange={onChange} inputMode="numeric" placeholder="Enter your phone number" className="min-w-0 flex-1 px-4 text-sm font-bold text-navy-900 outline-none placeholder:text-navy-500 md:px-7 md:text-xl" />
+        <div className="grid w-14 place-items-center text-navy-700 md:w-20">
+          <Phone className="h-6 w-6 md:h-8 md:w-8" />
+        </div>
+      </div>
+      {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : null}
+    </label>
+  );
+}
 
-  return errors;
+function PasswordField({ label = "Password", name = "password", value, onChange, error, placeholder = "Enter your password" }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <label>
+      <FieldLabel>{label}</FieldLabel>
+      <div className={`auth-field ${error ? "border-red-300" : "border-blue-100"}`}>
+        <LockKeyhole className="h-6 w-6 shrink-0 text-navy-950 md:h-8 md:w-8" />
+        <input name={name} type={visible ? "text" : "password"} value={value} onChange={onChange} placeholder={placeholder} className="auth-input" />
+        <button type="button" onClick={() => setVisible((current) => !current)} className="grid h-10 w-10 place-items-center text-navy-950" aria-label="Toggle password">
+          {visible ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+        </button>
+      </div>
+      {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : null}
+    </label>
+  );
+}
+
+function OtpBoxes({ value, onChange, error }) {
+  const refs = useRef([]);
+  return (
+    <div>
+      <FieldLabel>Enter OTP</FieldLabel>
+      <div className="grid grid-cols-6 gap-3">
+        {value.map((digit, index) => (
+          <input
+            key={index}
+            ref={(node) => {
+              refs.current[index] = node;
+            }}
+            value={digit}
+            onChange={(event) => {
+              const next = [...value];
+              next[index] = event.target.value.replace(/\D/g, "").slice(-1);
+              onChange(next);
+              if (next[index] && index < 5) refs.current[index + 1]?.focus();
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Backspace" && !digit && index > 0) refs.current[index - 1]?.focus();
+            }}
+            inputMode="numeric"
+            maxLength={1}
+            placeholder="-"
+            className="h-14 rounded-lg border border-blue-100 bg-white text-center text-lg font-black text-navy-950 outline-none focus:border-upchar-green focus:ring-4 focus:ring-upchar-green/10"
+          />
+        ))}
+      </div>
+      {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : null}
+    </div>
+  );
+}
+
+function Divider() {
+  return (
+    <div className="my-7 flex items-center gap-5 text-sm font-black text-navy-950 md:my-10">
+      <span className="h-px flex-1 bg-blue-100" />
+      OR
+      <span className="h-px flex-1 bg-blue-100" />
+    </div>
+  );
 }
 
 function SignInForm({ onModeChange, onSuccess }) {
@@ -32,27 +101,40 @@ function SignInForm({ onModeChange, onSuccess }) {
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
+  const [resetOtpSent, setResetOtpSent] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (!cooldown) return undefined;
+    const timer = window.setInterval(() => setCooldown((current) => Math.max(current - 1, 0)), 1000);
+    return () => window.clearInterval(timer);
+  }, [cooldown]);
 
   const update = (event) => {
-    const { name, value, checked, type } = event.target;
-    setValues((current) => ({
-      ...current,
-      [name]: type === "checkbox" ? checked : value
-    }));
+    const { name, value } = event.target;
+    setValues((current) => ({ ...current, [name]: name === "phone" ? cleanPhone(value) : value }));
     setErrors((current) => ({ ...current, [name]: "" }));
     setApiError("");
   };
 
+  const validateLogin = () => {
+    const nextErrors = {};
+    if (!/^[6-9]\d{9}$/.test(cleanPhone(values.phone))) nextErrors.phone = "Enter a valid Indian phone number.";
+    if (!values.password) nextErrors.password = "Password is required.";
+    else if (values.password.length < 8) nextErrors.password = "Password must be at least 8 characters.";
+    return nextErrors;
+  };
+
   const submit = async (event) => {
     event.preventDefault();
-    const nextErrors = validate(values);
+    const nextErrors = validateLogin();
     setErrors(nextErrors);
-
     if (Object.keys(nextErrors).length) return;
 
     setSubmitting(true);
     try {
-      const result = await loginUser(values);
+      const result = await loginUser({ phone: cleanPhone(values.phone), password: values.password });
       storeAuthSession(result);
       onSuccess?.(result.user, "Signed in successfully.");
     } catch (error) {
@@ -62,86 +144,90 @@ function SignInForm({ onModeChange, onSuccess }) {
     }
   };
 
+  const sendReset = async () => {
+    const phone = cleanPhone(values.phone);
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      setErrors({ phone: "Enter a valid Indian phone number." });
+      return;
+    }
+    if (cooldown) return;
+
+    setSubmitting(true);
+    try {
+      await sendResetOTP({ phone });
+      setResetMode(true);
+      setResetOtpSent(true);
+      setCooldown(30);
+    } catch (error) {
+      setApiError(error.response?.data?.message || "Unable to send reset OTP.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const savePassword = async () => {
+    const nextErrors = {};
+    if (otpValue(values.resetOtp).length !== 6) nextErrors.resetOtp = "Enter the 6-digit OTP.";
+    if (!values.newPassword || values.newPassword.length < 8) nextErrors.newPassword = "Password must be at least 8 characters.";
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+
+    setSubmitting(true);
+    try {
+      const payload = { phone: cleanPhone(values.phone), otp: otpValue(values.resetOtp), password: values.newPassword };
+      await verifyResetOTP(payload);
+      await resetPasswordWithOTP(payload);
+      setResetMode(false);
+      setResetOtpSent(false);
+      setValues((current) => ({ ...current, password: "", resetOtp: Array(6).fill(""), newPassword: "" }));
+      setApiError("");
+    } catch (error) {
+      setApiError(error.response?.data?.message || "Unable to reset password.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <form onSubmit={submit} noValidate>
-      <p className="text-xl font-black text-upchar-green">Welcome Back!</p>
-      <h2 className="mt-5 text-4xl font-black leading-tight text-navy-950 sm:text-5xl">Sign in to your account</h2>
-      <p className="mt-4 text-xl font-semibold leading-8 text-navy-600 sm:text-2xl">Access your bookings, reports and health records</p>
-
-      <div className="mt-8 grid gap-5">
-        <label>
-          <span className="mb-2 block text-base font-black text-navy-950 sm:text-lg">Email or Phone Number</span>
-          <div
-            className={`flex h-14 items-center rounded-lg border bg-white px-4 transition focus-within:border-upchar-blue focus-within:ring-4 focus-within:ring-upchar-blue/10 sm:h-16 ${
-              errors.identifier ? "border-red-300" : "border-blue-100"
-            }`}
-          >
-            <Mail className="h-6 w-6 shrink-0 text-navy-700" />
-            <input
-              name="identifier"
-              type="text"
-              value={values.identifier}
-              onChange={update}
-              placeholder="Enter your email or phone number"
-              className="h-full min-w-0 flex-1 border-0 bg-transparent px-4 text-base font-semibold text-navy-900 outline-none placeholder:text-navy-500 sm:text-lg"
-            />
-          </div>
-          {errors.identifier && <p className="mt-1 text-sm font-semibold text-red-600">{errors.identifier}</p>}
-        </label>
-
-        <label>
-          <span className="mb-2 block text-base font-black text-navy-950 sm:text-lg">Password</span>
-          <PasswordInput
-            id="signin-password"
-            name="password"
-            value={values.password}
-            onChange={update}
-            placeholder="Enter your password"
-            error={errors.password}
-          />
-        </label>
+    <form onSubmit={submit} noValidate className="auth-card auth-card-signin">
+      <div className="grid gap-7 md:gap-10">
+        <PhoneField value={values.phone} onChange={update} error={errors.phone} />
+        {!resetMode ? (
+          <>
+            <PasswordField value={values.password} onChange={update} error={errors.password} />
+            <button type="button" onClick={sendReset} className="justify-self-end text-base font-black text-upchar-green md:text-lg">
+              Forgot Password?
+            </button>
+          </>
+        ) : (
+          <>
+            <OtpBoxes value={values.resetOtp} onChange={(resetOtp) => setValues((current) => ({ ...current, resetOtp }))} error={errors.resetOtp} />
+            <p className="text-center text-sm font-bold text-navy-500">
+              Didn't receive OTP?{" "}
+              <button type="button" onClick={sendReset} disabled={!resetOtpSent || cooldown > 0 || submitting} className="font-black text-upchar-green disabled:text-navy-400">
+                Resend OTP ({`00:${String(cooldown || 30).padStart(2, "0")}`})
+              </button>
+            </p>
+            <PasswordField label="New Password" name="newPassword" value={values.newPassword} onChange={update} error={errors.newPassword} placeholder="Set new password" />
+          </>
+        )}
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <label className="inline-flex items-center gap-3 text-base font-black text-navy-950">
-          <span className="relative flex h-7 w-7 items-center justify-center rounded border-2 border-upchar-green text-upchar-green">
-            <input name="remember" type="checkbox" checked={values.remember} onChange={update} className="peer sr-only" />
-            {values.remember && <Check className="h-5 w-5" />}
-          </span>
-          Remember me
-        </label>
-        <button type="button" className="text-left text-base font-black text-upchar-blue sm:text-right">
-          Forgot Password?
+      {apiError ? <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{apiError}</p> : null}
+
+      {resetMode ? (
+        <button type="button" onClick={savePassword} disabled={submitting} className="auth-primary-btn mt-8">
+          {submitting ? "Saving..." : "Save New Password"}
         </button>
-      </div>
-
-      {apiError && <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{apiError}</p>}
-
-      <button
-        type="submit"
-        disabled={submitting}
-        className="mt-7 flex h-14 w-full items-center justify-center rounded-lg bg-upchar-green text-xl font-black text-white shadow-lg shadow-green-900/15 transition hover:bg-upchar-greenDark disabled:cursor-not-allowed disabled:opacity-70 sm:h-16"
-      >
-        {submitting ? "Signing In..." : "Sign In"}
+      ) : (
+        <button type="submit" disabled={submitting} className="auth-primary-btn mt-8 md:mt-12">
+          {submitting ? "Signing In..." : "Sign In"}
+        </button>
+      )}
+      <Divider />
+      <button type="button" onClick={() => onModeChange("signup")} className="auth-outline-btn">
+        Sign Up
       </button>
-
-      <div className="my-8 flex items-center gap-5 text-base font-bold text-navy-500">
-        <span className="h-px flex-1 bg-blue-100" />
-        or continue with
-        <span className="h-px flex-1 bg-blue-100" />
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <SocialLoginButton type="google" />
-        <SocialLoginButton type="phone" />
-      </div>
-
-      <p className="mt-8 text-center text-lg font-semibold text-navy-600">
-        Don't have an account?{" "}
-        <button type="button" className="font-black text-upchar-blue" onClick={() => onModeChange("signup")}>
-          Sign Up
-        </button>
-      </p>
     </form>
   );
 }

@@ -87,6 +87,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin" element={adminRoute(<AdminDashboardPage />)} />
+        <Route path="/admin/dashboard" element={adminRoute(<AdminDashboardPage />)} />
         <Route path="/admin/activity-logs" element={adminRoute(<AdminActivityLogsPage />)} />
         <Route path="/admin/assign-sample-collector" element={adminRoute(<AdminAssignSampleCollectorPage />)} />
         <Route path="/admin/backup-management" element={adminRoute(<AdminBackupManagementPage />)} />

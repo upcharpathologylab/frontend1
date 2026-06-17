@@ -303,7 +303,48 @@ export async function importGoogleReviews(googlePlaceId) {
 
 export async function loginUser(values) {
   const response = await api.post("/auth/login", {
-    identifier: values.identifier,
+    identifier: values.identifier || values.phone,
+    password: values.password
+  });
+
+  return response.data?.data || response.data;
+}
+
+export async function sendSignupOTP(values) {
+  const response = await api.post("/auth/signup/send-otp", { phone: values.phone });
+  return response.data?.data || response.data;
+}
+
+export async function verifySignupOTP(values) {
+  const response = await api.post("/auth/signup/verify-otp", { phone: values.phone, otp: values.otp });
+  return response.data?.data || response.data;
+}
+
+export async function registerUserWithOTP(values) {
+  const response = await api.post("/auth/signup/register", {
+    fullName: values.fullName,
+    phone: values.phone,
+    password: values.password,
+    otp: values.otp
+  });
+
+  return response.data?.data || response.data;
+}
+
+export async function sendResetOTP(values) {
+  const response = await api.post("/auth/reset/send-otp", { phone: values.phone });
+  return response.data?.data || response.data;
+}
+
+export async function verifyResetOTP(values) {
+  const response = await api.post("/auth/reset/verify-otp", { phone: values.phone, otp: values.otp });
+  return response.data?.data || response.data;
+}
+
+export async function resetPasswordWithOTP(values) {
+  const response = await api.post("/auth/reset/password", {
+    phone: values.phone,
+    otp: values.otp,
     password: values.password
   });
 

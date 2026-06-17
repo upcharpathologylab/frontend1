@@ -21,6 +21,7 @@ export function isSuperAdminUser(user) {
 }
 
 const routePageMap = [
+  ["/admin/dashboard", "Dashboard"],
   ["/admin/bookings", "Bookings"],
   ["/admin/booking-status", "Bookings"],
   ["/admin/assign-sample-collector", "Bookings"],
