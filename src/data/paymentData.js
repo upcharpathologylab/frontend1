@@ -1,21 +1,9 @@
 export const paymentMethods = [
   {
-    id: "card",
-    label: "Cards",
-    subtitle: "Debit / Credit Card",
-    icon: "CreditCard"
-  },
-  {
-    id: "upi",
-    label: "UPI",
-    subtitle: "Pay using any UPI app",
-    icon: "Send"
-  },
-  {
-    id: "netbanking",
-    label: "Net Banking",
-    subtitle: "All major banks",
-    icon: "Landmark"
+    id: "qr",
+    label: "QR Payment",
+    subtitle: "Scan and pay securely",
+    icon: "Smartphone"
   },
   {
     id: "cod",
