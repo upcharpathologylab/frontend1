@@ -96,15 +96,8 @@ function BookingMapSection({ data, content, modal = false, tests = [], packages 
   };
 
   const validate = () => {
-    const nextErrors = {};
-
-    if (!values.fullName.trim()) nextErrors.fullName = "Full name is required.";
-    if (!/^[6-9]\d{9}$/.test(values.mobile.trim())) nextErrors.mobile = "Enter a valid 10-digit mobile number.";
-    if (!selectedItems.length) nextErrors.selectedTestOrPackage = "Select a test or package.";
-    if (!values.prescriptionFile) nextErrors.prescriptionFile = "Upload a JPG, PNG or PDF prescription.";
-
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
+    setErrors({});
+    return true;
   };
 
   const saveBookingAndOpenWhatsApp = async () => {
