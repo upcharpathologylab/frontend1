@@ -15,7 +15,7 @@ const API_BASE_URL = configuredApiUrl
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 6000
+  timeout: 20000
 });
 
 export function assetUrl(value) {
