@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
-import { createBookingLead, getUserAddresses, getUserProfile } from "../api/api.js";
+import { createBookingLead, createRazorpayOrder, getUserAddresses, getUserProfile, verifyRazorpayPayment } from "../api/api.js";
 import CardPaymentForm from "../components/payment/CardPaymentForm.jsx";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
@@ -19,6 +19,55 @@ import {
   saveBookingData,
   saveCheckoutData
 } from "../utils/checkout.js";
+
+const RAZORPAY_CHECKOUT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
+
+function loadRazorpayCheckout() {
+  if (typeof window === "undefined") return Promise.reject(new Error("Razorpay checkout can only run in the browser."));
+  if (window.Razorpay) return Promise.resolve(true);
+
+  return new Promise((resolve, reject) => {
+    const existingScript = document.querySelector(`script[src="${RAZORPAY_CHECKOUT_SRC}"]`);
+
+    if (existingScript) {
+      existingScript.addEventListener("load", () => resolve(true), { once: true });
+      existingScript.addEventListener("error", () => reject(new Error("Unable to load Razorpay Checkout.")), { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = RAZORPAY_CHECKOUT_SRC;
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => reject(new Error("Unable to load Razorpay Checkout."));
+    document.body.appendChild(script);
+  });
+}
+
+function openRazorpayCheckout(options) {
+  return new Promise((resolve, reject) => {
+    const razorpay = new window.Razorpay({
+      ...options,
+      handler: resolve,
+      modal: {
+        ondismiss: () => {
+          const error = new Error("Payment cancelled. You can try again when ready.");
+          error.cancelled = true;
+          reject(error);
+        }
+      }
+    });
+
+    razorpay.on("payment.failed", (response) => {
+      const error = new Error(response?.error?.description || "Razorpay payment failed.");
+      error.failed = true;
+      error.razorpayResponse = response;
+      reject(error);
+    });
+
+    razorpay.open();
+  });
+}
 
 function getPaymentErrorMessage(error) {
   const errors = error?.response?.data?.errors;
@@ -69,7 +118,7 @@ const addressText = (address = {}) =>
 
 function PaymentPage() {
   const navigate = useNavigate();
-  const [selectedMethod, setSelectedMethod] = useState("qr");
+  const [selectedMethod, setSelectedMethod] = useState("razorpay");
   const [loading, setLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
   const [checkoutData, setCheckoutData] = useState({ items: [], summary: null });
@@ -141,41 +190,81 @@ function PaymentPage() {
         totalPayable: checkoutData.summary.totalPayable
       };
 
-      if (selectedMethod === "qr") {
-        const response = await createBookingLead({
-          ...bookingPayload,
-          paymentMethod: "QR Payment",
-          paymentStatus: "Payment Pending Verification",
-          bookingStatus: "Pending Confirmation",
-          source: "qr-payment-checkout"
+      if (selectedMethod === "razorpay") {
+        const order = await createRazorpayOrder({
+          currency: "INR",
+          receipt: `upchar_${Date.now()}`,
+          notes: {
+            itemCount: checkoutData.summary.itemCount,
+            paymentMode: "Razorpay Online Payment",
+            source: "checkout-page"
+          },
+          bookingData: {
+            ...bookingPayload,
+            paymentMethod: "Razorpay Online Payment",
+            source: "razorpay-checkout"
+          }
+        });
+
+        await loadRazorpayCheckout();
+
+        const paymentResponse = await openRazorpayCheckout({
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || order.key_id || order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          name: "Upchar Pathology",
+          description: "Lab test booking payment",
+          order_id: order.order_id || order.orderId,
+          prefill: {
+            name: bookingCustomer.name,
+            email: bookingCustomer.email,
+            contact: bookingCustomer.phone.replace(/\D/g, "")
+          },
+          notes: {
+            receipt: order.receipt,
+            paymentMode: "Razorpay Online Payment"
+          },
+          theme: {
+            color: "#099447"
+          }
+        });
+
+        const verification = await verifyRazorpayPayment({
+          razorpay_order_id: paymentResponse.razorpay_order_id,
+          razorpay_payment_id: paymentResponse.razorpay_payment_id,
+          razorpay_signature: paymentResponse.razorpay_signature,
+          paymentMethod: "Razorpay Online Payment",
+          bookingData: {
+            ...bookingPayload,
+            paymentMethod: "Razorpay Online Payment",
+            source: "razorpay-checkout"
+          }
         });
 
         const booking = createBookingData({
           items: checkoutData.items,
           summary: checkoutData.summary,
-          status: "pending",
-          paymentMode: "QR Payment",
-          paymentId: "QR_PENDING",
-          bookingId: response.data?.bookingId,
-          bookingStatus: "Pending Confirmation",
+          status: "paid",
+          paymentMode: "Razorpay Online Payment",
+          paymentId: verification.paymentId,
+          razorpayOrderId: verification.orderId,
+          bookingId: verification.booking?.bookingId,
+          bookingStatus: "Confirmed",
           customer: bookingCustomer
         });
 
-        saveBookingData({
-          ...booking,
-          paymentStatus: "Payment Pending Verification"
-        });
+        saveBookingData(booking);
         navigate("/booking-confirmation");
         return;
       }
 
       const response = await createBookingLead({
-        ...bookingPayload,
-        paymentMethod: "Cash on Delivery",
-        paymentStatus: "COD",
-        bookingStatus: "Confirmed",
-        source: "cash-on-delivery-checkout"
-      });
+          ...bookingPayload,
+          paymentMethod: "Cash on Delivery",
+          paymentStatus: "COD",
+          bookingStatus: "Confirmed",
+          source: "cash-on-delivery-checkout"
+        });
 
       const booking = {
         ...createBookingData({
