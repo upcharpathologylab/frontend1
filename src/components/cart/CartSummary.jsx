@@ -48,7 +48,7 @@ function CartSummary({ summary, onCheckout }) {
         className="mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-md bg-upchar-green text-sm font-black text-white shadow-lg shadow-green-900/15 transition hover:bg-upchar-greenDark"
       >
         <ShoppingCart className="h-5 w-5" />
-        Proceed to Checkout
+        Proceed to Payment
       </button>
       <p className="my-3 text-center text-sm font-bold text-navy-500">or</p>
       <Link
