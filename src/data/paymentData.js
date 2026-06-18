@@ -1,7 +1,7 @@
 export const paymentMethods = [
   {
     id: "razorpay",
-    label: "Razorpay Online Payment",
+    label: "Online Payment",
     subtitle: "UPI QR, UPI, card and netbanking",
     icon: "Smartphone"
   },

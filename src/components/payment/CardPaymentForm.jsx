@@ -1,4 +1,4 @@
-import { BadgeCheck, LockKeyhole, Smartphone } from "lucide-react";
+import { BadgeCheck, LockKeyhole, QrCode } from "lucide-react";
 import { paymentMethods } from "../../data/paymentData.js";
 import { price } from "../../utils.js";
 
@@ -21,12 +21,15 @@ function RazorpayPaymentFields({ amount, loading }) {
       <div className="mt-7 rounded-lg border border-blue-100 bg-blue-50/50 p-5">
         <div className="flex items-center gap-4">
           <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-white text-upchar-green">
-            <Smartphone className="h-8 w-8" />
+            <QrCode className="h-8 w-8" />
           </span>
           <div>
-            <p className="text-base font-black text-navy-900">Pay securely with Razorpay</p>
+            <p className="text-base font-black text-navy-900">Pay securely with Scanner</p>
             <p className="mt-1 text-sm font-semibold leading-6 text-navy-700">
-              Use UPI QR, UPI ID, card, netbanking, or other enabled Razorpay methods in the checkout window.
+              Open any UPI app and scan the QR code.
+            </p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-navy-700">
+              Complete the payment in the app.
             </p>
           </div>
         </div>
@@ -38,7 +41,7 @@ function RazorpayPaymentFields({ amount, loading }) {
           </span>
           <div>
             <p className="font-black text-upchar-green">Booking is confirmed only after payment verification.</p>
-            <p className="mt-1 text-sm font-semibold text-navy-700">Razorpay signature verification happens on our server.</p>
+            <p className="mt-1 text-sm font-semibold text-navy-700">Payment verification happens on our server.</p>
           </div>
         </div>
       </div>
@@ -77,10 +80,10 @@ function CardPaymentForm({ selectedMethod, amount, loading, onPay }) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-black text-navy-900">
-            {selectedMethod === "razorpay" ? "Pay using Razorpay" : `Pay using ${method.label}`}
+            {selectedMethod === "razorpay" ? "Pay using Scanner" : `Pay using ${method.label}`}
           </h2>
           <p className="mt-3 text-sm font-semibold text-navy-600">
-            {method.subtitle}
+            {selectedMethod === "razorpay" ? "Scan QR code using any UPI app to pay securely" : method.subtitle}
           </p>
         </div>
       </div>
