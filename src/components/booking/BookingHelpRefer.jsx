@@ -3,7 +3,7 @@ import { cartOfferAssets } from "../../data/cartData.js";
 
 function BookingHelpRefer() {
   return (
-    <section className="mt-8 grid overflow-hidden rounded-lg border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-green-50 shadow-sm lg:grid-cols-[1.2fr_0.9fr_1fr]">
+    <section className="mt-8 grid overflow-hidden rounded-lg border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-green-50 shadow-sm lg:grid-cols-[1.2fr_0.9fr]">
       <div className="grid gap-5 p-6 sm:grid-cols-[130px_1fr] sm:items-center">
         <img src={cartOfferAssets.doctor} alt="Doctor support specialist" className="h-32 w-32 rounded-lg object-cover object-top" />
         <div>
@@ -38,21 +38,6 @@ function BookingHelpRefer() {
         </div>
       </div>
 
-      <div className="grid gap-5 p-6 sm:grid-cols-[1fr_130px] sm:items-center">
-        <div>
-          <h2 className="text-2xl font-black text-navy-900">Refer & Earn</h2>
-          <p className="mt-2 text-sm font-semibold leading-6 text-navy-700">
-            Refer your friends & family and earn exciting rewards.
-          </p>
-          <button
-            type="button"
-            className="mt-4 inline-flex rounded-md border border-blue-100 bg-white px-6 py-2.5 text-sm font-black text-upchar-blue transition hover:bg-blue-50"
-          >
-            Refer Now
-          </button>
-        </div>
-        <img src={cartOfferAssets.gift} alt="Referral reward gift" className="mx-auto h-32 w-32 object-contain" />
-      </div>
     </section>
   );
 }
