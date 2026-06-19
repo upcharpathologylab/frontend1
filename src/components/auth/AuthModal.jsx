@@ -29,7 +29,7 @@ function AuthModal({ isOpen, mode, onModeChange, onClose, onSuccess, onSignupSuc
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className={`fixed inset-0 z-[100] flex items-center justify-center bg-navy-950/60 backdrop-blur-sm ${mode === "signup" ? "p-2 sm:p-3" : "p-4"}`}
+          className={`fixed inset-0 z-[100] flex items-center justify-center bg-navy-950/60 backdrop-blur-sm ${mode === "signup" ? "p-2 sm:p-3" : "p-2 sm:p-4"}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

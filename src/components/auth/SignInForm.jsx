@@ -14,20 +14,20 @@ const cleanPhone = (value) => String(value || "").replace(/\D/g, "").slice(-10);
 const otpValue = (otp) => otp.join("");
 
 function FieldLabel({ children }) {
-  return <span className="mb-3 block text-base font-black text-navy-950 md:text-xl">{children}</span>;
+  return <span className="mb-1.5 block text-sm font-black text-navy-950 md:mb-3 md:text-xl">{children}</span>;
 }
 
 function PhoneField({ value, onChange, error }) {
   return (
     <label>
       <FieldLabel>Phone Number</FieldLabel>
-      <div className={`flex h-14 overflow-hidden rounded-lg border bg-white md:h-[74px] ${error ? "border-red-300" : "border-blue-100"}`}>
-        <div className="flex w-24 items-center justify-center gap-2 border-r border-blue-100 text-base font-black text-navy-950 md:w-36 md:text-xl">
-          +91 <ChevronDown className="h-5 w-5" />
+      <div className={`flex h-11 overflow-hidden rounded-lg border bg-white md:h-[74px] ${error ? "border-red-300" : "border-blue-100"}`}>
+        <div className="flex w-20 items-center justify-center gap-1.5 border-r border-blue-100 text-sm font-black text-navy-950 md:w-36 md:gap-2 md:text-xl">
+          +91 <ChevronDown className="h-4 w-4 md:h-5 md:w-5" />
         </div>
         <input name="phone" value={value} onChange={onChange} inputMode="numeric" placeholder="Enter your phone number" className="min-w-0 flex-1 px-4 text-sm font-bold text-navy-900 outline-none placeholder:text-navy-500 md:px-7 md:text-xl" />
-        <div className="grid w-14 place-items-center text-navy-700 md:w-20">
-          <Phone className="h-6 w-6 md:h-8 md:w-8" />
+        <div className="grid w-11 place-items-center text-navy-700 md:w-20">
+          <Phone className="h-5 w-5 md:h-8 md:w-8" />
         </div>
       </div>
       {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : null}
@@ -41,10 +41,10 @@ function PasswordField({ label = "Password", name = "password", value, onChange,
     <label>
       <FieldLabel>{label}</FieldLabel>
       <div className={`auth-field ${error ? "border-red-300" : "border-blue-100"}`}>
-        <LockKeyhole className="h-6 w-6 shrink-0 text-navy-950 md:h-8 md:w-8" />
+        <LockKeyhole className="h-5 w-5 shrink-0 text-navy-950 md:h-8 md:w-8" />
         <input name={name} type={visible ? "text" : "password"} value={value} onChange={onChange} placeholder={placeholder} className="auth-input" />
-        <button type="button" onClick={() => setVisible((current) => !current)} className="grid h-10 w-10 place-items-center text-navy-950" aria-label="Toggle password">
-          {visible ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+        <button type="button" onClick={() => setVisible((current) => !current)} className="grid h-9 w-9 place-items-center text-navy-950 md:h-10 md:w-10" aria-label="Toggle password">
+          {visible ? <EyeOff className="h-5 w-5 md:h-6 md:w-6" /> : <Eye className="h-5 w-5 md:h-6 md:w-6" />}
         </button>
       </div>
       {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : null}
@@ -77,7 +77,7 @@ function OtpBoxes({ value, onChange, error }) {
             inputMode="numeric"
             maxLength={1}
             placeholder="-"
-            className="h-14 rounded-lg border border-blue-100 bg-white text-center text-lg font-black text-navy-950 outline-none focus:border-upchar-green focus:ring-4 focus:ring-upchar-green/10"
+            className="h-10 rounded-lg border border-blue-100 bg-white text-center text-base font-black text-navy-950 outline-none focus:border-upchar-green focus:ring-4 focus:ring-upchar-green/10 md:h-14 md:text-lg"
           />
         ))}
       </div>
@@ -88,7 +88,7 @@ function OtpBoxes({ value, onChange, error }) {
 
 function Divider() {
   return (
-    <div className="my-7 flex items-center gap-5 text-sm font-black text-navy-950 md:my-10">
+    <div className="my-4 flex items-center gap-4 text-sm font-black text-navy-950 md:my-10 md:gap-5">
       <span className="h-px flex-1 bg-blue-100" />
       OR
       <span className="h-px flex-1 bg-blue-100" />
@@ -190,12 +190,12 @@ function SignInForm({ onModeChange, onSuccess }) {
 
   return (
     <form onSubmit={submit} noValidate className="auth-card auth-card-signin">
-      <div className="grid gap-7 md:gap-10">
+      <div className="grid gap-4 md:gap-10">
         <PhoneField value={values.phone} onChange={update} error={errors.phone} />
         {!resetMode ? (
           <>
             <PasswordField value={values.password} onChange={update} error={errors.password} />
-            <button type="button" onClick={sendReset} className="justify-self-end text-base font-black text-upchar-green md:text-lg">
+            <button type="button" onClick={sendReset} className="justify-self-end text-sm font-black text-upchar-green md:text-lg">
               Forgot Password?
             </button>
           </>
@@ -216,11 +216,11 @@ function SignInForm({ onModeChange, onSuccess }) {
       {apiError ? <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{apiError}</p> : null}
 
       {resetMode ? (
-        <button type="button" onClick={savePassword} disabled={submitting} className="auth-primary-btn mt-8">
+        <button type="button" onClick={savePassword} disabled={submitting} className="auth-primary-btn mt-5 md:mt-8">
           {submitting ? "Saving..." : "Save New Password"}
         </button>
       ) : (
-        <button type="submit" disabled={submitting} className="auth-primary-btn mt-8 md:mt-12">
+        <button type="submit" disabled={submitting} className="auth-primary-btn mt-5 md:mt-12">
           {submitting ? "Signing In..." : "Sign In"}
         </button>
       )}

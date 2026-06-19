@@ -51,11 +51,11 @@
   }
 
   .auth-card {
-    @apply w-full bg-white px-5 py-8 text-navy-950 sm:px-8 md:px-9 md:py-14;
+    @apply w-full bg-white px-4 py-5 text-navy-950 sm:px-8 md:px-9 md:py-14;
   }
 
   .auth-card-signin {
-    @apply md:px-16 md:py-24;
+    @apply py-5 md:px-16 md:py-24;
   }
 
   .auth-card-signup {
@@ -63,7 +63,7 @@
   }
 
   .auth-field {
-    @apply flex h-14 items-center rounded-lg border bg-white px-4 transition focus-within:border-upchar-blue focus-within:ring-4 focus-within:ring-upchar-blue/10 md:h-[74px] md:px-7;
+    @apply flex h-11 items-center rounded-lg border bg-white px-3 transition focus-within:border-upchar-blue focus-within:ring-4 focus-within:ring-upchar-blue/10 md:h-[74px] md:px-7;
   }
 
   .auth-card-signup .auth-field {
@@ -71,7 +71,7 @@
   }
 
   .auth-input {
-    @apply h-full min-w-0 flex-1 border-0 bg-transparent px-4 text-sm font-bold text-navy-900 outline-none placeholder:text-navy-500 md:px-7 md:text-xl;
+    @apply h-full min-w-0 flex-1 border-0 bg-transparent px-3 text-sm font-bold text-navy-900 outline-none placeholder:text-navy-500 md:px-7 md:text-xl;
   }
 
   .auth-card-signup .auth-input {
@@ -79,7 +79,7 @@
   }
 
   .auth-primary-btn {
-    @apply flex h-14 w-full items-center justify-center rounded-lg bg-upchar-green text-lg font-black text-white shadow-lg shadow-green-900/15 transition hover:bg-upchar-greenDark disabled:cursor-not-allowed disabled:opacity-70 md:h-[74px] md:text-2xl;
+    @apply flex h-11 w-full items-center justify-center rounded-lg bg-upchar-green text-base font-black text-white shadow-lg shadow-green-900/15 transition hover:bg-upchar-greenDark disabled:cursor-not-allowed disabled:opacity-70 md:h-[74px] md:text-2xl;
   }
 
   .auth-card-signup .auth-primary-btn {
@@ -87,7 +87,7 @@
   }
 
   .auth-outline-btn {
-    @apply flex h-14 w-full items-center justify-center rounded-lg border border-upchar-green bg-white text-base font-black text-upchar-green transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-60 md:h-[74px] md:text-xl;
+    @apply flex h-11 w-full items-center justify-center rounded-lg border border-upchar-green bg-white text-sm font-black text-upchar-green transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-60 md:h-[74px] md:text-xl;
   }
 
   .auth-card-signup .auth-outline-btn {
