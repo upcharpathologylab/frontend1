@@ -95,12 +95,7 @@ export const sidebarItems = [
   { id: "bookings", label: "My Bookings", subtitle: "View booking history", icon: "ClipboardList" },
   { id: "reports", label: "Reports", subtitle: "View your reports", icon: "FileText" },
   { id: "appointments", label: "Appointments", subtitle: "Upcoming appointments", icon: "CalendarDays" },
-  { id: "saved", label: "Saved Packages", subtitle: "Your saved packages", icon: "Heart" },
-  { id: "payments", label: "Payment Methods", subtitle: "Saved cards & UPI", icon: "CreditCard" },
-  { id: "offers", label: "Offers & Coupons", subtitle: "View offers & coupons", icon: "BadgePercent" },
-  { id: "notifications", label: "Notification Settings", subtitle: "Manage notifications", icon: "Bell" },
-  { id: "settings", label: "Account Settings", subtitle: "Change password", icon: "Settings" },
-  { id: "help", label: "Help & Support", subtitle: "Get help", icon: "Headphones" }
+  { id: "settings", label: "Account Settings", subtitle: "Change password", icon: "Settings" }
 ];
 
 export const accountSidebarItems = [
@@ -111,11 +106,7 @@ export const accountSidebarItems = [
   { id: "bookings", href: "/my-account/bookings", label: "My Bookings", subtitle: "View booking history", icon: "ClipboardList" },
   { id: "reports", href: "/my-account/reports", label: "Reports", subtitle: "View your reports", icon: "FileText" },
   { id: "appointments", href: "/my-account/appointments", label: "Appointments", subtitle: "Upcoming appointments", icon: "CalendarDays" },
-  { id: "saved", href: "/my-account/saved-packages", label: "Saved Packages", subtitle: "Your saved packages", icon: "Heart" },
-  { id: "offers", href: "/my-account/offers-coupons", label: "Offers & Coupons", subtitle: "View offers & coupons", icon: "BadgePercent" },
-  { id: "notifications", href: "/my-account", label: "Notification Settings", subtitle: "Manage notifications", icon: "Bell" },
-  { id: "settings", href: "/my-account/account-settings", label: "Account Settings", subtitle: "Change password", icon: "Settings" },
-  { id: "help", href: "/my-account/help-support", label: "Help & Support", subtitle: "Get help", icon: "Headphones" }
+  { id: "settings", href: "/my-account/account-settings", label: "Account Settings", subtitle: "Change password", icon: "Settings" }
 ];
 
 export const quickActions = [

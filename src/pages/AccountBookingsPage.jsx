@@ -6,7 +6,6 @@ import AccountToast from "../components/account/AccountToast.jsx";
 import { AccountEmptyState, AccountLoadingState, AccountSyncNotice } from "../components/account/AccountState.jsx";
 import BookingCard from "../components/account/bookings/BookingCard.jsx";
 import ConfirmDeleteModal from "../components/account/ConfirmDeleteModal.jsx";
-import HeroIllustration from "../components/account/HeroIllustration.jsx";
 import QuickActions from "../components/account/QuickActions.jsx";
 import SummaryCard from "../components/account/SummaryCard.jsx";
 import TabFilterBar from "../components/account/TabFilterBar.jsx";
@@ -120,7 +119,6 @@ function AccountBookingsPage() {
       breadcrumbCurrent="My Bookings"
       title="My Bookings"
       subtitle="View and manage all your test bookings"
-      actions={<HeroIllustration type="bookings" />}
     >
       <div className="grid gap-6 xl:grid-cols-[280px_1fr]">
         <UserProfileCard profile={profile} />
