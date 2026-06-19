@@ -82,6 +82,7 @@ const formatProfileSummary = (summary = {}) => ({
 });
 
 const prescriptionTypes = new Set(["image/jpeg", "image/png", "application/pdf"]);
+const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
 
 function UploadPrescriptionModal({ file, onClose, onFileChange, onSend, previewUrl, profile, sending }) {
   const isImage = file && file.type !== "application/pdf";
@@ -155,7 +156,6 @@ function MyAccountPage() {
   const [imageUploading, setImageUploading] = useState(false);
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [cartItems, setCartItems] = useState(() => getCartItems());
-  const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
   const tab = searchParams.get("tab");
   const section = searchParams.get("section") || "profile";
   const activeSection = section === "saved-packages" ? "saved" : section;
@@ -213,8 +213,7 @@ function MyAccountPage() {
     }
 
     setPrescriptionModalOpen(true);
-    setSearchParams({ section: "profile" }, { replace: true });
-  }, [navigate, section, setSearchParams, tab, uploadPrescriptionPath]);
+  }, [navigate, section, tab]);
 
   const showToast = (message) => {
     setToast(message);
@@ -313,6 +312,9 @@ function MyAccountPage() {
     setPrescriptionFile(null);
     if (prescriptionPreviewUrl) URL.revokeObjectURL(prescriptionPreviewUrl);
     setPrescriptionPreviewUrl("");
+    if (tab === "upload-prescription" || tab === "prescription" || section === "prescription") {
+      setSearchParams({ section: "profile" }, { replace: true });
+    }
   };
 
   const handlePrescriptionSend = async () => {
