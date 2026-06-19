@@ -25,7 +25,9 @@ function PaymentMethodTabs({ methods, selectedMethod, onSelect }) {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-base font-black text-navy-900">{method.label}</span>
-                <span className="mt-1 block text-sm font-semibold text-navy-600">{method.subtitle}</span>
+                {method.id !== "razorpay" && method.subtitle ? (
+                  <span className="mt-1 block text-sm font-semibold text-navy-600">{method.subtitle}</span>
+                ) : null}
               </span>
               <ChevronRight className={`h-5 w-5 ${active ? "text-upchar-green" : "text-navy-400 group-hover:text-upchar-blue"}`} />
             </button>
