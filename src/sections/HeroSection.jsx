@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, BadgePercent, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import AuthModal from "../components/auth/AuthModal.jsx";
 import { getStoredUser } from "../components/auth/authStorage.js";
@@ -10,9 +11,11 @@ import BookingMapSection from "./BookingMapSection.jsx";
 
 function HeroSection({ data, loading, tests, packages }) {
   const { hero } = data;
+  const navigate = useNavigate();
   const [bookingOpen, setBookingOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signin");
+  const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
 
   useEffect(() => {
     if (!bookingOpen) return undefined;
@@ -36,6 +39,15 @@ function HeroSection({ data, loading, tests, packages }) {
   const handleAuthSuccess = () => {
     setAuthModalOpen(false);
     setBookingOpen(true);
+  };
+
+  const openUploadPrescription = () => {
+    if (getStoredUser()) {
+      navigate(uploadPrescriptionPath);
+      return;
+    }
+
+    navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`);
   };
 
   return (
@@ -74,10 +86,17 @@ function HeroSection({ data, loading, tests, packages }) {
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             {hero.buttons.map((button) => {
               const opensBooking = button.href === "#booking";
-              const ButtonTag = opensBooking ? "button" : "a";
+              const opensPrescription =
+                String(button.label || "").toLowerCase().includes("prescription") ||
+                String(button.href || "").toLowerCase().includes("upload-prescription");
+              const ButtonTag = opensBooking || opensPrescription ? "button" : "a";
               return (
               <ButtonTag
-                {...(opensBooking ? { type: "button", onClick: openBooking } : { href: button.href })}
+                {...(opensBooking
+                  ? { type: "button", onClick: openBooking }
+                  : opensPrescription
+                    ? { type: "button", onClick: openUploadPrescription }
+                    : { href: button.href })}
                 className={
                   button.variant === "primary"
                     ? "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-upchar-green px-6 text-sm font-bold text-white shadow-lg shadow-green-900/20 transition hover:-translate-y-0.5 hover:bg-upchar-greenDark"

@@ -14,6 +14,7 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
   const [added, setAdded] = useState({});
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signin");
+  const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
   const results = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return [];
@@ -29,11 +30,16 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
   const quickLink = (title) => {
     if (title === "Popular Tests") return "#popular-tests";
     if (title === "Health Packages") return "#packages";
-    if (title === "Upload Prescription") {
-      return `https://wa.me/91${whatsappNumber}?text=${encodeURIComponent("Hi, I want to upload my prescription for booking a test.")}`;
-    }
     if (title === "Download Report") return "/my-account/reports";
     return "#booking";
+  };
+
+  const openUploadPrescription = () => {
+    if (getStoredUser()) {
+      navigate(uploadPrescriptionPath);
+      return;
+    }
+    navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`);
   };
 
   const openReports = () => {
@@ -125,7 +131,24 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
 
             <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               {quickCards.map((card, index) => (
-                card.title === "Download Report" ? (
+                card.title === "Upload Prescription" ? (
+                  <button
+                    type="button"
+                    onClick={openUploadPrescription}
+                    className={`group flex h-[50px] items-center justify-center gap-3 px-2 text-base font-bold text-white transition hover:text-upchar-green ${
+                      index ? "xl:border-l xl:border-white/25" : ""
+                    }`}
+                    key={card.title}
+                  >
+                    <Icon
+                      name={card.icon}
+                      className={`h-8 w-8 ${
+                        card.color === "red" ? "text-upchar-red" : card.color === "blue" ? "text-upchar-blue" : "text-upchar-green"
+                      }`}
+                    />
+                    <span>{card.title}</span>
+                  </button>
+                ) : card.title === "Download Report" ? (
                   <button
                     type="button"
                     onClick={openReports}

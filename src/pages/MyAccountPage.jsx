@@ -155,6 +155,8 @@ function MyAccountPage() {
   const [imageUploading, setImageUploading] = useState(false);
   const [imageUploadProgress, setImageUploadProgress] = useState(0);
   const [cartItems, setCartItems] = useState(() => getCartItems());
+  const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
+  const tab = searchParams.get("tab");
   const section = searchParams.get("section") || "profile";
   const activeSection = section === "saved-packages" ? "saved" : section;
 
@@ -200,6 +202,19 @@ function MyAccountPage() {
       window.removeEventListener("storage", refreshCart);
     };
   }, []);
+
+  useEffect(() => {
+    const wantsUploadPrescription = tab === "upload-prescription" || tab === "prescription" || section === "prescription";
+    if (!wantsUploadPrescription) return;
+
+    if (!getStoredUser()) {
+      navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`, { replace: true });
+      return;
+    }
+
+    setPrescriptionModalOpen(true);
+    setSearchParams({ section: "profile" }, { replace: true });
+  }, [navigate, section, setSearchParams, tab, uploadPrescriptionPath]);
 
   const showToast = (message) => {
     setToast(message);
