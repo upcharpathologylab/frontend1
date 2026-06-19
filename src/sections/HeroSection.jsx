@@ -85,17 +85,17 @@ function HeroSection({ data, loading, tests, packages }) {
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             {hero.buttons.map((button) => {
-              const opensBooking = button.href === "#booking";
               const opensPrescription =
                 String(button.label || "").toLowerCase().includes("prescription") ||
                 String(button.href || "").toLowerCase().includes("upload-prescription");
+              const opensBooking = !opensPrescription && button.href === "#booking";
               const ButtonTag = opensBooking || opensPrescription ? "button" : "a";
               return (
               <ButtonTag
-                {...(opensBooking
-                  ? { type: "button", onClick: openBooking }
-                  : opensPrescription
+                {...(opensPrescription
                     ? { type: "button", onClick: openUploadPrescription }
+                    : opensBooking
+                      ? { type: "button", onClick: openBooking }
                     : { href: button.href })}
                 className={
                   button.variant === "primary"
