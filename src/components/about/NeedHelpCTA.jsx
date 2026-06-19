@@ -1,6 +1,35 @@
+import { useEffect, useState } from "react";
 import { Headphones, MessageCircle, Phone } from "lucide-react";
+import { getHomeData, getPageContent } from "../../api/api.js";
+import { fallbackHomeData } from "../../data/homeData.js";
+import { resolveContactInfo } from "../../utils/contactInfo.js";
 
 function NeedHelpCTA() {
+  const [contactContent, setContactContent] = useState(null);
+  const [siteSettings, setSiteSettings] = useState(() => fallbackHomeData.siteSettings || {});
+  const whatsappHref = resolveContactInfo(contactContent, siteSettings).whatsappHref;
+
+  useEffect(() => {
+    let mounted = true;
+
+    getHomeData()
+      .then((homeData) => {
+        if (mounted && homeData?.siteSettings) setSiteSettings({ ...(fallbackHomeData.siteSettings || {}), ...homeData.siteSettings });
+      })
+      .catch(() => {});
+
+    getPageContent("contact-us")
+      .then((page) => {
+        const section = (page?.sections || []).find((item) => item.sectionKey === "contact-info") || null;
+        if (mounted) setContactContent(section);
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <section className="bg-white pb-12 pt-7 lg:pb-16">
       <div className="container-page">
@@ -25,7 +54,7 @@ function NeedHelpCTA() {
             </span>
           </a>
           <a
-            href="https://wa.me/917838582205"
+            href={whatsappHref}
             className="flex h-16 items-center justify-center gap-4 rounded-lg bg-upchar-green px-8 text-lg font-black text-white shadow-lg shadow-green-900/15 transition hover:bg-upchar-greenDark"
           >
             <MessageCircle className="h-8 w-8" />
