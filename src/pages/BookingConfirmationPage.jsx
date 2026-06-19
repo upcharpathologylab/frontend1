@@ -124,15 +124,28 @@ function BookingConfirmationPage() {
 
   const handleDownloadInvoice = () => {
     if (!booking) return;
-    const blob = new Blob([invoiceHtml(booking)], { type: "text/html;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `invoice-${booking.bookingId}.html`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
+    const frame = document.createElement("iframe");
+    frame.title = `invoice-${booking.bookingId}.pdf`;
+    frame.style.position = "fixed";
+    frame.style.right = "0";
+    frame.style.bottom = "0";
+    frame.style.width = "0";
+    frame.style.height = "0";
+    frame.style.border = "0";
+
+    frame.onload = () => {
+      const printWindow = frame.contentWindow;
+      if (!printWindow) return;
+      printWindow.document.title = `invoice-${booking.bookingId}.pdf`;
+      printWindow.focus();
+      printWindow.print();
+      window.setTimeout(() => frame.remove(), 1000);
+    };
+
+    document.body.appendChild(frame);
+    frame.contentDocument.open();
+    frame.contentDocument.write(invoiceHtml(booking));
+    frame.contentDocument.close();
   };
 
   return (
