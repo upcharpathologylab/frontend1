@@ -13,7 +13,7 @@ import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import { benefitItems, listingHeroes } from "../data/listingData.js";
 import { fallbackHomeData } from "../data/homeData.js";
-import { addCartItem, cartEventName, getCartItems } from "../utils/cart.js";
+import { addCartItem } from "../utils/cart.js";
 import { applyListingHeroContent, getContentSection } from "../utils/contentOverrides.js";
 import { price } from "../utils.js";
 
@@ -52,9 +52,6 @@ const sortTests = (items, sort) => {
 };
 
 const cartKey = (id, type) => `${type}:${id}`;
-
-const getAddedTestKeys = () =>
-  new Set(getCartItems().filter((item) => item.type === "test").map((item) => cartKey(item.id, item.type)));
 
 const normalizeTest = (item, index) => {
   const originalPrice = item.price ?? item.originalPrice ?? item.oldPrice ?? 0;
@@ -99,7 +96,7 @@ function TestsPage() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [content, setContent] = useState(null);
-  const [addedKeys, setAddedKeys] = useState(() => getAddedTestKeys());
+  const [addedKeys, setAddedKeys] = useState(new Set());
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -113,16 +110,6 @@ function TestsPage() {
 
     return () => {
       mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const refreshAdded = () => setAddedKeys(getAddedTestKeys());
-    window.addEventListener(cartEventName, refreshAdded);
-    window.addEventListener("storage", refreshAdded);
-    return () => {
-      window.removeEventListener(cartEventName, refreshAdded);
-      window.removeEventListener("storage", refreshAdded);
     };
   }, []);
 
@@ -204,6 +191,7 @@ function TestsPage() {
   };
 
   const handleAddToCart = (item) => {
+    const key = cartKey(item.id, "test");
     addCartItem({
       id: item.id,
       type: "test",
@@ -216,7 +204,14 @@ function TestsPage() {
       image: item.image,
       color: item.color
     });
-    setAddedKeys(getAddedTestKeys());
+    setAddedKeys((current) => new Set(current).add(key));
+    window.setTimeout(() => {
+      setAddedKeys((current) => {
+        const next = new Set(current);
+        next.delete(key);
+        return next;
+      });
+    }, 1500);
     showToast(`${item.name} added to cart.`);
   };
 

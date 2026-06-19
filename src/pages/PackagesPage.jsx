@@ -12,7 +12,7 @@ import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import { benefitItems, listingHeroes } from "../data/listingData.js";
 import { fallbackHomeData } from "../data/homeData.js";
-import { addCartItem, cartEventName, getCartItems } from "../utils/cart.js";
+import { addCartItem } from "../utils/cart.js";
 import { applyListingHeroContent, getContentSection } from "../utils/contentOverrides.js";
 import { price } from "../utils.js";
 
@@ -63,9 +63,6 @@ const normalizePackage = (item, index) => {
 
 const cartKey = (id, type) => `${type}:${id}`;
 
-const getAddedPackageKeys = () =>
-  new Set(getCartItems().filter((item) => item.type === "package").map((item) => cartKey(item.id, item.type)));
-
 const packageCategoryOptions = (rows) =>
   [...new Set(rows.map((item) => item.category).filter(Boolean))]
     .sort((a, b) => String(a).localeCompare(String(b)))
@@ -83,7 +80,7 @@ function PackagesPage() {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [addedKeys, setAddedKeys] = useState(() => getAddedPackageKeys());
+  const [addedKeys, setAddedKeys] = useState(new Set());
 
   useEffect(() => {
     let mounted = true;
@@ -124,16 +121,6 @@ function PackagesPage() {
     };
   }, []);
 
-  useEffect(() => {
-    const refreshAdded = () => setAddedKeys(getAddedPackageKeys());
-    window.addEventListener(cartEventName, refreshAdded);
-    window.addEventListener("storage", refreshAdded);
-    return () => {
-      window.removeEventListener(cartEventName, refreshAdded);
-      window.removeEventListener("storage", refreshAdded);
-    };
-  }, []);
-
   const filteredItems = useMemo(() => {
     const values = items.filter((item) => {
       const categoryMatch = !appliedFilters.categories.length || appliedFilters.categories.includes(item.category);
@@ -163,6 +150,7 @@ function PackagesPage() {
   };
 
   const handleAddToCart = (item) => {
+    const key = cartKey(item.id, "package");
     addCartItem({
       id: item.id,
       type: "package",
@@ -176,7 +164,14 @@ function PackagesPage() {
       icon: item.icon,
       color: item.color
     });
-    setAddedKeys(getAddedPackageKeys());
+    setAddedKeys((current) => new Set(current).add(key));
+    window.setTimeout(() => {
+      setAddedKeys((current) => {
+        const next = new Set(current);
+        next.delete(key);
+        return next;
+      });
+    }, 1500);
     showToast(`${item.name} added to cart.`);
   };
 
