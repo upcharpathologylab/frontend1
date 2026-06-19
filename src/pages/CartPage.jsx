@@ -6,7 +6,6 @@ import CartOfferBanner from "../components/cart/CartOfferBanner.jsx";
 import CartSummary from "../components/cart/CartSummary.jsx";
 import CartTrustStrip from "../components/cart/CartTrustStrip.jsx";
 import CouponBox from "../components/cart/CouponBox.jsx";
-import PincodeCheck from "../components/cart/PincodeCheck.jsx";
 import RecommendedItems from "../components/cart/RecommendedItems.jsx";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
@@ -199,7 +198,6 @@ function CartPage() {
 
             <aside className="grid gap-5 self-start">
               <CartSummary summary={summary} onCheckout={handleCheckout} />
-              <PincodeCheck />
             </aside>
           </div>
 
