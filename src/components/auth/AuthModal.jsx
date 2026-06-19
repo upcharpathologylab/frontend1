@@ -41,7 +41,7 @@ function AuthModal({ isOpen, mode, onModeChange, onClose, onSuccess, onSignupSuc
             aria-label={mode === "signin" ? "Sign in" : "Sign up"}
             className={`relative w-full rounded-2xl bg-white shadow-2xl ${
               mode === "signin" ? "max-w-[900px]" : "max-w-[680px]"
-            } ${mode === "signup" ? "max-h-[90dvh] overflow-visible" : "max-h-[94vh] overflow-y-auto"}`}
+            } ${mode === "signup" ? "max-h-[90dvh] overflow-visible" : "max-h-[90dvh] overflow-y-auto"}`}
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.97 }}
