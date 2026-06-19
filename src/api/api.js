@@ -158,7 +158,7 @@ export async function getBookingLead(id) {
 }
 
 export async function createContactMessage(values) {
-  const response = await api.post("/contact", {
+  const response = await api.post("/contact/send-message", {
     fullName: values.fullName,
     email: values.email,
     phone: values.phone,
