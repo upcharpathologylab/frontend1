@@ -20,6 +20,10 @@ export const getCartItems = () => {
 
 export const getCartCount = () => getCartItems().reduce((total, item) => total + Number(item.quantity || 1), 0);
 
+export const cartItemKey = (id, type) => `${String(type)}:${String(id)}`;
+
+export const hasCartItem = (id, type) => getCartItems().some((item) => cartItemKey(item.id, item.type) === cartItemKey(id, type));
+
 export const setCartItems = (items) => {
   if (typeof window === "undefined") return 0;
   const safeItems = Array.isArray(items) ? items : [];

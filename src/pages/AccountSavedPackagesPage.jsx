@@ -12,7 +12,7 @@ import { getUserSavedPackages } from "../api/api.js";
 import { clearAuthSession } from "../components/auth/authStorage.js";
 import { quickAccountActions, savedPackages, savedPackageSummaryCards } from "../data/accountPagesData.js";
 import useAccountResource from "../hooks/useAccountResource.js";
-import { addCartItem } from "../utils/cart.js";
+import { addCartItem, hasCartItem } from "../utils/cart.js";
 
 function AccountSavedPackagesPage() {
   const navigate = useNavigate();
@@ -35,6 +35,7 @@ function AccountSavedPackagesPage() {
   };
 
   const bookPackage = (item) => {
+    if (hasCartItem(item.id, "package")) return;
     addCartItem({
       id: item.id,
       name: item.title,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, Clock3, Home } from "lucide-react";
 import AccountToast from "../components/account/AccountToast.jsx";
 import Icon from "../components/Icon.jsx";
@@ -6,16 +6,32 @@ import SectionHeading from "../components/SectionHeading.jsx";
 import SmartImage from "../components/SmartImage.jsx";
 import useAutoCarousel from "../hooks/useAutoCarousel.js";
 import { getColor, price } from "../utils.js";
-import { addCartItem } from "../utils/cart.js";
+import { addCartItem, cartEventName, cartItemKey, getCartItems, hasCartItem } from "../utils/cart.js";
 import { textValue } from "../utils/contentOverrides.js";
+
+const cartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
 
 function SpecialCareSection({ packages, content }) {
   const { sliderRef, scroll, handleScroll, pause, resume } = useAutoCarousel(packages.length);
   const sliderPackages = packages.length > 1 ? [...packages, ...packages] : packages;
-  const [addedKey, setAddedKey] = useState("");
+  const [addedKeys, setAddedKeys] = useState(() => cartKeys());
   const [toast, setToast] = useState("");
 
-  const handleAddToCart = (item, key) => {
+  useEffect(() => {
+    const syncCart = () => setAddedKeys(cartKeys());
+    window.addEventListener(cartEventName, syncCart);
+    window.addEventListener("storage", syncCart);
+    return () => {
+      window.removeEventListener(cartEventName, syncCart);
+      window.removeEventListener("storage", syncCart);
+    };
+  }, []);
+
+  const handleAddToCart = (item) => {
+    if (hasCartItem(item.id, "package")) {
+      setAddedKeys(cartKeys());
+      return;
+    }
     addCartItem({
       id: item.id,
       type: "package",
@@ -29,9 +45,8 @@ function SpecialCareSection({ packages, content }) {
       icon: item.icon,
       color: item.color
     });
-    setAddedKey(key);
+    setAddedKeys(cartKeys());
     setToast("Added to Cart");
-    window.setTimeout(() => setAddedKey(""), 1500);
     window.setTimeout(() => setToast(""), 1800);
   };
 
@@ -65,6 +80,7 @@ function SpecialCareSection({ packages, content }) {
             {sliderPackages.map((item, index) => {
               const style = getColor(item.color);
               const badgeText = item.badge || (item.isPopular ? "Most Booked" : "");
+              const isAdded = addedKeys.has(cartItemKey(item.id, "package"));
               return (
                 <article
                   data-carousel-card
@@ -108,8 +124,8 @@ function SpecialCareSection({ packages, content }) {
                       <a href="/packages" className="rounded-md border border-upchar-blue px-4 py-2.5 text-sm font-bold text-upchar-blue transition hover:bg-blue-50">
                         View Details
                       </a>
-                      <button type="button" onClick={() => handleAddToCart(item, `${item.id || item.name}-${index}`)} className="rounded-md bg-upchar-green px-4 py-2.5 text-sm font-bold text-white transition hover:bg-upchar-greenDark">
-                        {addedKey === `${item.id || item.name}-${index}` ? "Added ✓" : "Add to Cart"}
+                      <button type="button" onClick={() => !isAdded && handleAddToCart(item)} className="rounded-md bg-upchar-green px-4 py-2.5 text-sm font-bold text-white transition hover:bg-upchar-greenDark">
+                        {isAdded ? "Added" : "Add to Cart"}
                       </button>
                     </div>
                   </div>

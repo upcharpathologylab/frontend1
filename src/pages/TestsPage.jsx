@@ -13,7 +13,7 @@ import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import { benefitItems, listingHeroes } from "../data/listingData.js";
 import { fallbackHomeData } from "../data/homeData.js";
-import { addCartItem } from "../utils/cart.js";
+import { addCartItem, cartEventName, cartItemKey, getCartItems, hasCartItem } from "../utils/cart.js";
 import { applyListingHeroContent, getContentSection } from "../utils/contentOverrides.js";
 import { price } from "../utils.js";
 
@@ -51,7 +51,7 @@ const sortTests = (items, sort) => {
   return sortCatalogItems(items, sort);
 };
 
-const cartKey = (id, type) => `${type}:${id}`;
+const cartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
 
 const normalizeTest = (item, index) => {
   const originalPrice = item.price ?? item.originalPrice ?? item.oldPrice ?? 0;
@@ -96,7 +96,7 @@ function TestsPage() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [content, setContent] = useState(null);
-  const [addedKeys, setAddedKeys] = useState(new Set());
+  const [addedKeys, setAddedKeys] = useState(() => cartKeys());
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -110,6 +110,16 @@ function TestsPage() {
 
     return () => {
       mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const syncCart = () => setAddedKeys(cartKeys());
+    window.addEventListener(cartEventName, syncCart);
+    window.addEventListener("storage", syncCart);
+    return () => {
+      window.removeEventListener(cartEventName, syncCart);
+      window.removeEventListener("storage", syncCart);
     };
   }, []);
 
@@ -191,7 +201,10 @@ function TestsPage() {
   };
 
   const handleAddToCart = (item) => {
-    const key = cartKey(item.id, "test");
+    if (hasCartItem(item.id, "test")) {
+      setAddedKeys(cartKeys());
+      return;
+    }
     addCartItem({
       id: item.id,
       type: "test",
@@ -204,14 +217,7 @@ function TestsPage() {
       image: item.image,
       color: item.color
     });
-    setAddedKeys((current) => new Set(current).add(key));
-    window.setTimeout(() => {
-      setAddedKeys((current) => {
-        const next = new Set(current);
-        next.delete(key);
-        return next;
-      });
-    }, 1500);
+    setAddedKeys(cartKeys());
     showToast(`${item.name} added to cart.`);
   };
 
@@ -378,7 +384,7 @@ function TestsPage() {
                       key={item.id}
                       onAddToCart={handleAddToCart}
                       onDetails={() => showToast("Coming Soon")}
-                      isAdded={addedKeys.has(cartKey(item.id, "test"))}
+                      isAdded={addedKeys.has(cartItemKey(item.id, "test"))}
                     />
                   ))}
                 </div>

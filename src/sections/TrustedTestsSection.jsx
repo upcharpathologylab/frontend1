@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Clock3, ChevronLeft, ChevronRight, Home, Star } from "lucide-react";
 import AccountToast from "../components/account/AccountToast.jsx";
 import Icon from "../components/Icon.jsx";
 import SmartImage from "../components/SmartImage.jsx";
 import useAutoCarousel from "../hooks/useAutoCarousel.js";
 import { price } from "../utils.js";
-import { addCartItem } from "../utils/cart.js";
+import { addCartItem, cartEventName, cartItemKey, getCartItems, hasCartItem } from "../utils/cart.js";
 import { textValue } from "../utils/contentOverrides.js";
+
+const cartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
 
 function TrustedTestsSection({ tests, content }) {
   const { sliderRef, scroll, handleScroll, pause, resume } = useAutoCarousel(tests.length);
   const sliderTests = tests.length > 1 ? [...tests, ...tests] : tests;
-  const [addedKey, setAddedKey] = useState("");
+  const [addedKeys, setAddedKeys] = useState(() => cartKeys());
   const [toast, setToast] = useState("");
 
-  const handleAddToCart = (item, key) => {
+  useEffect(() => {
+    const syncCart = () => setAddedKeys(cartKeys());
+    window.addEventListener(cartEventName, syncCart);
+    window.addEventListener("storage", syncCart);
+    return () => {
+      window.removeEventListener(cartEventName, syncCart);
+      window.removeEventListener("storage", syncCart);
+    };
+  }, []);
+
+  const handleAddToCart = (item) => {
+    if (hasCartItem(item.id, "test")) {
+      setAddedKeys(cartKeys());
+      return;
+    }
     addCartItem({
       id: item.id,
       type: "test",
@@ -27,9 +43,8 @@ function TrustedTestsSection({ tests, content }) {
       image: item.image,
       color: item.color
     });
-    setAddedKey(key);
+    setAddedKeys(cartKeys());
     setToast("Added to Cart");
-    window.setTimeout(() => setAddedKey(""), 1500);
     window.setTimeout(() => setToast(""), 1800);
   };
 
@@ -58,7 +73,9 @@ function TrustedTestsSection({ tests, content }) {
             onMouseLeave={resume}
             className="hide-scrollbar flex snap-x items-stretch gap-4 overflow-x-auto pb-3"
           >
-            {sliderTests.map((test, index) => (
+            {sliderTests.map((test, index) => {
+              const isAdded = addedKeys.has(cartItemKey(test.id, "test"));
+              return (
               <article
                 data-carousel-card
                 className="group relative flex w-full shrink-0 snap-start flex-col overflow-hidden rounded-lg border border-blue-100 bg-white shadow-card transition hover:-translate-y-1 hover:shadow-soft sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)]"
@@ -110,13 +127,13 @@ function TrustedTestsSection({ tests, content }) {
                     <a href="/tests" className="inline-flex min-h-10 items-center justify-center rounded-md border border-upchar-blue px-3 py-2 text-xs font-bold text-upchar-blue transition hover:bg-blue-50">
                       View Details
                     </a>
-                    <button type="button" onClick={() => handleAddToCart(test, `${test.id || test.name}-${index}`)} className="inline-flex min-h-10 items-center justify-center rounded-md bg-upchar-green px-3 py-2 text-xs font-bold text-white transition hover:bg-upchar-greenDark">
-                      {addedKey === `${test.id || test.name}-${index}` ? "Added ✓" : "Add to Cart"}
+                    <button type="button" onClick={() => !isAdded && handleAddToCart(test)} className="inline-flex min-h-10 items-center justify-center rounded-md bg-upchar-green px-3 py-2 text-xs font-bold text-white transition hover:bg-upchar-greenDark">
+                      {isAdded ? "Added" : "Add to Cart"}
                     </button>
                   </div>
                 </div>
               </article>
-            ))}
+            )})}
             {!tests.length ? (
               <div className="w-full rounded-lg border border-blue-100 bg-white p-8 text-center text-sm font-black text-navy-600 shadow-sm">
                 No active tests available.

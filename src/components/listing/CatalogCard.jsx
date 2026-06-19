@@ -103,7 +103,7 @@ function PackageCard({ item, viewMode = "grid", onAddToCart, onDetails, isAdded 
             {buttonLabel}
           </a>
         ) : (
-          <button type="button" onClick={() => onAddToCart(item)} className={buttonClass}>
+          <button type="button" onClick={() => !isAdded && onAddToCart(item)} className={buttonClass}>
             {buttonLabel}
           </button>
         )}
@@ -172,7 +172,7 @@ function TestCard({ item, viewMode = "grid", onAddToCart, onDetails, isAdded = f
         </button>
         <button
           type="button"
-          onClick={() => onAddToCart(item)}
+          onClick={() => !isAdded && onAddToCart(item)}
           className="w-full rounded-md bg-upchar-green px-5 py-2.5 text-sm font-black text-white transition hover:bg-upchar-greenDark"
         >
           {isAdded ? "Added" : "Add to Cart"}

@@ -17,6 +17,7 @@ import {
   addCartItem,
   cartEventName,
   getCartItems,
+  hasCartItem,
   hasStoredCart,
   removeCartItem,
   setCartItems,
@@ -125,6 +126,10 @@ function CartPage() {
   };
 
   const handleRecommendedAdd = (item) => {
+    if (hasCartItem(item.id, item.type)) {
+      refreshItems();
+      return;
+    }
     addCartItem({ ...item, quantity: 1 });
     refreshItems();
     showToast(`${item.name} added to cart.`);
@@ -201,7 +206,7 @@ function CartPage() {
             </aside>
           </div>
 
-          <RecommendedItems items={recommendedCartItems} onAdd={handleRecommendedAdd} />
+          <RecommendedItems items={recommendedCartItems} onAdd={handleRecommendedAdd} cartItems={items} />
           <CartOfferBanner />
         </section>
       </main>

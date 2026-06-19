@@ -10,12 +10,14 @@ const colorStyles = {
   blue: "bg-blue-50 text-upchar-blue"
 };
 
-function RecommendedItems({ items, onAdd }) {
+function RecommendedItems({ items, onAdd, cartItems = [] }) {
   return (
     <section className="mt-8">
       <h2 className="text-2xl font-black text-navy-900">You may also like</h2>
       <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {items.map((item) => (
+        {items.map((item) => {
+          const isAdded = cartItems.some((cartItem) => cartItem.id === item.id && cartItem.type === item.type);
+          return (
           <article className="relative rounded-lg border border-blue-100 bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-card" key={`${item.type}-${item.id}`}>
             {item.badge ? (
               <span className={`absolute left-4 top-4 rounded-md px-2.5 py-1 text-[10px] font-black text-white ${item.badge === "Popular" ? "bg-upchar-green" : "bg-upchar-blue"}`}>
@@ -35,14 +37,14 @@ function RecommendedItems({ items, onAdd }) {
             </div>
             <button
               type="button"
-              onClick={() => onAdd(item)}
+              onClick={() => !isAdded && onAdd(item)}
               className="mt-5 flex h-10 w-full items-center justify-center gap-2 rounded-md border border-upchar-blue bg-white text-sm font-black text-upchar-blue transition hover:bg-blue-50"
             >
-              Add to Cart
+              {isAdded ? "Added" : "Add to Cart"}
               <ShoppingCart className="h-4 w-4" />
             </button>
           </article>
-        ))}
+        )})}
       </div>
     </section>
   );

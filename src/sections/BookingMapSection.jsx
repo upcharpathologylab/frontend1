@@ -6,7 +6,7 @@ import { getStoredUser } from "../components/auth/authStorage.js";
 import Icon from "../components/Icon.jsx";
 import { textValue } from "../utils/contentOverrides.js";
 import { price } from "../utils.js";
-import { addCartItem } from "../utils/cart.js";
+import { addCartItem, hasCartItem } from "../utils/cart.js";
 
 const initialValues = {
   fullName: "",
@@ -183,7 +183,10 @@ function BookingMapSection({ data, content, modal = false, tests = [], packages 
   const addSearchItem = (item) => {
     if (!selectedItems.some((selected) => selected.id === item.id && selected.resultType === item.resultType)) {
       setSelectedItems((current) => [...current, item]);
-      addCartItem({ ...item, type: item.resultType.toLowerCase(), price: item.discountedPrice, oldPrice: item.originalPrice });
+      const type = item.resultType.toLowerCase();
+      if (!hasCartItem(item.id, type)) {
+        addCartItem({ ...item, type, price: item.discountedPrice, oldPrice: item.originalPrice });
+      }
     }
     setErrors((current) => ({ ...current, selectedTestOrPackage: "" }));
   };

@@ -1,17 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Search, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AuthModal from "../components/auth/AuthModal.jsx";
 import { getStoredUser } from "../components/auth/authStorage.js";
 import Icon from "../components/Icon.jsx";
 import { price } from "../utils.js";
-import { addCartItem } from "../utils/cart.js";
+import { addCartItem, cartEventName, cartItemKey, getCartItems, hasCartItem } from "../utils/cart.js";
+
+const cartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
 
 function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState({});
-  const [added, setAdded] = useState({});
+  const [addedKeys, setAddedKeys] = useState(() => cartKeys());
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signin");
   const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
@@ -26,6 +28,16 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
       .filter((item) => item.name.toLowerCase().startsWith(term))
       .slice(0, 10);
   }, [packages, query, tests]);
+
+  useEffect(() => {
+    const syncCart = () => setAddedKeys(cartKeys());
+    window.addEventListener(cartEventName, syncCart);
+    window.addEventListener("storage", syncCart);
+    return () => {
+      window.removeEventListener(cartEventName, syncCart);
+      window.removeEventListener("storage", syncCart);
+    };
+  }, []);
 
   const quickLink = (title) => {
     if (title === "Popular Tests") return "#popular-tests";
@@ -59,16 +71,20 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
   const resultKey = (item) => `${item.resultType}-${item.id}`;
 
   const addResultToCart = (item) => {
+    const type = item.resultType.toLowerCase();
+    if (hasCartItem(item.id, type)) {
+      setAddedKeys(cartKeys());
+      return;
+    }
     const key = resultKey(item);
     setSelected((current) => ({ ...current, [key]: true }));
     addCartItem({
       ...item,
-      type: item.resultType.toLowerCase(),
+      type,
       price: item.discountedPrice,
       oldPrice: item.originalPrice
     });
-    setAdded((current) => ({ ...current, [key]: true }));
-    window.setTimeout(() => setAdded((current) => ({ ...current, [key]: false })), 1600);
+    setAddedKeys(cartKeys());
   };
 
   return (
@@ -97,6 +113,7 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
                 <div className="absolute inset-x-0 top-full z-40 mt-2 max-h-[420px] overflow-y-auto rounded-lg border border-blue-100 bg-white p-2 text-navy-900 shadow-soft">
                   {results.map((item) => {
                     const key = resultKey(item);
+                    const isAdded = addedKeys.has(cartItemKey(item.id, item.resultType.toLowerCase()));
                     return (
                       <div className="grid gap-2 border-b border-blue-50 px-3 py-3 last:border-0 sm:grid-cols-[24px_minmax(0,1fr)_70px_90px_120px] sm:items-center" key={key}>
                         <input
@@ -110,13 +127,13 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
                         <span className="text-sm font-black text-upchar-green">{price(item.discountedPrice)}</span>
                         <button
                           type="button"
-                          onClick={() => addResultToCart(item)}
+                          onClick={() => !isAdded && addResultToCart(item)}
                           className={`inline-flex h-9 items-center justify-center gap-1 rounded-md bg-upchar-green px-3 text-xs font-black text-white transition ${
-                            added[key] ? "scale-105 bg-upchar-greenDark ring-2 ring-green-200" : ""
+                            isAdded ? "scale-105 bg-upchar-greenDark ring-2 ring-green-200" : ""
                           }`}
                         >
                           <ShoppingCart className="h-3.5 w-3.5" />
-                          {added[key] ? "Added" : "Add to Cart"}
+                          {isAdded ? "Added" : "Add to Cart"}
                         </button>
                       </div>
                     );
