@@ -1,9 +1,38 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MessageCircle } from "lucide-react";
+import { getHomeData, getPageContent } from "../../api/api.js";
+import { fallbackHomeData } from "../../data/homeData.js";
+import { resolveContactInfo } from "../../utils/contactInfo.js";
 import Icon from "../Icon.jsx";
 import { accountSidebarItems } from "../../data/profileData.js";
 
 function AccountSidebar({ active, onSectionSelect }) {
+  const [contactContent, setContactContent] = useState(null);
+  const [siteSettings, setSiteSettings] = useState(() => fallbackHomeData.siteSettings || {});
+  const whatsappHref = resolveContactInfo(contactContent, siteSettings).whatsappHref;
+
+  useEffect(() => {
+    let mounted = true;
+
+    getHomeData()
+      .then((homeData) => {
+        if (mounted && homeData?.siteSettings) setSiteSettings({ ...(fallbackHomeData.siteSettings || {}), ...homeData.siteSettings });
+      })
+      .catch(() => {});
+
+    getPageContent("contact-us")
+      .then((page) => {
+        const section = (page?.sections || []).find((item) => item.sectionKey === "contact-info") || null;
+        if (mounted) setContactContent(section);
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <aside className="rounded-lg border border-blue-100 bg-white p-3 shadow-sm lg:sticky lg:top-32">
       <nav className="flex gap-2 overflow-x-auto pb-2 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
@@ -51,7 +80,7 @@ function AccountSidebar({ active, onSectionSelect }) {
         <h3 className="mt-4 text-base font-black text-navy-900">Need Help?</h3>
         <p className="mt-2 text-sm font-semibold leading-6 text-navy-700">Our support team is here to help you.</p>
         <a
-          href="https://wa.me/917838532205"
+          href={whatsappHref}
           className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-md bg-upchar-green px-5 text-sm font-black text-white transition hover:bg-upchar-greenDark"
         >
           <MessageCircle className="h-4 w-4" />
