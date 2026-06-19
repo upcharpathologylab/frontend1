@@ -14,6 +14,85 @@ import { fallbackHomeData } from "../data/homeData.js";
 import { trustStripItems } from "../data/cartData.js";
 import { getBookingLead } from "../api/api.js";
 import { getStoredBookingData } from "../utils/checkout.js";
+import { price } from "../utils.js";
+
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const invoiceRows = (items = []) =>
+  items
+    .map((item) => {
+      const quantity = Number(item.quantity || 1);
+      const amount = Number(item.price || item.discountedPrice || item.finalPrice || 0) * quantity;
+      return `
+        <tr>
+          <td>${escapeHtml(item.name || item.title || "Test / Package")}</td>
+          <td>${escapeHtml(item.subtitle || item.description || item.type || "-")}</td>
+          <td>${quantity}</td>
+          <td>${escapeHtml(price(amount))}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+const invoiceHtml = (booking) => `
+  <!doctype html>
+  <html>
+    <head>
+      <title>invoice-${escapeHtml(booking.bookingId)}.pdf</title>
+      <style>
+        body { font-family: Arial, sans-serif; color: #0f172a; margin: 32px; }
+        h1 { color: #099447; margin-bottom: 4px; }
+        h2 { margin-top: 28px; }
+        .muted { color: #475569; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 28px; margin-top: 20px; }
+        .label { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }
+        .value { margin-top: 4px; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        th, td { border: 1px solid #dbeafe; padding: 10px; text-align: left; font-size: 13px; }
+        th { background: #eff6ff; }
+        .total { margin-top: 22px; text-align: right; font-size: 20px; font-weight: 800; color: #099447; }
+        .contact { margin-top: 28px; padding-top: 16px; border-top: 1px solid #dbeafe; }
+      </style>
+    </head>
+    <body>
+      <h1>Upchar Pathology Lab</h1>
+      <p class="muted">Invoice / Receipt</p>
+      <div class="grid">
+        <div><div class="label">Booking ID</div><div class="value">${escapeHtml(booking.bookingId)}</div></div>
+        <div><div class="label">Booking Date</div><div class="value">${escapeHtml(booking.bookingDate || booking.createdAt || "-")}</div></div>
+        <div><div class="label">Customer Name</div><div class="value">${escapeHtml(booking.customer?.name || booking.fullName || "-")}</div></div>
+        <div><div class="label">Email</div><div class="value">${escapeHtml(booking.customer?.email || booking.email || "-")}</div></div>
+        <div><div class="label">Phone</div><div class="value">${escapeHtml(booking.customer?.phone || booking.mobile || "-")}</div></div>
+        <div><div class="label">Payment Mode</div><div class="value">${escapeHtml(booking.paymentMode || booking.paymentMethod || "-")}</div></div>
+        <div><div class="label">Payment Status</div><div class="value">${escapeHtml(booking.paymentStatus || "-")}</div></div>
+      </div>
+      <h2>Test / Package Details</h2>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Details</th><th>Qty</th><th>Amount</th></tr>
+        </thead>
+        <tbody>${invoiceRows(booking.items)}</tbody>
+      </table>
+      <div class="total">Total Paid: ${escapeHtml(price(booking.summary?.totalPayable || 0))}</div>
+      <div class="contact">
+        <strong>Contact Details</strong>
+        <p>Phone: 8882753539</p>
+        <p>Email: upcharpathologylab@gmail.com</p>
+      </div>
+      <script>
+        window.onload = function () {
+          window.print();
+        };
+      </script>
+    </body>
+  </html>
+`;
 
 function BookingConfirmationPage() {
   const [booking, setBooking] = useState(null);
@@ -48,6 +127,15 @@ function BookingConfirmationPage() {
     };
   }, []);
 
+  const handleDownloadInvoice = () => {
+    if (!booking) return;
+    const invoiceWindow = window.open("", "_blank", "noopener,noreferrer");
+    if (!invoiceWindow) return;
+    invoiceWindow.document.open();
+    invoiceWindow.document.write(invoiceHtml(booking));
+    invoiceWindow.document.close();
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50/70 via-white to-white">
       <Header data={fallbackHomeData} />
@@ -81,7 +169,7 @@ function BookingConfirmationPage() {
                 <BookingDetails booking={booking} />
               </div>
               <aside className="grid gap-6 self-start xl:sticky xl:top-32">
-                <BookingSummary booking={booking} />
+                <BookingSummary booking={booking} onDownloadInvoice={handleDownloadInvoice} />
                 <WhatsNextTimeline />
               </aside>
             </div>

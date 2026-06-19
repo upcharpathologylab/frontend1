@@ -10,7 +10,7 @@ function SummaryLine({ label, value }) {
   );
 }
 
-function BookingSummary({ booking }) {
+function BookingSummary({ booking, onDownloadInvoice }) {
   return (
     <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
       <h2 className="text-2xl font-black text-navy-900">Booking Summary</h2>
@@ -41,6 +41,7 @@ function BookingSummary({ booking }) {
 
       <button
         type="button"
+        onClick={onDownloadInvoice}
         className="mt-5 flex h-12 w-full items-center justify-center gap-3 rounded-md border border-blue-100 bg-white text-sm font-black text-upchar-blue transition hover:bg-blue-50"
       >
         <Download className="h-5 w-5" />
