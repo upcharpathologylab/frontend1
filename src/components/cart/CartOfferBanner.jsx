@@ -1,7 +1,36 @@
+import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
+import { getHomeData, getPageContent } from "../../api/api.js";
 import { cartOfferAssets } from "../../data/cartData.js";
+import { fallbackHomeData } from "../../data/homeData.js";
+import { resolveContactInfo } from "../../utils/contactInfo.js";
 
 function CartOfferBanner() {
+  const [contactContent, setContactContent] = useState(null);
+  const [siteSettings, setSiteSettings] = useState(() => fallbackHomeData.siteSettings || {});
+  const whatsappHref = resolveContactInfo(contactContent, siteSettings).whatsappHref;
+
+  useEffect(() => {
+    let mounted = true;
+
+    getHomeData()
+      .then((homeData) => {
+        if (mounted && homeData?.siteSettings) setSiteSettings({ ...(fallbackHomeData.siteSettings || {}), ...homeData.siteSettings });
+      })
+      .catch(() => {});
+
+    getPageContent("contact-us")
+      .then((page) => {
+        const section = (page?.sections || []).find((item) => item.sectionKey === "contact-info") || null;
+        if (mounted) setContactContent(section);
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <section className="mt-8 grid overflow-hidden rounded-lg border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-green-50 shadow-sm lg:grid-cols-[1.1fr_0.7fr_1fr]">
       <div className="grid gap-5 p-6 sm:grid-cols-[130px_1fr] sm:items-center">
@@ -12,7 +41,7 @@ function CartOfferBanner() {
             Talk to our health experts and get personalized recommendations.
           </p>
           <a
-            href="https://wa.me/917838582205"
+            href={whatsappHref}
             className="mt-4 inline-flex items-center gap-2 rounded-md bg-upchar-green px-5 py-2 text-sm font-black text-white transition hover:bg-upchar-greenDark"
           >
             <MessageCircle className="h-4 w-4" />
