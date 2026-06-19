@@ -39,9 +39,9 @@ function AuthModal({ isOpen, mode, onModeChange, onClose, onSuccess, onSignupSuc
             role="dialog"
             aria-modal="true"
             aria-label={mode === "signin" ? "Sign in" : "Sign up"}
-            className={`relative w-full overflow-y-auto rounded-2xl bg-white shadow-2xl ${
+            className={`relative w-full rounded-2xl bg-white shadow-2xl ${
               mode === "signin" ? "max-w-[900px]" : "max-w-[680px]"
-            } ${mode === "signup" ? "max-h-[96dvh]" : "max-h-[94vh]"}`}
+            } ${mode === "signup" ? "max-h-[90dvh] overflow-visible" : "max-h-[94vh] overflow-y-auto"}`}
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.97 }}
@@ -50,11 +50,13 @@ function AuthModal({ isOpen, mode, onModeChange, onClose, onSuccess, onSignupSuc
           >
             <button
               type="button"
-              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-navy-900 transition hover:bg-blue-100"
+              className={`absolute flex items-center justify-center rounded-full bg-blue-50 text-navy-900 transition hover:bg-blue-100 ${
+                mode === "signup" ? "right-3 top-3 h-8 w-8" : "right-4 top-4 h-10 w-10"
+              }`}
               onClick={onClose}
               aria-label="Close auth popup"
             >
-              <X className="h-5 w-5" />
+              <X className={mode === "signup" ? "h-4 w-4" : "h-5 w-5"} />
             </button>
 
             {mode === "signin" ? (
