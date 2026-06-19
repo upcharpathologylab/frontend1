@@ -85,11 +85,6 @@ const invoiceHtml = (booking) => `
         <p>Phone: 8882753539</p>
         <p>Email: upcharpathologylab@gmail.com</p>
       </div>
-      <script>
-        window.onload = function () {
-          window.print();
-        };
-      </script>
     </body>
   </html>
 `;
@@ -129,11 +124,15 @@ function BookingConfirmationPage() {
 
   const handleDownloadInvoice = () => {
     if (!booking) return;
-    const invoiceWindow = window.open("", "_blank", "noopener,noreferrer");
-    if (!invoiceWindow) return;
-    invoiceWindow.document.open();
-    invoiceWindow.document.write(invoiceHtml(booking));
-    invoiceWindow.document.close();
+    const blob = new Blob([invoiceHtml(booking)], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `invoice-${booking.bookingId}.html`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   return (
