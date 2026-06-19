@@ -5,7 +5,7 @@ function PaymentHelpStrip() {
     {
       icon: Headphones,
       title: "Need help with your payment?",
-      lines: ["Call us at 7838532205", "Mon - Sun: 7:00 AM - 9:00 PM"]
+      lines: ["Call us at 8882753539", "Mon - Sun: 7:00 AM - 9:00 PM"]
     },
     {
       icon: MessageCircle,
@@ -15,7 +15,7 @@ function PaymentHelpStrip() {
     {
       icon: Mail,
       title: "Write to us",
-      lines: ["support@upcharlab.com", "We reply within a few minutes"]
+      lines: ["upcharpathologylab@gmail.com", "We reply within a few minutes"]
     }
   ];
 
