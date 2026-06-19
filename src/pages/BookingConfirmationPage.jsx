@@ -14,80 +14,87 @@ import { fallbackHomeData } from "../data/homeData.js";
 import { trustStripItems } from "../data/cartData.js";
 import { getBookingLead } from "../api/api.js";
 import { getStoredBookingData } from "../utils/checkout.js";
-import { price } from "../utils.js";
 
-const escapeHtml = (value) =>
+const pdfText = (value) =>
   String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)")
+    .replace(/[\r\n]+/g, " ");
 
-const invoiceRows = (items = []) =>
-  items
-    .map((item) => {
-      const quantity = Number(item.quantity || 1);
-      const amount = Number(item.price || item.discountedPrice || item.finalPrice || 0) * quantity;
-      return `
-        <tr>
-          <td>${escapeHtml(item.name || item.title || "Test / Package")}</td>
-          <td>${escapeHtml(item.subtitle || item.description || item.type || "-")}</td>
-          <td>${quantity}</td>
-          <td>${escapeHtml(price(amount))}</td>
-        </tr>
-      `;
-    })
-    .join("");
+const invoiceAmount = (value) => `Rs. ${Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
-const invoiceHtml = (booking) => `
-  <!doctype html>
-  <html>
-    <head>
-      <title>invoice-${escapeHtml(booking.bookingId)}.pdf</title>
-      <style>
-        body { font-family: Arial, sans-serif; color: #0f172a; margin: 32px; }
-        h1 { color: #099447; margin-bottom: 4px; }
-        h2 { margin-top: 28px; }
-        .muted { color: #475569; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 28px; margin-top: 20px; }
-        .label { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }
-        .value { margin-top: 4px; font-weight: 700; }
-        table { width: 100%; border-collapse: collapse; margin-top: 14px; }
-        th, td { border: 1px solid #dbeafe; padding: 10px; text-align: left; font-size: 13px; }
-        th { background: #eff6ff; }
-        .total { margin-top: 22px; text-align: right; font-size: 20px; font-weight: 800; color: #099447; }
-        .contact { margin-top: 28px; padding-top: 16px; border-top: 1px solid #dbeafe; }
-      </style>
-    </head>
-    <body>
-      <h1>Upchar Pathology Lab</h1>
-      <p class="muted">Invoice / Receipt</p>
-      <div class="grid">
-        <div><div class="label">Booking ID</div><div class="value">${escapeHtml(booking.bookingId)}</div></div>
-        <div><div class="label">Booking Date</div><div class="value">${escapeHtml(booking.bookingDate || booking.createdAt || "-")}</div></div>
-        <div><div class="label">Customer Name</div><div class="value">${escapeHtml(booking.customer?.name || booking.fullName || "-")}</div></div>
-        <div><div class="label">Email</div><div class="value">${escapeHtml(booking.customer?.email || booking.email || "-")}</div></div>
-        <div><div class="label">Phone</div><div class="value">${escapeHtml(booking.customer?.phone || booking.mobile || "-")}</div></div>
-        <div><div class="label">Payment Mode</div><div class="value">${escapeHtml(booking.paymentMode || booking.paymentMethod || "-")}</div></div>
-        <div><div class="label">Payment Status</div><div class="value">${escapeHtml(booking.paymentStatus || "-")}</div></div>
-      </div>
-      <h2>Test / Package Details</h2>
-      <table>
-        <thead>
-          <tr><th>Name</th><th>Details</th><th>Qty</th><th>Amount</th></tr>
-        </thead>
-        <tbody>${invoiceRows(booking.items)}</tbody>
-      </table>
-      <div class="total">Total Paid: ${escapeHtml(price(booking.summary?.totalPayable || 0))}</div>
-      <div class="contact">
-        <strong>Contact Details</strong>
-        <p>Phone: 8882753539</p>
-        <p>Email: upcharpathologylab@gmail.com</p>
-      </div>
-    </body>
-  </html>
-`;
+const invoiceLines = (booking) => {
+  const lines = [
+    "Upchar Pathology Lab",
+    "Invoice / Receipt",
+    "",
+    `Booking ID: ${booking.bookingId || "-"}`,
+    `Booking Date: ${booking.bookingDate || booking.createdAt || "-"}`,
+    `Customer Name: ${booking.customer?.name || booking.fullName || "-"}`,
+    `Phone: ${booking.customer?.phone || booking.mobile || "-"}`,
+    `Email: ${booking.customer?.email || booking.email || "-"}`,
+    `Payment Mode: ${booking.paymentMode || booking.paymentMethod || "-"}`,
+    `Payment Status: ${booking.paymentStatus || "-"}`,
+    "",
+    "Test / Package Details"
+  ];
+
+  (booking.items || []).forEach((item, index) => {
+    const quantity = Number(item.quantity || 1);
+    const amount = Number(item.price || item.discountedPrice || item.finalPrice || 0) * quantity;
+    lines.push(`${index + 1}. ${item.name || item.title || "Test / Package"} | Qty: ${quantity} | Amount: ${invoiceAmount(amount)}`);
+  });
+
+  lines.push(
+    "",
+    `Total Paid: ${invoiceAmount(booking.summary?.totalPayable || 0)}`,
+    "",
+    "Contact Details",
+    "Phone: 8882753539",
+    "Email: upcharpathologylab@gmail.com"
+  );
+
+  return lines;
+};
+
+const createInvoicePdfBlob = (booking) => {
+  const lines = invoiceLines(booking);
+  const content = [
+    "BT",
+    "/F1 18 Tf",
+    "50 790 Td",
+    "(Upchar Pathology Lab) Tj",
+    "/F1 11 Tf",
+    "0 -24 Td",
+    ...lines.slice(1).map((line) => `(${pdfText(line)}) Tj 0 -16 Td`),
+    "ET"
+  ].join("\n");
+  const contentLength = new TextEncoder().encode(content).length;
+  const objects = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    `<< /Length ${contentLength} >>\nstream\n${content}\nendstream`
+  ];
+  let pdf = "%PDF-1.4\n";
+  const offsets = [0];
+
+  objects.forEach((object, index) => {
+    offsets.push(pdf.length);
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  });
+
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => {
+    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+  });
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+  return new Blob([pdf], { type: "application/pdf" });
+};
 
 function BookingConfirmationPage() {
   const [booking, setBooking] = useState(null);
@@ -124,28 +131,14 @@ function BookingConfirmationPage() {
 
   const handleDownloadInvoice = () => {
     if (!booking) return;
-    const frame = document.createElement("iframe");
-    frame.title = `invoice-${booking.bookingId}.pdf`;
-    frame.style.position = "fixed";
-    frame.style.right = "0";
-    frame.style.bottom = "0";
-    frame.style.width = "0";
-    frame.style.height = "0";
-    frame.style.border = "0";
-
-    frame.onload = () => {
-      const printWindow = frame.contentWindow;
-      if (!printWindow) return;
-      printWindow.document.title = `invoice-${booking.bookingId}.pdf`;
-      printWindow.focus();
-      printWindow.print();
-      window.setTimeout(() => frame.remove(), 1000);
-    };
-
-    document.body.appendChild(frame);
-    frame.contentDocument.open();
-    frame.contentDocument.write(invoiceHtml(booking));
-    frame.contentDocument.close();
+    const url = URL.createObjectURL(createInvoicePdfBlob(booking));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `invoice-${booking.bookingId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   };
 
   return (
