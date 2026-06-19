@@ -23,7 +23,7 @@ function validateBase(values) {
 }
 
 function FieldLabel({ children }) {
-  return <span className="mb-3 block text-base font-black text-navy-950 md:text-xl">{children}</span>;
+  return <span className="mb-1.5 block text-sm font-black text-navy-950 md:text-base">{children}</span>;
 }
 
 function TextField({ label, name, value, onChange, placeholder, error, icon: Icon }) {
@@ -31,10 +31,10 @@ function TextField({ label, name, value, onChange, placeholder, error, icon: Ico
     <label>
       <FieldLabel>{label}</FieldLabel>
       <div className={`auth-field ${error ? "border-red-300" : "border-blue-100"}`}>
-        <Icon className="h-6 w-6 shrink-0 text-navy-600 md:h-8 md:w-8" />
+        <Icon className="h-5 w-5 shrink-0 text-navy-600 md:h-6 md:w-6" />
         <input name={name} value={value} onChange={onChange} placeholder={placeholder} className="auth-input" />
       </div>
-      {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : null}
+      {error ? <p className="mt-1 text-xs font-bold text-red-600">{error}</p> : null}
     </label>
   );
 }
@@ -45,7 +45,7 @@ function PasswordField({ value, onChange, error }) {
     <label>
       <FieldLabel>Password</FieldLabel>
       <div className={`auth-field ${error ? "border-red-300" : "border-blue-100"}`}>
-        <LockKeyhole className="h-6 w-6 shrink-0 text-navy-600 md:h-8 md:w-8" />
+        <LockKeyhole className="h-5 w-5 shrink-0 text-navy-600 md:h-6 md:w-6" />
         <input
           name="password"
           type={visible ? "text" : "password"}
@@ -54,11 +54,11 @@ function PasswordField({ value, onChange, error }) {
           placeholder="Create password"
           className="auth-input"
         />
-        <button type="button" onClick={() => setVisible((current) => !current)} className="grid h-10 w-10 place-items-center text-navy-700" aria-label="Toggle password">
-          {visible ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
+        <button type="button" onClick={() => setVisible((current) => !current)} className="grid h-9 w-9 place-items-center text-navy-700" aria-label="Toggle password">
+          {visible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
         </button>
       </div>
-      {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : <p className="mt-3 text-sm font-bold text-navy-500 md:text-base">Password must be at least 8 characters long</p>}
+      {error ? <p className="mt-1 text-xs font-bold text-red-600">{error}</p> : <p className="mt-1 text-xs font-bold text-navy-500">Password must be at least 8 characters long</p>}
     </label>
   );
 }
@@ -67,16 +67,16 @@ function PhoneField({ value, onChange, error }) {
   return (
     <label>
       <FieldLabel>Phone Number</FieldLabel>
-      <div className={`flex h-14 overflow-hidden rounded-lg border bg-white md:h-[74px] ${error ? "border-red-300" : "border-blue-100"}`}>
-        <div className="grid w-16 place-items-center border-r border-blue-100 text-navy-600 md:w-20">
-          <Phone className="h-6 w-6 md:h-8 md:w-8" />
+      <div className={`flex h-11 overflow-hidden rounded-lg border bg-white md:h-12 ${error ? "border-red-300" : "border-blue-100"}`}>
+        <div className="grid w-12 place-items-center border-r border-blue-100 text-navy-600 md:w-14">
+          <Phone className="h-5 w-5 md:h-6 md:w-6" />
         </div>
-        <div className="flex w-24 items-center justify-center gap-2 border-r border-blue-100 text-base font-black text-navy-950 md:w-32 md:text-xl">
-          +91 <ChevronDown className="h-5 w-5" />
+        <div className="flex w-20 items-center justify-center gap-1.5 border-r border-blue-100 text-sm font-black text-navy-950 md:w-24 md:text-base">
+          +91 <ChevronDown className="h-4 w-4" />
         </div>
-        <input name="phone" value={value} onChange={onChange} inputMode="numeric" placeholder="Enter your phone number" className="min-w-0 flex-1 px-4 text-sm font-bold text-navy-900 outline-none placeholder:text-navy-500 md:px-6 md:text-xl" />
+        <input name="phone" value={value} onChange={onChange} inputMode="numeric" placeholder="Enter your phone number" className="min-w-0 flex-1 px-3 text-sm font-bold text-navy-900 outline-none placeholder:text-navy-500 md:px-4 md:text-base" />
       </div>
-      {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : null}
+      {error ? <p className="mt-1 text-xs font-bold text-red-600">{error}</p> : null}
     </label>
   );
 }
@@ -95,7 +95,7 @@ function OtpBoxes({ value, onChange, error }) {
   return (
     <div>
       <FieldLabel>Enter OTP</FieldLabel>
-      <div className="grid grid-cols-6 gap-3 md:gap-8">
+      <div className="grid grid-cols-6 gap-2">
         {value.map((digit, index) => (
           <input
             key={index}
@@ -110,18 +110,18 @@ function OtpBoxes({ value, onChange, error }) {
             inputMode="numeric"
             maxLength={1}
             placeholder="-"
-            className="h-16 rounded-lg border border-blue-100 bg-white text-center text-xl font-black text-navy-950 outline-none focus:border-upchar-green focus:ring-4 focus:ring-upchar-green/10 md:h-24"
+            className="h-11 rounded-lg border border-blue-100 bg-white text-center text-base font-black text-navy-950 outline-none focus:border-upchar-green focus:ring-4 focus:ring-upchar-green/10 md:h-12"
           />
         ))}
       </div>
-      {error ? <p className="mt-2 text-sm font-bold text-red-600">{error}</p> : null}
+      {error ? <p className="mt-1 text-xs font-bold text-red-600">{error}</p> : null}
     </div>
   );
 }
 
 function Divider() {
   return (
-    <div className="my-6 flex items-center gap-5 text-sm font-black text-navy-950 md:my-8">
+    <div className="my-3 flex items-center gap-4 text-xs font-black text-navy-950 md:my-4">
       <span className="h-px flex-1 bg-blue-100" />
       OR
       <span className="h-px flex-1 bg-blue-100" />
@@ -190,8 +190,8 @@ function SignUpForm({ onModeChange, onSuccess }) {
   };
 
   return (
-    <form onSubmit={submit} noValidate className="auth-card">
-      <div className="grid gap-6 md:gap-9">
+    <form onSubmit={submit} noValidate className="auth-card auth-card-signup">
+      <div className="grid gap-3 md:gap-4">
         <TextField label="Full Name" name="fullName" value={values.fullName} onChange={update} placeholder="Enter your full name" error={errors.fullName} icon={UserRound} />
         <PasswordField value={values.password} onChange={update} error={errors.password} />
         <PhoneField value={values.phone} onChange={update} error={errors.phone} />
@@ -199,12 +199,12 @@ function SignUpForm({ onModeChange, onSuccess }) {
         <button type="button" onClick={sendOtp} disabled={sendingOtp || cooldown > 0} className="auth-outline-btn">
           {sendingOtp ? "Sending..." : "Send OTP"}
         </button>
-        <p className="flex items-center gap-2 text-sm font-bold text-navy-500 md:text-base">
-          <ShieldCheck className="h-5 w-5" /> We will send an OTP to your phone number
+        <p className="flex items-center gap-2 text-xs font-bold text-navy-500 md:text-sm">
+          <ShieldCheck className="h-4 w-4" /> We will send an OTP to your phone number
         </p>
 
         <OtpBoxes value={values.otp} onChange={(otp) => setValues((current) => ({ ...current, otp }))} error={errors.otp} />
-        <p className="text-center text-sm font-bold text-navy-500 md:text-base">
+        <p className="text-center text-xs font-bold text-navy-500 md:text-sm">
           Didn't receive OTP?{" "}
           <button type="button" onClick={sendOtp} disabled={!otpSent || cooldown > 0 || sendingOtp} className="font-black text-upchar-green disabled:text-navy-400">
             Resend OTP ({`00:${String(cooldown || 30).padStart(2, "0")}`})
@@ -212,9 +212,9 @@ function SignUpForm({ onModeChange, onSuccess }) {
         </p>
       </div>
 
-      {apiError ? <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{apiError}</p> : null}
+      {apiError ? <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-bold text-red-700">{apiError}</p> : null}
 
-      <button type="submit" disabled={submitting} className="auth-primary-btn mt-8">
+      <button type="submit" disabled={submitting} className="auth-primary-btn mt-4">
         {submitting ? "Signing Up..." : "Sign Up"}
       </button>
       <Divider />

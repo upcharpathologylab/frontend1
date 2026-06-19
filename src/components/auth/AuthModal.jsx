@@ -29,7 +29,7 @@ function AuthModal({ isOpen, mode, onModeChange, onClose, onSuccess, onSignupSuc
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-950/60 p-4 backdrop-blur-sm"
+          className={`fixed inset-0 z-[100] flex items-center justify-center bg-navy-950/60 backdrop-blur-sm ${mode === "signup" ? "p-2 sm:p-3" : "p-4"}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -39,9 +39,9 @@ function AuthModal({ isOpen, mode, onModeChange, onClose, onSuccess, onSignupSuc
             role="dialog"
             aria-modal="true"
             aria-label={mode === "signin" ? "Sign in" : "Sign up"}
-            className={`relative max-h-[94vh] w-full overflow-y-auto rounded-2xl bg-white shadow-2xl ${
+            className={`relative w-full overflow-y-auto rounded-2xl bg-white shadow-2xl ${
               mode === "signin" ? "max-w-[900px]" : "max-w-[680px]"
-            }`}
+            } ${mode === "signup" ? "max-h-[96dvh]" : "max-h-[94vh]"}`}
             initial={{ opacity: 0, y: 24, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.97 }}
