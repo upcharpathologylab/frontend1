@@ -44,10 +44,10 @@ function MetaItem({ icon, label, value }) {
   );
 }
 
-function PackageCard({ item, viewMode = "grid", onAddToCart, onDetails }) {
+function PackageCard({ item, viewMode = "grid", onAddToCart, onDetails, isAdded = false }) {
   const color = getColor(item.color);
   const isList = viewMode === "list";
-  const buttonLabel = item.buttonText || "Book Now";
+  const buttonLabel = isAdded ? "Added" : "Add to Cart";
   const buttonLink = item.buttonLink;
   const buttonClass = "rounded-md bg-upchar-green px-4 py-2 text-center text-sm font-black text-white transition hover:bg-upchar-greenDark";
 
@@ -112,7 +112,7 @@ function PackageCard({ item, viewMode = "grid", onAddToCart, onDetails }) {
   );
 }
 
-function TestCard({ item, viewMode = "grid", onAddToCart, onDetails }) {
+function TestCard({ item, viewMode = "grid", onAddToCart, onDetails, isAdded = false }) {
   const color = getColor(item.color);
   const isList = viewMode === "list";
 
@@ -175,7 +175,7 @@ function TestCard({ item, viewMode = "grid", onAddToCart, onDetails }) {
           onClick={() => onAddToCart(item)}
           className="w-full rounded-md bg-upchar-green px-5 py-2.5 text-sm font-black text-white transition hover:bg-upchar-greenDark"
         >
-          Book Now
+          {isAdded ? "Added" : "Add to Cart"}
         </button>
       </div>
     </article>

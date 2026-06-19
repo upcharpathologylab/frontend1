@@ -56,7 +56,8 @@ function ContactForm({ content }) {
       });
       setValues(initialValues);
       setStatus({ type: "success", message: "Your message has been sent successfully. Our team will contact you soon." });
-    } catch {
+    } catch (error) {
+      console.error("Contact form error:", error.response?.data || error.message);
       setStatus({ type: "error", message: "Failed to send message. Please try again or contact us on WhatsApp." });
     } finally {
       setSubmitting(false);

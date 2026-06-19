@@ -12,7 +12,7 @@ import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import { benefitItems, listingHeroes } from "../data/listingData.js";
 import { fallbackHomeData } from "../data/homeData.js";
-import { addCartItem } from "../utils/cart.js";
+import { addCartItem, cartEventName, getCartItems } from "../utils/cart.js";
 import { applyListingHeroContent, getContentSection } from "../utils/contentOverrides.js";
 import { price } from "../utils.js";
 
@@ -56,10 +56,15 @@ const normalizePackage = (item, index) => {
     popularity: item.popularity ?? index,
     status: item.status || (item.isActive === false ? "Inactive" : "Active"),
     isActive: item.isActive !== false,
-    buttonText: item.buttonText || "Book Now",
-    buttonLink: item.buttonLink || (item.buttonUrl && item.buttonUrl !== "/cart" ? item.buttonUrl : "")
+    buttonText: "Add to Cart",
+    buttonLink: ""
   };
 };
+
+const cartKey = (id, type) => `${type}:${id}`;
+
+const getAddedPackageKeys = () =>
+  new Set(getCartItems().filter((item) => item.type === "package").map((item) => cartKey(item.id, item.type)));
 
 const packageCategoryOptions = (rows) =>
   [...new Set(rows.map((item) => item.category).filter(Boolean))]
@@ -78,6 +83,7 @@ function PackagesPage() {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [addedKeys, setAddedKeys] = useState(() => getAddedPackageKeys());
 
   useEffect(() => {
     let mounted = true;
@@ -115,6 +121,16 @@ function PackagesPage() {
 
     return () => {
       mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const refreshAdded = () => setAddedKeys(getAddedPackageKeys());
+    window.addEventListener(cartEventName, refreshAdded);
+    window.addEventListener("storage", refreshAdded);
+    return () => {
+      window.removeEventListener(cartEventName, refreshAdded);
+      window.removeEventListener("storage", refreshAdded);
     };
   }, []);
 
@@ -160,6 +176,7 @@ function PackagesPage() {
       icon: item.icon,
       color: item.color
     });
+    setAddedKeys(getAddedPackageKeys());
     showToast(`${item.name} added to cart.`);
   };
 
@@ -274,6 +291,7 @@ function PackagesPage() {
                       key={item.id}
                       onAddToCart={handleAddToCart}
                       onDetails={() => showToast("Details page coming soon.")}
+                      isAdded={addedKeys.has(cartKey(item.id, "package"))}
                     />
                   ))}
                 </div>

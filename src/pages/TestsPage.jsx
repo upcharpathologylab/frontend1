@@ -13,7 +13,7 @@ import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import { benefitItems, listingHeroes } from "../data/listingData.js";
 import { fallbackHomeData } from "../data/homeData.js";
-import { addCartItem } from "../utils/cart.js";
+import { addCartItem, cartEventName, getCartItems } from "../utils/cart.js";
 import { applyListingHeroContent, getContentSection } from "../utils/contentOverrides.js";
 import { price } from "../utils.js";
 
@@ -50,6 +50,11 @@ const sortTests = (items, sort) => {
   if (sort === "rating") return [...items].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
   return sortCatalogItems(items, sort);
 };
+
+const cartKey = (id, type) => `${type}:${id}`;
+
+const getAddedTestKeys = () =>
+  new Set(getCartItems().filter((item) => item.type === "test").map((item) => cartKey(item.id, item.type)));
 
 const normalizeTest = (item, index) => {
   const originalPrice = item.price ?? item.originalPrice ?? item.oldPrice ?? 0;
@@ -94,6 +99,7 @@ function TestsPage() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [content, setContent] = useState(null);
+  const [addedKeys, setAddedKeys] = useState(() => getAddedTestKeys());
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -107,6 +113,16 @@ function TestsPage() {
 
     return () => {
       mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const refreshAdded = () => setAddedKeys(getAddedTestKeys());
+    window.addEventListener(cartEventName, refreshAdded);
+    window.addEventListener("storage", refreshAdded);
+    return () => {
+      window.removeEventListener(cartEventName, refreshAdded);
+      window.removeEventListener("storage", refreshAdded);
     };
   }, []);
 
@@ -200,6 +216,7 @@ function TestsPage() {
       image: item.image,
       color: item.color
     });
+    setAddedKeys(getAddedTestKeys());
     showToast(`${item.name} added to cart.`);
   };
 
@@ -360,7 +377,14 @@ function TestsPage() {
                   }`}
                 >
                   {visibleItems.map((item) => (
-                    <TestCard item={item} viewMode={viewMode} key={item.id} onAddToCart={handleAddToCart} onDetails={() => showToast("Coming Soon")} />
+                    <TestCard
+                      item={item}
+                      viewMode={viewMode}
+                      key={item.id}
+                      onAddToCart={handleAddToCart}
+                      onDetails={() => showToast("Coming Soon")}
+                      isAdded={addedKeys.has(cartKey(item.id, "test"))}
+                    />
                   ))}
                 </div>
               ) : null}
