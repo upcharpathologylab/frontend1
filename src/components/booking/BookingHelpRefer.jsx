@@ -24,7 +24,7 @@ function BookingHelpRefer() {
           <Phone className="h-8 w-8 text-upchar-blue" />
           <div>
             <p className="font-black text-navy-900">Call Us</p>
-            <p className="mt-1 text-sm font-semibold text-navy-700">7838532205</p>
+            <p className="mt-1 text-sm font-semibold text-navy-700">8882753539</p>
             <p className="text-sm font-semibold text-navy-700">Mon - Sun: 7:00 AM - 9:00 PM</p>
           </div>
         </div>
@@ -32,7 +32,7 @@ function BookingHelpRefer() {
           <Mail className="h-8 w-8 text-upchar-blue" />
           <div>
             <p className="font-black text-navy-900">Email Us</p>
-            <p className="mt-1 text-sm font-semibold text-navy-700">support@upcharlab.com</p>
+            <p className="mt-1 text-sm font-semibold text-navy-700">upcharpathologylab@gmail.com</p>
             <p className="text-sm font-semibold text-navy-700">We reply within a few minutes</p>
           </div>
         </div>
