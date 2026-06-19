@@ -70,6 +70,11 @@ function Header({ data }) {
     setOpen(false);
   };
 
+  const closeAuthModal = () => {
+    authReturnToRef.current = "";
+    setAuthModalOpen(false);
+  };
+
   const handleAuthSuccess = (user, message) => {
     setCurrentUser(user);
     setAuthModalOpen(false);
@@ -130,6 +135,10 @@ function Header({ data }) {
     setAuthMode("signin");
     setAuthModalOpen(true);
     setOpen(false);
+    params.delete("auth");
+    params.delete("returnTo");
+    const nextSearch = params.toString();
+    navigate(`${location.pathname}${nextSearch ? `?${nextSearch}` : ""}${location.hash}`, { replace: true });
   }, [location.search]);
 
   useEffect(() => {
@@ -343,7 +352,7 @@ function Header({ data }) {
         isOpen={authModalOpen}
         mode={authMode}
         onModeChange={setAuthMode}
-        onClose={() => setAuthModalOpen(false)}
+        onClose={closeAuthModal}
         onSuccess={handleAuthSuccess}
         onSignupSuccess={showToast}
       />
