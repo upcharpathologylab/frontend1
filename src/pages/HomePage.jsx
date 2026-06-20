@@ -9,7 +9,6 @@ import {
   Grid2X2,
   HeartPulse,
   Home as HomeIcon,
-  LockKeyhole,
   MapPin,
   Menu,
   MessageCircle,
@@ -23,7 +22,6 @@ import {
   TestTube2,
   UserRound,
   X,
-  Zap
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { assetUrl, getFeaturedServiceLocation, getHomeData, getHomepageBanners, getPackages, getPageContent, getTestimonials, getTests } from "../api/api.js";
@@ -609,20 +607,6 @@ function HomePage() {
                 <strong>{label}</strong>
               </Link>
             ))}
-          </section>
-
-          <section className="mobile-prescription-card">
-            <div className="mobile-prescription-icon"><ClipboardList /></div>
-            <div>
-              <h2>Upload Prescription</h2>
-              <p>Upload your prescription & get FLAT 10% OFF</p>
-              <div>
-                <span><Zap /> Quick & Easy</span>
-                <span><ShieldCheck /> 100% Secure</span>
-                <span><LockKeyhole /> Confidential</span>
-              </div>
-            </div>
-            <button type="button" onClick={openMobilePrescription}>Upload Now <ArrowRight /></button>
           </section>
 
           <section className="mobile-product-section">
