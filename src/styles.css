@@ -263,12 +263,42 @@
     font-size: 16px;
   }
 
+  form .grid[class*="sm:grid-cols-2"],
+  form .grid[class*="md:grid-cols-2"],
+  form .grid[class*="lg:grid-cols"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  form [class*="py-4"] {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  form [class*="h-12"],
+  form [class*="h-11"] {
+    min-height: 42px;
+  }
+
   [class*="grid-cols-["] {
     min-width: 0;
   }
 
   [class*="overflow-x-auto"] {
     max-width: calc(100vw - 1.75rem);
+  }
+
+  aside[class*="sticky"],
+  aside[class*="top-32"] {
+    position: static;
+    max-height: none;
+  }
+
+  aside nav[class*="overflow-x-auto"] {
+    scroll-snap-type: x mandatory;
+  }
+
+  aside nav[class*="overflow-x-auto"] > * {
+    scroll-snap-align: start;
   }
 
   [class*="min-w-[520px]"],
@@ -296,6 +326,15 @@
 
   footer {
     text-align: left;
+  }
+
+  footer [class*="lg:grid-cols"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  footer [class*="lg:grid-cols"] > :first-child,
+  footer [class*="lg:grid-cols"] > :last-child {
+    grid-column: 1 / -1;
   }
 
   footer [class*="grid"] {
@@ -330,6 +369,20 @@
   .grid[class*="md:grid-cols-3"]:not(form),
   .grid[class*="xl:grid-cols-4"]:not(form) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  form .grid[class*="sm:grid-cols-2"],
+  form .grid[class*="md:grid-cols-2"],
+  form .grid[class*="xl:grid-cols"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  [class*="lg:grid-cols-[260px_1fr]"],
+  [class*="lg:grid-cols-[280px_1fr]"],
+  [class*="xl:grid-cols-[280px_1fr]"],
+  [class*="xl:grid-cols-[1fr_300px]"],
+  [class*="xl:grid-cols-[minmax(0,1fr)_360px]"] {
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 
   .grid[class*="xl:grid-cols-5"]:not(form) {
@@ -577,6 +630,72 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  form .grid,
+  form [class*="grid-cols-2"],
+  form [class*="sm:grid-cols-2"],
+  form [class*="md:grid-cols-2"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  [class*="lg:grid-cols-[auto_1fr_auto_auto]"],
+  [class*="lg:grid-cols-[0.62fr_1.1fr]"],
+  [class*="lg:grid-cols-[1.1fr_0.7fr_1fr]"],
+  [class*="lg:grid-cols-[1fr_auto]"],
+  [class*="xl:grid-cols-[1.35fr_1fr_180px_150px]"],
+  [class*="xl:grid-cols-[1fr_300px]"],
+  [class*="xl:grid-cols-[280px_1fr]"],
+  [class*="lg:grid-cols-[280px_1fr]"],
+  [class*="lg:grid-cols-[260px_1fr]"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  [class*="sm:grid-cols-[130px_1fr]"],
+  [class*="sm:grid-cols-[1fr_130px]"],
+  [class*="sm:grid-cols-[64px_1fr]"],
+  [class*="md:grid-cols-[170px_1fr]"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  [class*="min-h-[315px]"],
+  [class*="min-h-[390px]"],
+  [class*="min-h-[118px]"],
+  [class*="min-h-[130px]"] {
+    min-height: auto;
+  }
+
+  [class*="max-h-[calc(100vh-2rem)]"],
+  [class*="max-h-[94vh]"],
+  [class*="max-h-[90dvh]"] {
+    max-height: 88dvh !important;
+  }
+
+  iframe[class*="h-72"],
+  img[class*="max-h-72"] {
+    max-height: 220px;
+    height: 220px;
+  }
+
+  [class*="h-64"][class*="w-64"],
+  [class*="h-40"][class*="w-40"] {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  [class*="h-32"][class*="w-32"] {
+    width: 6rem;
+    height: 6rem;
+  }
+
+  [class*="h-16"][class*="w-16"] {
+    width: 3.75rem;
+    height: 3.75rem;
+  }
+
+  [class*="h-12"][class*="w-12"] {
+    width: 3rem;
+    height: 3rem;
+  }
+
   .bg-navy-950.text-white > .container-page {
     padding-top: 1rem;
     padding-bottom: 1rem;
@@ -634,6 +753,22 @@
   footer .container-page {
     padding-top: 2rem;
     padding-bottom: 2rem;
+  }
+
+  footer [class*="lg:grid-cols"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  footer [class*="gap-10"] {
+    gap: 1.35rem;
+  }
+
+  footer ul {
+    gap: 0.65rem;
+  }
+
+  footer [class*="mt-12"] {
+    margin-top: 1.5rem;
   }
 
   footer img {
@@ -697,6 +832,24 @@
 
   [data-carousel-card] {
     width: calc((100% - 0.45rem) / 2) !important;
+  }
+
+  [data-carousel-card] h3,
+  article h3 {
+    font-size: 0.88rem;
+  }
+
+  [data-carousel-card] p,
+  article p {
+    font-size: 0.72rem;
+  }
+
+  [data-carousel-card] button,
+  [data-carousel-card] a {
+    font-size: 0.7rem;
+    min-height: 30px;
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
   }
 
   [data-carousel-card][href="#booking"] {
