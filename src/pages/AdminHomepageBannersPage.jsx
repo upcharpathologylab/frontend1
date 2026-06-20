@@ -8,6 +8,7 @@ import { assetUrl, createAdminResource, deleteAdminResource, getAdminResource, u
 const emptyBanner = {
   bannerTitle: "",
   bannerImage: "",
+  mobileBannerImage: "",
   status: "Active",
   sortOrder: 1,
   headingLine1: "",
@@ -31,6 +32,7 @@ const fieldGroups = [
     fields: [
       ["bannerTitle", "Banner Title", "text", true],
       ["bannerImage", "Banner Image", "image", true],
+      ["mobileBannerImage", "Mobile Banner Image", "image"],
       ["status", "Status", "select", true],
       ["sortOrder", "Sort Order", "number", true]
     ]
@@ -81,13 +83,13 @@ function BannerForm({ item, onClose, onSave }) {
 
   const update = (key, value) => setValues((current) => ({ ...current, [key]: value }));
 
-  const uploadImage = async (file) => {
+  const uploadImage = async (file, key = "bannerImage") => {
     if (!file) return;
     try {
       setUploading(true);
       setError("");
       const result = await uploadContentImage(file);
-      update("bannerImage", result.imageUrl || result.url || "");
+      update(key, result.imageUrl || result.url || "");
     } catch (uploadError) {
       setError(uploadError?.response?.data?.message || "Image upload failed.");
     } finally {
@@ -141,14 +143,14 @@ function BannerForm({ item, onClose, onSave }) {
                       </select>
                     ) : type === "image" ? (
                       <div className="grid gap-3 rounded-md border border-blue-100 p-3">
-                        {assetUrl(values.bannerImage) ? <img src={assetUrl(values.bannerImage)} alt="Banner preview" className="h-44 w-full rounded-md object-cover" /> : null}
+                        {assetUrl(values[key]) ? <img src={assetUrl(values[key])} alt={`${label} preview`} className="h-44 w-full rounded-md object-cover" /> : null}
                         <div className="flex flex-wrap gap-3">
                           <label className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md bg-upchar-blue px-4 text-sm font-black text-white">
                             <Upload className="h-4 w-4" />
                             {uploading ? "Uploading..." : "Upload Image"}
-                            <input className="hidden" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={(event) => uploadImage(event.target.files?.[0])} />
+                            <input className="hidden" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={(event) => uploadImage(event.target.files?.[0], key)} />
                           </label>
-                          <input className={`${inputClass} min-w-[260px] flex-1`} value={values.bannerImage || ""} onChange={(event) => update("bannerImage", event.target.value)} placeholder="Uploaded image URL" />
+                          <input className={`${inputClass} min-w-[260px] flex-1`} value={values[key] || ""} onChange={(event) => update(key, event.target.value)} placeholder="Uploaded image URL" />
                         </div>
                       </div>
                     ) : (

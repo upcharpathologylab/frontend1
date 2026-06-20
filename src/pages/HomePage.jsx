@@ -13,7 +13,6 @@ import {
   MapPin,
   Menu,
   MessageCircle,
-  Mic,
   Package,
   Plus,
   Search,
@@ -152,7 +151,8 @@ const bannerToHero = (banner, fallbackHero) => {
       }
     ],
     offerText: offerText || fallbackHero.offerText,
-    image: assetUrl(banner.bannerImage) || fallbackHero.image
+    image: assetUrl(banner.bannerImage) || fallbackHero.image,
+    mobileImage: assetUrl(banner.mobileBannerImage) || assetUrl(banner.bannerImage) || fallbackHero.image
   };
 };
 
@@ -361,7 +361,7 @@ function HomePage() {
   const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
   const contact = resolveContactInfo(contactContent, displayHomeData.siteSettings || {}, serviceLocation);
   const hero = displayHomeData.hero || fallbackHomeData.hero;
-  const mobileHeroImage = hero.image || "/images/home-banner.png";
+  const mobileHeroImage = hero.mobileImage || hero.image || "/images/home-banner.png";
   const mobileSearchResults = useMemo(() => {
     const term = mobileQuery.trim().toLowerCase();
     if (!term) return [];
@@ -544,7 +544,7 @@ function HomePage() {
                 onChange={(event) => setMobileQuery(event.target.value)}
                 placeholder="Search for tests, packages..."
               />
-              <button type="button" aria-label="Voice search"><Mic /></button>
+              <button type="button" aria-label="Search"><Search /></button>
             </div>
             {mobileSearchResults.length > 0 && (
               <div className="mobile-search-results">
@@ -648,6 +648,26 @@ function HomePage() {
               })}
             </div>
           </section>
+
+          {displayHomeData.reviews?.length ? (
+            <section className="mobile-reviews-section">
+              <div className="mobile-section-heading">
+                <h2>Patient Reviews</h2>
+              </div>
+              <div className="mobile-review-slider">
+                {displayHomeData.reviews.slice(0, 6).map((review, index) => (
+                  <article className="mobile-review-card" key={review.id || review.name || index}>
+                    <div>
+                      <strong>{review.name || "Upchar Customer"}</strong>
+                      <span><Star /><Star /><Star /><Star /><Star /></span>
+                    </div>
+                    <p>{review.comment || review.content}</p>
+                    <small>{review.reviewDate || "Recently"}</small>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           <section className="mobile-trust-help">
             <div>

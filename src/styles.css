@@ -827,6 +827,7 @@ footer li,
     overflow-x: hidden;
     background: #f8fbff;
     color: #061944;
+    padding-top: 4.75rem;
     padding-bottom: 7.25rem;
     font-size: 16px;
   }
@@ -836,7 +837,9 @@ footer li,
   }
 
   .mobile-home-header {
-    position: sticky;
+    position: fixed;
+    right: 0;
+    left: 0;
     top: 0;
     z-index: 45;
     display: grid;
@@ -931,8 +934,10 @@ footer li,
   }
 
   .mobile-home-menu {
-    position: sticky;
-    top: 4.35rem;
+    position: fixed;
+    right: 0;
+    left: 0;
+    top: 4.75rem;
     z-index: 44;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -963,7 +968,7 @@ footer li,
 
   .mobile-hero-card {
     position: relative;
-    min-height: 17.5rem;
+    min-height: 15.5rem;
     overflow: hidden;
     border-radius: 1rem;
     background: linear-gradient(105deg, #071b4f 0%, #062057 48%, #042255 100%);
@@ -973,8 +978,8 @@ footer li,
   .mobile-hero-copy {
     position: relative;
     z-index: 2;
-    width: 63%;
-    padding: 1.15rem 1rem 1.25rem;
+    width: 61%;
+    padding: 1rem 0.9rem 1.1rem;
     color: #fff;
   }
 
@@ -991,7 +996,7 @@ footer li,
 
   .mobile-hero-copy h1 {
     margin-top: 0.75rem;
-    font-size: clamp(2.25rem, 10vw, 3.35rem);
+    font-size: clamp(2rem, 9vw, 3rem);
     line-height: 0.92;
     font-weight: 1000;
     letter-spacing: 0;
@@ -1003,7 +1008,7 @@ footer li,
 
   .mobile-hero-copy p {
     margin-top: 0.35rem;
-    font-size: clamp(1.08rem, 4.8vw, 1.55rem);
+    font-size: clamp(1rem, 4.4vw, 1.35rem);
     font-weight: 900;
     line-height: 1.15;
   }
@@ -1012,7 +1017,7 @@ footer li,
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem 0.55rem;
-    margin-top: 0.9rem;
+    margin-top: 0.75rem;
   }
 
   .mobile-hero-features div {
@@ -1040,8 +1045,8 @@ footer li,
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    min-height: 2.75rem;
-    margin-top: 1rem;
+    min-height: 2.65rem;
+    margin-top: 0.85rem;
     border: 0;
     border-radius: 0.55rem;
     background: #fff;
@@ -1058,10 +1063,10 @@ footer li,
 
   .mobile-hero-card img {
     position: absolute;
-    right: -0.85rem;
+    right: -0.45rem;
     bottom: 0;
     z-index: 1;
-    width: 52%;
+    width: 50%;
     height: 100%;
     object-fit: cover;
     object-position: center;
@@ -1109,9 +1114,9 @@ footer li,
     align-items: center;
     gap: 0.55rem;
     min-height: 4.15rem;
-    border: 1px solid #eef2f7;
+    border: 2px solid #0ba660;
     border-radius: 999px;
-    background: #fff;
+    background: #f2fff8;
     padding: 0.35rem 0.35rem 0.35rem 1rem;
     box-shadow: 0 10px 24px rgba(6, 25, 68, 0.08);
   }
@@ -1119,7 +1124,7 @@ footer li,
   .mobile-search-bar > svg {
     width: 1.5rem;
     height: 1.5rem;
-    color: #061944;
+    color: #0ba660;
   }
 
   .mobile-search-bar input {
@@ -1199,14 +1204,24 @@ footer li,
 
   .mobile-category-card {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.65rem 0.5rem;
-    overflow: visible;
+    grid-auto-flow: column;
+    grid-auto-columns: 6.35rem;
+    grid-template-columns: none;
+    gap: 0.65rem;
+    overflow-x: auto;
+    overflow-y: hidden;
     border: 1px solid #eef2f7;
     border-radius: 1rem;
     background: #fff;
     padding: 0.9rem 0.7rem;
     box-shadow: 0 8px 18px rgba(6, 25, 68, 0.06);
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .mobile-category-card::-webkit-scrollbar {
+    display: none;
   }
 
   .mobile-category-item {
@@ -1216,6 +1231,7 @@ footer li,
     min-width: 0;
     color: #061944;
     text-align: center;
+    scroll-snap-align: start;
   }
 
   .mobile-category-item span {
@@ -1371,6 +1387,7 @@ footer li,
     overflow-y: hidden;
     padding: 0.1rem 0.05rem 0.45rem;
     scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
     scrollbar-width: none;
   }
 
@@ -1522,6 +1539,82 @@ footer li,
     padding-bottom: 3.25rem;
   }
 
+  .mobile-reviews-section {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .mobile-review-slider {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(16rem, 82%);
+    gap: 0.85rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.1rem 0.05rem 0.45rem;
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .mobile-review-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-review-card {
+    display: grid;
+    gap: 0.65rem;
+    scroll-snap-align: start;
+    border: 1px solid #edf2f7;
+    border-radius: 0.95rem;
+    background: #fff;
+    padding: 1rem;
+    box-shadow: 0 8px 18px rgba(6, 25, 68, 0.08);
+  }
+
+  .mobile-review-card > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .mobile-review-card strong {
+    color: #061944;
+    font-size: 0.95rem;
+    font-weight: 1000;
+  }
+
+  .mobile-review-card span {
+    display: inline-flex;
+    gap: 0.1rem;
+    color: #f6b21a;
+  }
+
+  .mobile-review-card span svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    fill: currentColor;
+  }
+
+  .mobile-review-card p {
+    display: -webkit-box;
+    min-height: 3.6rem;
+    overflow: hidden;
+    color: #34405c;
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .mobile-review-card small {
+    color: #0ba660;
+    font-size: 0.78rem;
+    font-weight: 900;
+  }
+
   .mobile-trust-help {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(8rem, 0.75fr);
@@ -1666,7 +1759,7 @@ footer li,
   }
 
   .mobile-hero-card {
-    min-height: 16.5rem;
+    min-height: 15.25rem;
   }
 
   .mobile-card-grid {
@@ -1691,13 +1784,13 @@ footer li,
   }
 
   .mobile-hero-copy {
-    width: 64%;
-    padding: 1rem 0.85rem;
+    width: 62%;
+    padding: 0.9rem 0.8rem;
   }
 
   .mobile-hero-card img {
-    right: -1.25rem;
-    width: 54%;
+    right: -0.75rem;
+    width: 51%;
   }
 
   .mobile-prescription-card {
@@ -1723,7 +1816,7 @@ footer li,
   }
 
   .mobile-hero-card {
-    min-height: 15.75rem;
+    min-height: 14.75rem;
   }
 
   .mobile-hero-copy {
