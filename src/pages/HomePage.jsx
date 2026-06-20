@@ -395,6 +395,28 @@ function HomePage() {
     navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`);
   };
 
+  const openProtectedMobileRoute = (route) => {
+    setMobileMenuOpen(false);
+    if (getStoredUser()) {
+      navigate(route);
+      return;
+    }
+    navigate(`/?auth=signin&returnTo=${encodeURIComponent(route)}`);
+  };
+
+  const openMobileLocation = () => {
+    const locationQuery = serviceLocation ? `${serviceLocation.centerName || ""} ${serviceLocation.fullAddress || ""}`.trim() : "";
+    const locationUrl = serviceLocation?.googlePlaceUrl?.trim()
+      || serviceLocation?.googleDirectionUrl?.trim()
+      || (locationQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationQuery)}` : "");
+
+    if (locationUrl) {
+      window.open(locationUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    navigate("/contact-us");
+  };
+
   const addMobileCartItem = (item, type) => {
     if (hasCartItem(item.id, type)) return;
     addCartItem({
@@ -423,9 +445,10 @@ function HomePage() {
     { label: "Home", icon: HomeIcon, href: "/" },
     { label: "Tests", icon: TestTube2, href: "/tests" },
     { label: "Packages", icon: Package, href: "/packages" },
-    { label: "Reports", icon: FileText, href: "/my-account?section=reports" },
-    { label: "Profile", icon: UserRound, href: "/my-account" }
+    { label: "Reports", icon: FileText, href: "/my-account/reports", protected: true },
+    { label: "Profile", icon: UserRound, href: "/my-account", protected: true }
   ];
+  const locationLabel = serviceLocation?.areaLabel || serviceLocation?.city || serviceLocation?.centerName || "Location";
 
   return (
     <div className="min-h-screen overflow-hidden bg-white">
@@ -470,9 +493,9 @@ function HomePage() {
             {mobileMenuOpen ? <X /> : <Menu />}
           </button>
           <Logo />
-          <button type="button" className="mobile-location-pill" onClick={() => navigate("/contact-us")}>
+          <button type="button" className="mobile-location-pill" onClick={openMobileLocation}>
             <MapPin />
-            <span>Faridabad</span>
+            <span>{locationLabel}</span>
             <ChevronDown />
           </button>
           <Link className="mobile-cart-button" to="/cart" aria-label="Cart">
@@ -528,7 +551,7 @@ function HomePage() {
                 {mobileSearchResults.map((item) => (
                   <Link
                     key={`${item.resultType}-${item.id}`}
-                    to={item.resultType === "package" ? `/packages/${item.id}` : `/tests/${item.id}`}
+                    to={item.resultType === "package" ? "/packages" : "/tests"}
                     onClick={() => setMobileQuery("")}
                   >
                     <span>{item.resultType}</span>
@@ -645,8 +668,14 @@ function HomePage() {
           <button type="button" className="mobile-upload-nav" onClick={openMobilePrescription}>
             <ClipboardList /><span>Upload<br />Prescription</span>
           </button>
-          {mobileNav.slice(3).map(({ label, icon: NavIcon, href }) => (
-            <Link key={label} to={href}><NavIcon /><span>{label}</span></Link>
+          {mobileNav.slice(3).map(({ label, icon: NavIcon, href, protected: protectedRoute }) => (
+            protectedRoute ? (
+              <button type="button" key={label} onClick={() => openProtectedMobileRoute(href)}>
+                <NavIcon /><span>{label}</span>
+              </button>
+            ) : (
+              <Link key={label} to={href}><NavIcon /><span>{label}</span></Link>
+            )
           ))}
         </nav>
       </div>
