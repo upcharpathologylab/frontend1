@@ -466,17 +466,31 @@ function HomePage() {
   ];
   const locationLabel = "Map";
   const mapQuery = serviceLocation ? `${serviceLocation.centerName || ""} ${serviceLocation.fullAddress || ""}`.trim() : "";
+  const savedMapEmbed = serviceLocation?.googleMapEmbedUrl?.trim() || "";
+  const iframeSrcMatch = savedMapEmbed.match(/src=["']([^"']+)["']/i);
+  const normalizedSavedEmbed = iframeSrcMatch?.[1] || savedMapEmbed;
+  const hasMapCoordinates = serviceLocation?.latitude != null && serviceLocation?.longitude != null;
   const mobileMapLink = serviceLocation?.googlePlaceUrl?.trim()
     || serviceLocation?.googleDirectionUrl?.trim()
-    || (mapQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}` : "");
+    || (hasMapCoordinates
+      ? `https://www.google.com/maps/search/?api=1&query=${serviceLocation.latitude},${serviceLocation.longitude}`
+      : mapQuery
+        ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
+        : "");
   const mobileDirectionLink = serviceLocation?.googleDirectionUrl?.trim()
-    || (mapQuery ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}` : mobileMapLink);
-  const mobileMapEmbedUrl = serviceLocation?.googleMapEmbedUrl?.trim()
-    || (serviceLocation?.latitude != null && serviceLocation?.longitude != null
+    || (hasMapCoordinates
+      ? `https://www.google.com/maps/dir/?api=1&destination=${serviceLocation.latitude},${serviceLocation.longitude}`
+      : mapQuery
+        ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`
+        : mobileMapLink);
+  const mobileMapEmbedUrl =
+    normalizedSavedEmbed.includes("output=embed") || normalizedSavedEmbed.includes("/embed")
+      ? normalizedSavedEmbed
+      : hasMapCoordinates
       ? `https://maps.google.com/maps?q=${serviceLocation.latitude},${serviceLocation.longitude}&z=15&output=embed`
       : mapQuery
         ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=15&output=embed`
-        : "");
+        : "";
 
   return (
     <div className="min-h-screen overflow-hidden bg-white">
@@ -767,13 +781,29 @@ function HomePage() {
             </section>
           ) : null}
 
-          {mobileMapEmbedUrl ? (
+          {mobileMapEmbedUrl || mobileDirectionLink ? (
             <section className="mobile-map-section">
               <div className="mobile-section-heading">
                 <h2>Find Us</h2>
-                {mobileDirectionLink ? <a href={mobileDirectionLink} target="_blank" rel="noreferrer">Get Directions <ArrowRight /></a> : null}
               </div>
-              <iframe title={serviceLocation?.centerName || "Upchar Pathology location"} src={mobileMapEmbedUrl} loading="lazy" />
+              {mobileMapEmbedUrl ? (
+                <iframe
+                  title={serviceLocation?.centerName || "Upchar Pathology location"}
+                  src={mobileMapEmbedUrl}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              ) : (
+                <div className="mobile-map-fallback">
+                  <strong>{serviceLocation?.centerName || "Upchar Pathology"}</strong>
+                  <p>{serviceLocation?.fullAddress || "Open location in Google Maps."}</p>
+                </div>
+              )}
+              {mobileDirectionLink ? (
+                <a className="mobile-direction-button" href={mobileDirectionLink} target="_blank" rel="noreferrer">
+                  Get Directions <ArrowRight />
+                </a>
+              ) : null}
             </section>
           ) : null}
         </main>
