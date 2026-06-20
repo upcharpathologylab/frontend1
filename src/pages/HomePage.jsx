@@ -1,10 +1,42 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowRight,
+  ChevronDown,
+  ClipboardList,
+  Droplet,
+  FileText,
+  Grid2X2,
+  HeartPulse,
+  Home as HomeIcon,
+  LockKeyhole,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Mic,
+  Package,
+  Plus,
+  Search,
+  ShieldCheck,
+  ShieldPlus,
+  ShoppingCart,
+  Star,
+  TestTube2,
+  UserRound,
+  X,
+  Zap
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { assetUrl, getFeaturedServiceLocation, getHomeData, getHomepageBanners, getPackages, getPageContent, getTestimonials, getTests } from "../api/api.js";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
+import Logo from "../components/Logo.jsx";
+import { getStoredUser } from "../components/auth/authStorage.js";
 import { fallbackHomeData, mergeHomeData } from "../data/homeData.js";
+import { addCartItem, cartEventName, cartItemKey, getCartCount, getCartItems, hasCartItem } from "../utils/cart.js";
+import { resolveContactInfo } from "../utils/contactInfo.js";
 import { applyHomeContentOverrides, getContentSection } from "../utils/contentOverrides.js";
+import { price } from "../utils.js";
 import BlogSection from "../sections/BlogSection.jsx";
 import BookingMapSection from "../sections/BookingMapSection.jsx";
 import HeroSection from "../sections/HeroSection.jsx";
@@ -139,9 +171,28 @@ function SectionSkeleton({ className = "bg-white" }) {
   );
 }
 
+const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
+const mobileCartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
+
+const discountLabel = (item) => {
+  if (item.discount) return item.discount;
+  const original = Number(item.originalPrice || 0);
+  const current = Number(item.discountedPrice || 0);
+  if (original > current && current > 0) return `${Math.round(((original - current) / original) * 100)}% OFF`;
+  return "BEST PRICE";
+};
+
+const savingText = (item) => {
+  const original = Number(item.originalPrice || 0);
+  const current = Number(item.discountedPrice || 0);
+  return original > current && current > 0 ? `You Save ${price(original - current)}` : "Best value";
+};
+
 function HomePage() {
+  const navigate = useNavigate();
   const [homeData, setHomeData] = useState(null);
   const [homeContent, setHomeContent] = useState(null);
+  const [contactContent, setContactContent] = useState(null);
   const [blogContent, setBlogContent] = useState(null);
   const [homepageBanners, setHomepageBanners] = useState([]);
   const [homepageBannersLoaded, setHomepageBannersLoaded] = useState(false);
@@ -157,6 +208,10 @@ function HomePage() {
   const [serviceLocationLoaded, setServiceLocationLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileQuery, setMobileQuery] = useState("");
+  const [mobileAddedKeys, setMobileAddedKeys] = useState(() => mobileCartKeys());
+  const [mobileCartCount, setMobileCartCount] = useState(() => getCartCount());
 
   useEffect(() => {
     let mounted = true;
@@ -183,6 +238,13 @@ function HomePage() {
     getPageContent("home")
       .then((content) => {
         if (mounted) setHomeContent(content);
+      })
+      .catch(() => {});
+
+    getPageContent("contact-us")
+      .then((page) => {
+        const section = (page?.sections || []).find((item) => item.sectionKey === "contact-info") || null;
+        if (mounted) setContactContent(section);
       })
       .catch(() => {});
 
@@ -295,41 +357,299 @@ function HomePage() {
   const packageContent = getContentSection(homeContent, "packages");
   const activePackages = useMemo(() => homePackages.filter((item) => item.isActive), [homePackages]);
   const activeTests = useMemo(() => homeTests.filter((item) => item.isActive), [homeTests]);
+  const mobilePackages = useMemo(() => activePackages.slice(0, 4), [activePackages]);
+  const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
+  const contact = resolveContactInfo(contactContent, displayHomeData.siteSettings || {}, serviceLocation);
+  const hero = displayHomeData.hero || fallbackHomeData.hero;
+  const mobileHeroImage = hero.image || "/images/home-banner.png";
+  const mobileSearchResults = useMemo(() => {
+    const term = mobileQuery.trim().toLowerCase();
+    if (!term) return [];
+    return [
+      ...activeTests.map((item) => ({ ...item, resultType: "test" })),
+      ...activePackages.map((item) => ({ ...item, resultType: "package" }))
+    ]
+      .filter((item) => `${item.name} ${item.subtitle || ""} ${item.testCount || ""}`.toLowerCase().includes(term))
+      .slice(0, 6);
+  }, [activePackages, activeTests, mobileQuery]);
+
+  useEffect(() => {
+    const syncMobileCart = () => {
+      setMobileAddedKeys(mobileCartKeys());
+      setMobileCartCount(getCartCount());
+    };
+    window.addEventListener(cartEventName, syncMobileCart);
+    window.addEventListener("storage", syncMobileCart);
+    return () => {
+      window.removeEventListener(cartEventName, syncMobileCart);
+      window.removeEventListener("storage", syncMobileCart);
+    };
+  }, []);
+
+  const openMobilePrescription = () => {
+    setMobileMenuOpen(false);
+    if (getStoredUser()) {
+      navigate(uploadPrescriptionPath);
+      return;
+    }
+    navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`);
+  };
+
+  const addMobileCartItem = (item, type) => {
+    if (hasCartItem(item.id, type)) return;
+    addCartItem({
+      id: item.id,
+      type,
+      name: item.name,
+      subtitle: item.subtitle,
+      testCount: item.testCount,
+      image: item.image,
+      price: item.discountedPrice,
+      oldPrice: item.originalPrice,
+      discount: item.discount,
+      quantity: 1
+    });
+  };
+  const mobileCategories = [
+    { label: "Blood Tests", icon: Droplet, href: "/tests?search=blood", tone: "red" },
+    { label: "Full Body Checkup", icon: UserRound, href: "/packages", tone: "green" },
+    { label: "Diabetes Care", icon: Droplet, href: "/tests?search=diabetes", tone: "orange" },
+    { label: "Thyroid Tests", icon: HeartPulse, href: "/tests?search=thyroid", tone: "purple" },
+    { label: "Heart Health", icon: HeartPulse, href: "/tests?search=heart", tone: "red" },
+    { label: "Immunity Boost", icon: ShieldPlus, href: "/packages?search=immunity", tone: "green" },
+    { label: "View All", icon: Grid2X2, href: "/tests", tone: "slate" }
+  ];
+  const mobileNav = [
+    { label: "Home", icon: HomeIcon, href: "/" },
+    { label: "Tests", icon: TestTube2, href: "/tests" },
+    { label: "Packages", icon: Package, href: "/packages" },
+    { label: "Reports", icon: FileText, href: "/my-account?section=reports" },
+    { label: "Profile", icon: UserRound, href: "/my-account" }
+  ];
 
   return (
     <div className="min-h-screen overflow-hidden bg-white">
-      <Header data={displayHomeData} />
-      <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
-        {homepageBannersLoaded ? (
-          <HeroSection data={displayHomeData} loading={loading} tests={activeTests} packages={activePackages} />
-        ) : (
-          <section className="relative min-h-[430px] overflow-hidden bg-navy-950 lg:h-[350px] lg:min-h-0">
-            <div className="absolute inset-x-0 bottom-0 h-1 animate-pulse bg-upchar-green" />
-          </section>
+      <div className="desktop-home-shell">
+        <Header data={displayHomeData} />
+        <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
+          {homepageBannersLoaded ? (
+            <HeroSection data={displayHomeData} loading={loading} tests={activeTests} packages={activePackages} />
+          ) : (
+            <section className="relative min-h-[430px] overflow-hidden bg-navy-950 lg:h-[350px] lg:min-h-0">
+              <div className="absolute inset-x-0 bottom-0 h-1 animate-pulse bg-upchar-green" />
+            </section>
+          )}
+          <SearchSection
+            quickCards={displayHomeData.quickCards}
+            whatsappNumber={displayHomeData.siteSettings.whatsappNumber}
+            tests={activeTests}
+            packages={activePackages}
+          />
+          {packagesLoaded ? <SpecialCareSection packages={activePackages} content={packageContent} /> : <SectionSkeleton className="bg-gradient-to-b from-white to-blue-50/40" />}
+          <VitalOrgansSection organs={displayHomeData.organs} />
+          {testsLoaded ? <TrustedTestsSection tests={activeTests} content={getContentSection(homeContent, "trusted-tests")} /> : <SectionSkeleton className="bg-gradient-to-b from-blue-50/40 to-white" />}
+          <WhyChooseSection features={displayHomeData.whyChoose} content={getContentSection(homeContent, "why-choose")} />
+          <HowItWorksSection steps={displayHomeData.howItWorks} />
+          {testimonialsLoaded ? <ReviewsSection reviews={displayHomeData.reviews} content={getContentSection(homeContent, "testimonials")} /> : <SectionSkeleton />}
+          {blogsLoaded ? <BlogSection blogs={displayHomeData.blogs} content={getContentSection(blogContent, "hero") || getContentSection(homeContent, "blog")} /> : <SectionSkeleton className="bg-gradient-to-b from-blue-50/40 to-white" />}
+          <BookingMapSection
+            data={displayHomeData}
+            content={getContentSection(homeContent, "cta")}
+            tests={activeTests}
+            packages={activePackages}
+            serviceLocation={serviceLocation}
+            serviceLocationLoaded={serviceLocationLoaded}
+          />
+        </main>
+        <Footer data={displayHomeData} serviceLocation={serviceLocation} />
+      </div>
+
+      <div className="mobile-home-shell">
+        <header className="mobile-home-header">
+          <button type="button" className="mobile-icon-button" onClick={() => setMobileMenuOpen((value) => !value)} aria-label="Open menu">
+            {mobileMenuOpen ? <X /> : <Menu />}
+          </button>
+          <Logo />
+          <button type="button" className="mobile-location-pill" onClick={() => navigate("/contact-us")}>
+            <MapPin />
+            <span>Faridabad</span>
+            <ChevronDown />
+          </button>
+          <Link className="mobile-cart-button" to="/cart" aria-label="Cart">
+            <ShoppingCart />
+            {mobileCartCount > 0 && <span>{mobileCartCount}</span>}
+          </Link>
+        </header>
+
+        {mobileMenuOpen && (
+          <nav className="mobile-home-menu">
+            {["Home", "About Us", "Packages", "Tests", "Contact Us"].map((label) => (
+              <Link key={label} to={label === "Home" ? "/" : `/${label.toLowerCase().replace(/\s+/g, "-")}`} onClick={() => setMobileMenuOpen(false)}>
+                {label}
+              </Link>
+            ))}
+          </nav>
         )}
-        <SearchSection
-          quickCards={displayHomeData.quickCards}
-          whatsappNumber={displayHomeData.siteSettings.whatsappNumber}
-          tests={activeTests}
-          packages={activePackages}
-        />
-        {packagesLoaded ? <SpecialCareSection packages={activePackages} content={packageContent} /> : <SectionSkeleton className="bg-gradient-to-b from-white to-blue-50/40" />}
-        <VitalOrgansSection organs={displayHomeData.organs} />
-        {testsLoaded ? <TrustedTestsSection tests={activeTests} content={getContentSection(homeContent, "trusted-tests")} /> : <SectionSkeleton className="bg-gradient-to-b from-blue-50/40 to-white" />}
-        <WhyChooseSection features={displayHomeData.whyChoose} content={getContentSection(homeContent, "why-choose")} />
-        <HowItWorksSection steps={displayHomeData.howItWorks} />
-        {testimonialsLoaded ? <ReviewsSection reviews={displayHomeData.reviews} content={getContentSection(homeContent, "testimonials")} /> : <SectionSkeleton />}
-        {blogsLoaded ? <BlogSection blogs={displayHomeData.blogs} content={getContentSection(blogContent, "hero") || getContentSection(homeContent, "blog")} /> : <SectionSkeleton className="bg-gradient-to-b from-blue-50/40 to-white" />}
-        <BookingMapSection
-          data={displayHomeData}
-          content={getContentSection(homeContent, "cta")}
-          tests={activeTests}
-          packages={activePackages}
-          serviceLocation={serviceLocation}
-          serviceLocationLoaded={serviceLocationLoaded}
-        />
-      </main>
-      <Footer data={displayHomeData} serviceLocation={serviceLocation} />
+
+        <main className="mobile-home-main">
+          <section className="mobile-hero-card">
+            <div className="mobile-hero-copy">
+              <span>Limited Time Offer</span>
+              <h1>UP TO <strong>60% OFF</strong></h1>
+              <p>on Selected Health Packages</p>
+              <div className="mobile-hero-features">
+                {(hero.trustPoints || []).slice(0, 4).map((point) => (
+                  <div key={point.label}>
+                    <ShieldCheck />
+                    <small>{point.label}</small>
+                  </div>
+                ))}
+              </div>
+              <button type="button" onClick={() => navigate("/packages")}>
+                Book Now <ArrowRight />
+              </button>
+            </div>
+            <img src={mobileHeroImage} alt="Upchar health packages" />
+            <div className="mobile-hero-dots"><i /><i /><i /></div>
+          </section>
+
+          <section className="mobile-search-panel">
+            <div className="mobile-search-bar">
+              <Search />
+              <input
+                value={mobileQuery}
+                onChange={(event) => setMobileQuery(event.target.value)}
+                placeholder="Search for tests, packages..."
+              />
+              <button type="button" aria-label="Voice search"><Mic /></button>
+            </div>
+            {mobileSearchResults.length > 0 && (
+              <div className="mobile-search-results">
+                {mobileSearchResults.map((item) => (
+                  <Link
+                    key={`${item.resultType}-${item.id}`}
+                    to={item.resultType === "package" ? `/packages/${item.id}` : `/tests/${item.id}`}
+                    onClick={() => setMobileQuery("")}
+                  >
+                    <span>{item.resultType}</span>
+                    <strong>{item.name}</strong>
+                    <small>{price(item.discountedPrice || item.originalPrice || 0)}</small>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="mobile-category-card">
+            {mobileCategories.map(({ label, icon: CategoryIcon, href, tone }) => (
+              <Link key={label} to={href} className={`mobile-category-item mobile-tone-${tone}`}>
+                <span><CategoryIcon /></span>
+                <strong>{label}</strong>
+              </Link>
+            ))}
+          </section>
+
+          <section className="mobile-prescription-card">
+            <div className="mobile-prescription-icon"><ClipboardList /></div>
+            <div>
+              <h2>Upload Prescription</h2>
+              <p>Upload your prescription & get FLAT 10% OFF</p>
+              <div>
+                <span><Zap /> Quick & Easy</span>
+                <span><ShieldCheck /> 100% Secure</span>
+                <span><LockKeyhole /> Confidential</span>
+              </div>
+            </div>
+            <button type="button" onClick={openMobilePrescription}>Upload Now <ArrowRight /></button>
+          </section>
+
+          <section className="mobile-product-section">
+            <div className="mobile-section-heading">
+              <h2>Popular Health Packages</h2>
+              <Link to="/packages">View All <ArrowRight /></Link>
+            </div>
+            <div className="mobile-card-grid">
+              {mobilePackages.map((item) => {
+                const isAdded = mobileAddedKeys.has(cartItemKey(item.id, "package"));
+                return (
+                  <article className="mobile-package-card" key={item.id}>
+                    <div className="mobile-card-image">
+                      <img src={item.image} alt={item.name} />
+                      <span>{discountLabel(item)}</span>
+                    </div>
+                    <div className="mobile-card-body">
+                      <h3>{item.name}</h3>
+                      <p>{item.testCount || "Health Package"}</p>
+                      <div className="mobile-price-row">
+                        <del>{price(item.originalPrice || item.discountedPrice || 0)}</del>
+                        <strong>{price(item.discountedPrice || item.originalPrice || 0)}</strong>
+                      </div>
+                      <small>{savingText(item)}</small>
+                      <button type="button" className={isAdded ? "is-added" : ""} onClick={() => addMobileCartItem(item, "package")}>
+                        <ShoppingCart /> {isAdded ? "Added" : "Add to Cart"}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="mobile-product-section">
+            <div className="mobile-section-heading">
+              <h2>Popular Tests</h2>
+              <Link to="/tests">View All Tests <ArrowRight /></Link>
+            </div>
+            <div className="mobile-card-grid">
+              {mobileTests.map((item) => {
+                const isAdded = mobileAddedKeys.has(cartItemKey(item.id, "test"));
+                return (
+                  <article className="mobile-test-card" key={item.id}>
+                    <div className="mobile-card-image">
+                      <img src={item.image} alt={item.name} />
+                      <span>{discountLabel(item)}</span>
+                    </div>
+                    <div className="mobile-card-body">
+                      <h3>{item.name}</h3>
+                      <p>{item.subtitle}</p>
+                      <div className="mobile-price-row">
+                        <del>{price(item.originalPrice || item.discountedPrice || 0)}</del>
+                        <strong>{price(item.discountedPrice || item.originalPrice || 0)}</strong>
+                      </div>
+                      <button type="button" className={`mobile-add-circle ${isAdded ? "is-added" : ""}`} onClick={() => addMobileCartItem(item, "test")}>
+                        <Plus />
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="mobile-trust-help">
+            <div>
+              <strong>Trusted by 10,000+ Happy Customers</strong>
+              <p><b>4.8</b> <Star /><Star /><Star /><Star /><Star /> <span>(2,500+ Reviews)</span></p>
+            </div>
+            <a href={contact.whatsappHref || `https://wa.me/${displayHomeData.siteSettings.whatsappNumber}`} target="_blank" rel="noreferrer">
+              <MessageCircle />
+              <span><strong>Need Help?</strong> Chat on WhatsApp</span>
+            </a>
+          </section>
+        </main>
+
+        <nav className="mobile-bottom-nav">
+          {mobileNav.slice(0, 3).map(({ label, icon: NavIcon, href }) => (
+            <Link key={label} to={href}><NavIcon /><span>{label}</span></Link>
+          ))}
+          <button type="button" className="mobile-upload-nav" onClick={openMobilePrescription}>
+            <ClipboardList /><span>Upload<br />Prescription</span>
+          </button>
+          {mobileNav.slice(3).map(({ label, icon: NavIcon, href }) => (
+            <Link key={label} to={href}><NavIcon /><span>{label}</span></Link>
+          ))}
+        </nav>
+      </div>
 
       <AnimatePresence>
         {usingFallback && !loading && (
