@@ -1,13 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   ChevronDown,
   ClipboardList,
-  Droplet,
   FileText,
-  Grid2X2,
-  HeartPulse,
   Home as HomeIcon,
   MapPin,
   Menu,
@@ -16,17 +13,17 @@ import {
   Plus,
   Search,
   ShieldCheck,
-  ShieldPlus,
   ShoppingCart,
   Star,
   TestTube2,
   UserRound,
-  X,
+  X
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { assetUrl, getFeaturedServiceLocation, getHomeData, getHomepageBanners, getPackages, getPageContent, getTestimonials, getTests } from "../api/api.js";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
+import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
 import { getStoredUser } from "../components/auth/authStorage.js";
 import { fallbackHomeData, mergeHomeData } from "../data/homeData.js";
@@ -209,6 +206,13 @@ function HomePage() {
   const [mobileQuery, setMobileQuery] = useState("");
   const [mobileAddedKeys, setMobileAddedKeys] = useState(() => mobileCartKeys());
   const [mobileCartCount, setMobileCartCount] = useState(() => getCartCount());
+  const mobileOrgansRef = useRef(null);
+  const mobilePackagesRef = useRef(null);
+  const mobileTestsRef = useRef(null);
+  const mobileReviewsRef = useRef(null);
+  const mobileWhyRef = useRef(null);
+  const mobileHowRef = useRef(null);
+  const mobileBlogsRef = useRef(null);
 
   useEffect(() => {
     let mounted = true;
@@ -395,6 +399,23 @@ function HomePage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia("(max-width: 768px)").matches) return undefined;
+    const refs = [mobileOrgansRef, mobilePackagesRef, mobileTestsRef, mobileReviewsRef, mobileWhyRef, mobileHowRef, mobileBlogsRef];
+    const timer = window.setInterval(() => {
+      refs.forEach((ref) => {
+        const node = ref.current;
+        if (!node || node.scrollWidth <= node.clientWidth) return;
+        const firstCard = node.firstElementChild;
+        const step = firstCard ? firstCard.getBoundingClientRect().width + 12 : node.clientWidth * 0.7;
+        const nearEnd = node.scrollLeft + node.clientWidth + step >= node.scrollWidth;
+        node.scrollTo({ left: nearEnd ? 0 : node.scrollLeft + step, behavior: "smooth" });
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [displayHomeData.blogs, displayHomeData.howItWorks, displayHomeData.organs, displayHomeData.reviews, displayHomeData.whyChoose, mobilePackages, mobileTests]);
+
   const openMobilePrescription = () => {
     setMobileMenuOpen(false);
     if (getStoredUser()) {
@@ -441,14 +462,11 @@ function HomePage() {
       quantity: 1
     });
   };
-  const mobileCategories = [
-    { label: "Blood Tests", icon: Droplet, href: "/tests?search=blood", tone: "red" },
-    { label: "Full Body Checkup", icon: UserRound, href: "/packages", tone: "green" },
-    { label: "Diabetes Care", icon: Droplet, href: "/tests?search=diabetes", tone: "orange" },
-    { label: "Thyroid Tests", icon: HeartPulse, href: "/tests?search=thyroid", tone: "purple" },
-    { label: "Heart Health", icon: HeartPulse, href: "/tests?search=heart", tone: "red" },
-    { label: "Immunity Boost", icon: ShieldPlus, href: "/packages?search=immunity", tone: "green" },
-    { label: "View All", icon: Grid2X2, href: "/tests", tone: "slate" }
+  const mobileOrgans = displayHomeData.organs?.length ? displayHomeData.organs : [
+    { name: "Blood Test", icon: "Droplet", color: "red" },
+    { name: "Thyroid Tests", icon: "HeartPulse", color: "purple" },
+    { name: "Heart Health", icon: "HeartPulse", color: "red" },
+    { name: "Immunity Boost", icon: "ShieldPlus", color: "green" }
   ];
   const mobileNav = [
     { label: "Home", icon: HomeIcon, href: "/" },
@@ -457,7 +475,14 @@ function HomePage() {
     { label: "Reports", icon: FileText, href: "/my-account/reports", protected: true },
     { label: "Profile", icon: UserRound, href: "/my-account", protected: true }
   ];
-  const locationLabel = serviceLocation?.areaLabel || serviceLocation?.city || serviceLocation?.centerName || "Location";
+  const locationLabel = "Map";
+  const mapQuery = serviceLocation ? `${serviceLocation.centerName || ""} ${serviceLocation.fullAddress || ""}`.trim() : "";
+  const mobileMapEmbedUrl = serviceLocation?.googleMapEmbedUrl?.trim()
+    || (serviceLocation?.latitude != null && serviceLocation?.longitude != null
+      ? `https://maps.google.com/maps?q=${serviceLocation.latitude},${serviceLocation.longitude}&z=15&output=embed`
+      : mapQuery
+        ? `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&z=15&output=embed`
+        : "");
 
   return (
     <div className="min-h-screen overflow-hidden bg-white">
@@ -598,13 +623,19 @@ function HomePage() {
             )}
           </section>
 
-          <section className="mobile-category-card">
-            {mobileCategories.map(({ label, icon: CategoryIcon, href, tone }) => (
-              <Link key={label} to={href} className={`mobile-category-item mobile-tone-${tone}`}>
-                <span><CategoryIcon /></span>
-                <strong>{label}</strong>
+          <section className="mobile-product-section">
+            <div className="mobile-section-heading">
+              <h2>Vital Organs</h2>
+              <Link to="/tests">View All <ArrowRight /></Link>
+            </div>
+            <div className="mobile-category-card" ref={mobileOrgansRef}>
+              {mobileOrgans.map((organ) => (
+              <Link key={organ.name} to="/tests" className={`mobile-category-item mobile-tone-${organ.color || "green"}`}>
+                <span><Icon name={organ.icon || "Activity"} /></span>
+                <strong>{organ.name}</strong>
               </Link>
-            ))}
+              ))}
+            </div>
           </section>
 
           <section className="mobile-product-section">
@@ -612,7 +643,7 @@ function HomePage() {
               <h2>Popular Health Packages</h2>
               <Link to="/packages">View All <ArrowRight /></Link>
             </div>
-            <div className="mobile-card-grid">
+            <div className="mobile-card-grid" ref={mobilePackagesRef}>
               {mobilePackages.map((item) => {
                 const isAdded = mobileAddedKeys.has(cartItemKey(item.id, "package"));
                 return (
@@ -644,7 +675,7 @@ function HomePage() {
               <h2>Popular Tests</h2>
               <Link to="/tests">View All Tests <ArrowRight /></Link>
             </div>
-            <div className="mobile-card-grid">
+            <div className="mobile-card-grid" ref={mobileTestsRef}>
               {mobileTests.map((item) => {
                 const isAdded = mobileAddedKeys.has(cartItemKey(item.id, "test"));
                 return (
@@ -675,7 +706,7 @@ function HomePage() {
               <div className="mobile-section-heading">
                 <h2>Patient Reviews</h2>
               </div>
-              <div className="mobile-review-slider">
+              <div className="mobile-review-slider" ref={mobileReviewsRef}>
                 {displayHomeData.reviews.slice(0, 6).map((review, index) => (
                   <article className="mobile-review-card" key={review.id || review.name || index}>
                     <div>
@@ -685,6 +716,58 @@ function HomePage() {
                     <p>{review.comment || review.content}</p>
                     <small>{review.reviewDate || "Recently"}</small>
                   </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {displayHomeData.whyChoose?.length ? (
+            <section className="mobile-product-section">
+              <div className="mobile-section-heading">
+                <h2>Why Choose Upchar?</h2>
+              </div>
+              <div className="mobile-mini-slider" ref={mobileWhyRef}>
+                {displayHomeData.whyChoose.map((item) => (
+                  <article className="mobile-mini-card" key={item.title || item.name}>
+                    <span><Icon name={item.icon || "ShieldCheck"} /></span>
+                    <strong>{item.title || item.name}</strong>
+                    <p>{item.description}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {displayHomeData.howItWorks?.length ? (
+            <section className="mobile-product-section">
+              <div className="mobile-section-heading">
+                <h2>How It Works</h2>
+              </div>
+              <div className="mobile-mini-slider" ref={mobileHowRef}>
+                {displayHomeData.howItWorks.map((item, index) => (
+                  <article className="mobile-mini-card" key={item.title || index}>
+                    <span><Icon name={item.icon || "ClipboardList"} /></span>
+                    <strong>{item.title}</strong>
+                    <p>{item.description}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {displayHomeData.blogs?.length ? (
+            <section className="mobile-product-section">
+              <div className="mobile-section-heading">
+                <h2>From Our Blogs</h2>
+                <Link to="/blog">View All <ArrowRight /></Link>
+              </div>
+              <div className="mobile-blog-slider" ref={mobileBlogsRef}>
+                {displayHomeData.blogs.slice(0, 8).map((blog) => (
+                  <Link className="mobile-blog-card" to={`/blog/${blog.slug}`} key={blog.id || blog.slug}>
+                    <img src={blog.image} alt={blog.title} />
+                    <span>{blog.category || "Health Tips"}</span>
+                    <strong>{blog.title}</strong>
+                  </Link>
                 ))}
               </div>
             </section>
@@ -700,6 +783,15 @@ function HomePage() {
               <span><strong>Need Help?</strong> Chat on WhatsApp</span>
             </a>
           </section>
+
+          {mobileMapEmbedUrl ? (
+            <section className="mobile-map-section">
+              <div className="mobile-section-heading">
+                <h2>Find Us</h2>
+              </div>
+              <iframe title={serviceLocation?.centerName || "Upchar Pathology location"} src={mobileMapEmbedUrl} loading="lazy" />
+            </section>
+          ) : null}
         </main>
 
         <nav className="mobile-bottom-nav">

@@ -1183,6 +1183,9 @@ footer li,
 
   .mobile-search-panel {
     position: relative;
+    width: 70%;
+    margin-right: auto;
+    margin-left: auto;
     overflow: visible;
   }
 
@@ -1691,6 +1694,121 @@ footer li,
     color: #0ba660;
     font-size: 0.78rem;
     font-weight: 900;
+  }
+
+  .mobile-mini-slider,
+  .mobile-blog-slider {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 1rem) / 3);
+    gap: 0.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.1rem 0.05rem 0.45rem;
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .mobile-mini-slider::-webkit-scrollbar,
+  .mobile-blog-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-mini-card,
+  .mobile-blog-card {
+    scroll-snap-align: start;
+    overflow: hidden;
+    border: 1px solid #edf2f7;
+    border-radius: 0.85rem;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(6, 25, 68, 0.08);
+  }
+
+  .mobile-mini-card {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    min-height: 8.4rem;
+    padding: 0.75rem 0.45rem;
+    text-align: center;
+  }
+
+  .mobile-mini-card span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.45rem;
+    height: 2.45rem;
+    border-radius: 999px;
+    background: #eefdf4;
+    color: #0ba660;
+  }
+
+  .mobile-mini-card svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .mobile-mini-card strong,
+  .mobile-blog-card strong {
+    display: -webkit-box;
+    overflow: hidden;
+    color: #061944;
+    font-size: 0.72rem;
+    font-weight: 1000;
+    line-height: 1.15;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .mobile-mini-card p {
+    display: -webkit-box;
+    overflow: hidden;
+    color: #516078;
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1.25;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .mobile-blog-card {
+    display: grid;
+    gap: 0.35rem;
+    padding-bottom: 0.55rem;
+    color: #061944;
+  }
+
+  .mobile-blog-card img {
+    width: 100%;
+    height: 4.6rem;
+    object-fit: cover;
+  }
+
+  .mobile-blog-card span {
+    padding: 0 0.5rem;
+    color: #0ba660;
+    font-size: 0.56rem;
+    font-weight: 1000;
+    text-transform: uppercase;
+  }
+
+  .mobile-blog-card strong {
+    padding: 0 0.5rem;
+  }
+
+  .mobile-map-section {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .mobile-map-section iframe {
+    width: 100%;
+    height: 14rem;
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 8px 18px rgba(6, 25, 68, 0.1);
   }
 
   .mobile-trust-help {
