@@ -8,7 +8,6 @@ import { assetUrl, createAdminResource, deleteAdminResource, getAdminResource, u
 const emptyBanner = {
   bannerTitle: "",
   bannerImage: "",
-  mobileBannerImage: "",
   status: "Active",
   sortOrder: 1,
   headingLine1: "",
@@ -32,7 +31,6 @@ const fieldGroups = [
     fields: [
       ["bannerTitle", "Banner Title", "text", true],
       ["bannerImage", "Banner Image", "image", true],
-      ["mobileBannerImage", "Mobile Banner Image", "image"],
       ["status", "Status", "select", true],
       ["sortOrder", "Sort Order", "number", true]
     ]

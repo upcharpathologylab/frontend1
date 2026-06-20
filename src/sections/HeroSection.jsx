@@ -9,8 +9,9 @@ import { assetUrl } from "../api/api.js";
 import heroBackground from "../assets/hero-bg.png";
 import BookingMapSection from "./BookingMapSection.jsx";
 
-function HeroSection({ data, loading, tests, packages }) {
+function HeroSection({ data, loading, tests, packages, slides = [] }) {
   const { hero } = data;
+  const heroSlides = slides.length ? slides : [hero];
   const navigate = useNavigate();
   const [bookingOpen, setBookingOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -50,74 +51,92 @@ function HeroSection({ data, loading, tests, packages }) {
     navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`);
   };
 
+  const renderButtons = (slide) => (
+    slide.buttons.map((button) => {
+      const opensPrescription =
+        String(button.label || "").toLowerCase().includes("prescription") ||
+        String(button.href || "").toLowerCase().includes("upload-prescription");
+      const opensBooking = !opensPrescription && button.href === "#booking";
+      const ButtonTag = opensBooking || opensPrescription ? "button" : "a";
+      return (
+        <ButtonTag
+          {...(opensPrescription
+            ? { type: "button", onClick: openUploadPrescription }
+            : opensBooking
+              ? { type: "button", onClick: openBooking }
+              : { href: button.href })}
+          className={
+            button.variant === "primary"
+              ? "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-upchar-green px-6 text-sm font-bold text-white shadow-lg shadow-green-900/20 transition hover:-translate-y-0.5 hover:bg-upchar-greenDark"
+              : "inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-white/70 bg-white/5 px-6 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/15"
+          }
+          key={button.label}
+        >
+          {button.label}
+          <ArrowRight className="h-5 w-5" />
+        </ButtonTag>
+      );
+    })
+  );
+
   return (
     <section className="relative overflow-hidden bg-navy-950 text-white">
-      <div className="absolute inset-0">
-        <img src={assetUrl(hero.image) || heroBackground} alt="" className="h-full w-full object-cover object-[62%_center]" aria-hidden="true" />
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/90 to-transparent" />
-      <div className="absolute inset-y-0 left-0 w-[50%] bg-navy-950/30" />
-
-      <div className="container-page relative flex min-h-[430px] items-center py-7 lg:h-[350px] lg:min-h-0 lg:py-0">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="max-w-[700px]"
-        >
-          <h1 className="max-w-[680px] whitespace-pre-line text-4xl font-black leading-tight text-white sm:text-5xl lg:text-[36px] lg:leading-[1.12] 2xl:text-[39px]">
-            {hero.title.split("\n")[0]}
-            {hero.title.split("\n")[1] ? <span className="block text-[#159447]">{hero.title.split("\n").slice(1).join("\n")}</span> : null}
-            {hero.highlightText ? <span className="text-[#159447]"> {hero.highlightText}</span> : null}
-          </h1>
-          <p className="mt-3 max-w-[650px] text-base font-semibold leading-7 text-white lg:text-[17px]">{hero.subtitle}</p>
-
-          <div className="mt-4 grid max-w-[660px] grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4">
-            {hero.trustPoints.map((point, index) => (
-              <div className={`flex items-center gap-2 text-[13px] font-bold text-white ${index ? "md:border-l md:border-white/25 md:pl-3" : ""}`} key={point.label}>
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center text-white">
-                  <Icon name={point.icon} className="h-7 w-7 text-white" />
-                </span>
-                {point.label}
+      <div className="desktop-hero-slider">
+        <div className="desktop-hero-track">
+          {heroSlides.map((slide, slideIndex) => (
+            <article className="desktop-hero-slide" key={`${slide.title}-${slideIndex}`}>
+              <div className="absolute inset-0">
+                <img src={assetUrl(slide.image) || heroBackground} alt="" className="h-full w-full object-cover object-[62%_center]" aria-hidden="true" />
               </div>
-            ))}
-          </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/90 to-transparent" />
+              <div className="absolute inset-y-0 left-0 w-[50%] bg-navy-950/30" />
 
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-            {hero.buttons.map((button) => {
-              const opensPrescription =
-                String(button.label || "").toLowerCase().includes("prescription") ||
-                String(button.href || "").toLowerCase().includes("upload-prescription");
-              const opensBooking = !opensPrescription && button.href === "#booking";
-              const ButtonTag = opensBooking || opensPrescription ? "button" : "a";
-              return (
-              <ButtonTag
-                {...(opensPrescription
-                    ? { type: "button", onClick: openUploadPrescription }
-                    : opensBooking
-                      ? { type: "button", onClick: openBooking }
-                    : { href: button.href })}
-                className={
-                  button.variant === "primary"
-                    ? "inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-upchar-green px-6 text-sm font-bold text-white shadow-lg shadow-green-900/20 transition hover:-translate-y-0.5 hover:bg-upchar-greenDark"
-                    : "inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-white/70 bg-white/5 px-6 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-white/15"
-                }
-                key={button.label}
-              >
-                {button.label}
-                <ArrowRight className="h-5 w-5" />
-              </ButtonTag>
-            )})}
-            <div className="inline-flex min-h-11 max-w-full flex-wrap items-center gap-3 rounded-lg bg-white px-4 py-1.5 text-sm font-extrabold text-upchar-green shadow-soft sm:h-11 sm:flex-nowrap sm:py-0">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50">
-                <BadgePercent className="h-5 w-5" />
-              </span>
-              <span className="sm:whitespace-nowrap">{hero.offerText.split(" on ")[0]}</span>
-              <span className="hidden h-6 w-px shrink-0 bg-blue-100 sm:block" />
-              <span className="text-upchar-blue sm:whitespace-nowrap">on {hero.offerText.split(" on ")[1] || "selected health packages"}</span>
-            </div>
-          </div>
-        </motion.div>
+              <div className="container-page relative flex min-h-[430px] items-center py-7 lg:h-[350px] lg:min-h-0 lg:py-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45 }}
+                  className="max-w-[700px]"
+                >
+                  <h1 className="max-w-[680px] whitespace-pre-line text-4xl font-black leading-tight text-white sm:text-5xl lg:text-[36px] lg:leading-[1.12] 2xl:text-[39px]">
+                    {slide.title.split("\n")[0]}
+                    {slide.title.split("\n")[1] ? <span className="block text-[#159447]">{slide.title.split("\n").slice(1).join("\n")}</span> : null}
+                    {slide.highlightText ? <span className="text-[#159447]"> {slide.highlightText}</span> : null}
+                  </h1>
+                  <p className="mt-3 max-w-[650px] text-base font-semibold leading-7 text-white lg:text-[17px]">{slide.subtitle}</p>
+
+                  <div className="mt-4 grid max-w-[660px] grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-4">
+                    {slide.trustPoints.map((point, index) => (
+                      <div className={`flex items-center gap-2 text-[13px] font-bold text-white ${index ? "md:border-l md:border-white/25 md:pl-3" : ""}`} key={point.label}>
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center text-white">
+                          <Icon name={point.icon} className="h-7 w-7 text-white" />
+                        </span>
+                        {point.label}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+                    {renderButtons(slide)}
+                    <div className="inline-flex min-h-11 max-w-full flex-wrap items-center gap-3 rounded-lg bg-white px-4 py-1.5 text-sm font-extrabold text-upchar-green shadow-soft sm:h-11 sm:flex-nowrap sm:py-0">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50">
+                        <BadgePercent className="h-5 w-5" />
+                      </span>
+                      <span className="sm:whitespace-nowrap">{slide.offerText.split(" on ")[0]}</span>
+                      <span className="hidden h-6 w-px shrink-0 bg-blue-100 sm:block" />
+                      <span className="text-upchar-blue sm:whitespace-nowrap">on {slide.offerText.split(" on ")[1] || "selected health packages"}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="desktop-hero-dots">
+          {heroSlides.map((slide, index) => (
+            <span key={`${slide.title}-${index}`} />
+          ))}
+        </div>
       </div>
       {loading && <div className="absolute inset-x-0 bottom-0 h-1 animate-pulse bg-upchar-green" />}
       {bookingOpen && (

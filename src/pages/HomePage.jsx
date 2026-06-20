@@ -149,8 +149,7 @@ const bannerToHero = (banner, fallbackHero) => {
       }
     ],
     offerText: offerText || fallbackHero.offerText,
-    image: assetUrl(banner.bannerImage) || fallbackHero.image,
-    mobileImage: assetUrl(banner.mobileBannerImage) || assetUrl(banner.bannerImage) || fallbackHero.image
+    image: assetUrl(banner.bannerImage) || fallbackHero.image
   };
 };
 
@@ -355,17 +354,16 @@ function HomePage() {
   const packageContent = getContentSection(homeContent, "packages");
   const activePackages = useMemo(() => homePackages.filter((item) => item.isActive), [homePackages]);
   const activeTests = useMemo(() => homeTests.filter((item) => item.isActive), [homeTests]);
-  const mobilePackages = useMemo(() => activePackages.slice(0, 4), [activePackages]);
-  const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
-  const contact = resolveContactInfo(contactContent, displayHomeData.siteSettings || {}, serviceLocation);
-  const hero = displayHomeData.hero || fallbackHomeData.hero;
-  const mobileHeroSlides = useMemo(() => {
+  const heroSlides = useMemo(() => {
     const activeBanners = homepageBanners
       .filter((banner) => banner.status === "Active" && banner.isActive !== false)
       .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
     const slides = activeBanners.map((banner) => bannerToHero(banner, fallbackHomeData.hero));
-    return slides.length ? slides : [hero];
-  }, [homepageBanners, hero]);
+    return slides.length ? slides : [displayHomeData.hero || fallbackHomeData.hero];
+  }, [displayHomeData.hero, homepageBanners]);
+  const mobilePackages = useMemo(() => activePackages.slice(0, 4), [activePackages]);
+  const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
+  const contact = resolveContactInfo(contactContent, displayHomeData.siteSettings || {}, serviceLocation);
   const openHeroLink = (href = "/packages") => {
     if (!href || href === "#booking" || href.startsWith("#")) {
       navigate("/packages");
@@ -467,7 +465,7 @@ function HomePage() {
         <Header data={displayHomeData} />
         <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
           {homepageBannersLoaded ? (
-            <HeroSection data={displayHomeData} loading={loading} tests={activeTests} packages={activePackages} />
+            <HeroSection data={displayHomeData} loading={loading} tests={activeTests} packages={activePackages} slides={heroSlides} />
           ) : (
             <section className="relative min-h-[430px] overflow-hidden bg-navy-950 lg:h-[350px] lg:min-h-0">
               <div className="absolute inset-x-0 bottom-0 h-1 animate-pulse bg-upchar-green" />
@@ -528,7 +526,7 @@ function HomePage() {
         <main className="mobile-home-main">
           <section className="mobile-hero-slider" aria-label="Health offers">
             <div className="mobile-hero-track">
-              {mobileHeroSlides.map((slide, index) => {
+              {heroSlides.map((slide, index) => {
                 const offerParts = String(slide.offerText || "UP TO 60% OFF on selected health packages").split(" on ");
                 const offerTitle = offerParts[0] || "UP TO 60% OFF";
                 const offerSubtitle = offerParts[1] || slide.highlightText || "Selected Health Packages";
@@ -536,7 +534,7 @@ function HomePage() {
                   .map((point) => point.label)
                   .filter((label) => /home|report|fast|sample/i.test(label))
                   .slice(0, 2);
-                const image = slide.mobileImage || slide.image || "/images/home-banner.png";
+                const image = slide.image || "/images/home-banner.png";
                 const primary = slide.buttons?.[0] || { label: "Book Now", href: "/packages" };
                 const secondary = slide.buttons?.[1] || { label: "View Packages", href: "/packages" };
 
@@ -569,7 +567,7 @@ function HomePage() {
               })}
             </div>
             <div className="mobile-hero-dots">
-              {mobileHeroSlides.map((slide, index) => <i key={`${slide.title}-${index}`} />)}
+              {heroSlides.map((slide, index) => <i key={`${slide.title}-${index}`} />)}
             </div>
           </section>
 

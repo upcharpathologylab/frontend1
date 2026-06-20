@@ -816,6 +816,53 @@ footer li,
   display: none;
 }
 
+.desktop-hero-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.desktop-hero-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.desktop-hero-track::-webkit-scrollbar {
+  display: none;
+}
+
+.desktop-hero-slide {
+  position: relative;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.desktop-hero-dots {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  gap: 0.5rem;
+  transform: translateX(-50%);
+}
+
+.desktop-hero-dots span {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.desktop-hero-dots span:first-child {
+  background: #16c86d;
+}
+
 @media (max-width: 768px) {
   .desktop-home-shell {
     display: none !important;
@@ -1103,7 +1150,7 @@ footer li,
     z-index: 1;
     width: 48%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
     opacity: 0.95;
   }
