@@ -361,7 +361,20 @@ function HomePage() {
   const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
   const contact = resolveContactInfo(contactContent, displayHomeData.siteSettings || {}, serviceLocation);
   const hero = displayHomeData.hero || fallbackHomeData.hero;
-  const mobileHeroImage = hero.mobileImage || hero.image || "/images/home-banner.png";
+  const mobileHeroSlides = useMemo(() => {
+    const activeBanners = homepageBanners
+      .filter((banner) => banner.status === "Active" && banner.isActive !== false)
+      .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
+    const slides = activeBanners.map((banner) => bannerToHero(banner, fallbackHomeData.hero));
+    return slides.length ? slides : [hero];
+  }, [homepageBanners, hero]);
+  const openHeroLink = (href = "/packages") => {
+    if (!href || href === "#booking" || href.startsWith("#")) {
+      navigate("/packages");
+      return;
+    }
+    navigate(href);
+  };
   const mobileSearchResults = useMemo(() => {
     const term = mobileQuery.trim().toLowerCase();
     if (!term) return [];
@@ -515,25 +528,51 @@ function HomePage() {
         )}
 
         <main className="mobile-home-main">
-          <section className="mobile-hero-card">
-            <div className="mobile-hero-copy">
-              <span>Limited Time Offer</span>
-              <h1>UP TO <strong>60% OFF</strong></h1>
-              <p>on Selected Health Packages</p>
-              <div className="mobile-hero-features">
-                {(hero.trustPoints || []).slice(0, 4).map((point) => (
-                  <div key={point.label}>
-                    <ShieldCheck />
-                    <small>{point.label}</small>
-                  </div>
-                ))}
-              </div>
-              <button type="button" onClick={() => navigate("/packages")}>
-                Book Now <ArrowRight />
-              </button>
+          <section className="mobile-hero-slider" aria-label="Health offers">
+            <div className="mobile-hero-track">
+              {mobileHeroSlides.map((slide, index) => {
+                const offerParts = String(slide.offerText || "UP TO 60% OFF on selected health packages").split(" on ");
+                const offerTitle = offerParts[0] || "UP TO 60% OFF";
+                const offerSubtitle = offerParts[1] || slide.highlightText || "Selected Health Packages";
+                const benefits = (slide.trustPoints || [])
+                  .map((point) => point.label)
+                  .filter((label) => /home|report|fast|sample/i.test(label))
+                  .slice(0, 2);
+                const image = slide.mobileImage || slide.image || "/images/home-banner.png";
+                const primary = slide.buttons?.[0] || { label: "Book Now", href: "/packages" };
+                const secondary = slide.buttons?.[1] || { label: "View Packages", href: "/packages" };
+
+                return (
+                  <article className="mobile-hero-card" key={`${slide.title}-${index}`}>
+                    <div className="mobile-hero-copy">
+                      <span>Limited Time Offer</span>
+                      <h1>{offerTitle}</h1>
+                      <p>{offerSubtitle}</p>
+                      <div className="mobile-hero-features">
+                        {(benefits.length ? benefits : ["Home Sample Collection", "Fast Reports"]).map((label) => (
+                          <div key={label}>
+                            <ShieldCheck />
+                            <small>{label}</small>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mobile-hero-actions">
+                        <button type="button" onClick={() => openHeroLink(primary.href)}>
+                          {primary.label || "Book Now"} <ArrowRight />
+                        </button>
+                        <button type="button" onClick={() => openHeroLink(secondary.href)}>
+                          {secondary.label || "View Packages"}
+                        </button>
+                      </div>
+                    </div>
+                    <img src={image} alt={slide.title || "Upchar health offer"} />
+                  </article>
+                );
+              })}
             </div>
-            <img src={mobileHeroImage} alt="Upchar health packages" />
-            <div className="mobile-hero-dots"><i /><i /><i /></div>
+            <div className="mobile-hero-dots">
+              {mobileHeroSlides.map((slide, index) => <i key={`${slide.title}-${index}`} />)}
+            </div>
           </section>
 
           <section className="mobile-search-panel">
