@@ -1183,7 +1183,6 @@ footer li,
 
   .mobile-search-panel {
     position: relative;
-    width: 70%;
     margin-right: auto;
     margin-left: auto;
     overflow: visible;
@@ -1191,21 +1190,21 @@ footer li,
 
   .mobile-search-bar {
     display: grid;
-    grid-template-columns: 1.6rem minmax(0, 1fr) 3.5rem;
+    grid-template-columns: 1.45rem minmax(0, 1fr) 2.45rem;
     align-items: center;
-    gap: 0.55rem;
-    min-height: 4.15rem;
-    border: 2px solid #0ba660;
+    gap: 0.5rem;
+    min-height: 2.9rem;
+    border: 1px solid #eef2f7;
     border-radius: 999px;
-    background: #f2fff8;
-    padding: 0.35rem 0.35rem 0.35rem 1rem;
+    background: #fff;
+    padding: 0.25rem 0.25rem 0.25rem 0.9rem;
     box-shadow: 0 10px 24px rgba(6, 25, 68, 0.08);
   }
 
   .mobile-search-bar > svg {
-    width: 1.5rem;
-    height: 1.5rem;
-    color: #0ba660;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #061944;
   }
 
   .mobile-search-bar input {
@@ -1214,7 +1213,7 @@ footer li,
     outline: 0;
     background: transparent;
     color: #061944;
-    font-size: 1rem;
+    font-size: 0.92rem;
     font-weight: 700;
   }
 
@@ -1226,8 +1225,8 @@ footer li,
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 3.35rem;
-    height: 3.35rem;
+    width: 2.4rem;
+    height: 2.4rem;
     border: 0;
     border-radius: 999px;
     background: #0ba660;
@@ -1235,8 +1234,8 @@ footer li,
   }
 
   .mobile-search-bar button svg {
-    width: 1.45rem;
-    height: 1.45rem;
+    width: 1.1rem;
+    height: 1.1rem;
   }
 
   .mobile-search-results {
