@@ -463,6 +463,19 @@ function HomePage() {
     navigate(`/?auth=signin&returnTo=${encodeURIComponent(route)}`);
   };
 
+  const handleMobileNavAction = (item) => {
+    setMobileMenuOpen(false);
+    if (item.action === "upload-prescription") {
+      openMobilePrescription();
+      return;
+    }
+    if (item.protected) {
+      openProtectedMobileRoute(item.href);
+      return;
+    }
+    navigate(item.href);
+  };
+
   const openMobileLocation = () => {
     const locationQuery = serviceLocation ? `${serviceLocation.centerName || ""} ${serviceLocation.fullAddress || ""}`.trim() : "";
     const locationUrl = serviceLocation?.googlePlaceUrl?.trim()
@@ -501,6 +514,7 @@ function HomePage() {
     { label: "Home", icon: HomeIcon, href: "/" },
     { label: "Tests", icon: TestTube2, href: "/tests" },
     { label: "Packages", icon: Package, href: "/packages" },
+    { label: "Upload Prescription", icon: ClipboardList, href: uploadPrescriptionPath, action: "upload-prescription", featured: true },
     { label: "Reports", icon: FileText, href: "/my-account/reports", protected: true },
     { label: "Profile", icon: UserRound, href: "/my-account", protected: true }
   ];
@@ -852,18 +866,20 @@ function HomePage() {
           {mobileNav.slice(0, 3).map(({ label, icon: NavIcon, href }) => (
             <Link key={label} to={href}><NavIcon /><span>{label}</span></Link>
           ))}
-          <button type="button" className="mobile-upload-nav" onClick={openMobilePrescription}>
-            <ClipboardList /><span>Upload<br />Prescription</span>
-          </button>
-          {mobileNav.slice(3).map(({ label, icon: NavIcon, href, protected: protectedRoute }) => (
-            protectedRoute ? (
-              <button type="button" key={label} onClick={() => openProtectedMobileRoute(href)}>
-                <NavIcon /><span>{label}</span>
+          {mobileNav.slice(3).map((item) => {
+            const NavIcon = item.icon;
+            return (
+              <button
+                type="button"
+                className={item.featured ? "mobile-upload-nav" : ""}
+                key={item.label}
+                onClick={() => handleMobileNavAction(item)}
+              >
+                <NavIcon />
+                <span>{item.featured ? <>Upload<br />Prescription</> : item.label}</span>
               </button>
-            ) : (
-              <Link key={label} to={href}><NavIcon /><span>{label}</span></Link>
-            )
-          ))}
+            );
+          })}
         </nav>
       </div>
 
