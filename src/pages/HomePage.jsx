@@ -165,6 +165,7 @@ function SectionSkeleton({ className = "bg-white" }) {
 
 const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
 const mobileCartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
+const loopItems = (items = []) => (items.length > 1 ? [...items, ...items] : items);
 
 const discountLabel = (item) => {
   if (item.discount) return item.discount;
@@ -210,6 +211,7 @@ function HomePage() {
   const mobileWhyRef = useRef(null);
   const mobileHowRef = useRef(null);
   const mobileBlogsRef = useRef(null);
+  const pausedMobileSlidersRef = useRef(new Set());
 
   useEffect(() => {
     let mounted = true;
@@ -391,25 +393,40 @@ function HomePage() {
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia("(max-width: 768px)").matches) return undefined;
     const refs = [mobileOrgansRef, mobilePackagesRef, mobileTestsRef, mobileReviewsRef, mobileWhyRef, mobileHowRef, mobileBlogsRef];
+    const cleanupHandlers = refs
+      .map((ref) => ref.current)
+      .filter(Boolean)
+      .map((node) => {
+        const pause = () => pausedMobileSlidersRef.current.add(node);
+        const resume = () => pausedMobileSlidersRef.current.delete(node);
+        node.addEventListener("touchstart", pause, { passive: true });
+        node.addEventListener("touchend", resume, { passive: true });
+        node.addEventListener("touchcancel", resume, { passive: true });
+        return () => {
+          node.removeEventListener("touchstart", pause);
+          node.removeEventListener("touchend", resume);
+          node.removeEventListener("touchcancel", resume);
+        };
+      });
     const timer = window.setInterval(() => {
       refs.forEach((ref) => {
         const node = ref.current;
-        if (!node || node.scrollWidth <= node.clientWidth) return;
+        if (!node || node.scrollWidth <= node.clientWidth || pausedMobileSlidersRef.current.has(node)) return;
         const firstCard = node.firstElementChild;
         const step = firstCard ? firstCard.getBoundingClientRect().width + 12 : node.clientWidth * 0.7;
-        const nearEnd = node.scrollLeft + node.clientWidth + step >= node.scrollWidth;
-        if (nearEnd) {
-          node.scrollTo({ left: 0, behavior: "auto" });
-          window.requestAnimationFrame(() => {
-            node.scrollTo({ left: step, behavior: "smooth" });
-          });
-          return;
+        const loopWidth = node.dataset.loop === "true" ? node.scrollWidth / 2 : 0;
+        if (loopWidth && node.scrollLeft >= loopWidth) {
+          node.scrollTo({ left: node.scrollLeft - loopWidth, behavior: "auto" });
         }
         node.scrollTo({ left: node.scrollLeft + step, behavior: "smooth" });
       });
     }, 1000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+      cleanupHandlers.forEach((cleanup) => cleanup());
+      pausedMobileSlidersRef.current.clear();
+    };
   }, [displayHomeData.blogs, displayHomeData.howItWorks, displayHomeData.organs, displayHomeData.reviews, displayHomeData.whyChoose, mobilePackages, mobileTests]);
 
   const openMobilePrescription = () => {
@@ -643,9 +660,9 @@ function HomePage() {
               <h2>Vital Organs</h2>
               <Link to="/tests">View All <ArrowRight /></Link>
             </div>
-            <div className="mobile-category-card" ref={mobileOrgansRef}>
-              {mobileOrgans.map((organ) => (
-              <Link key={organ.name} to="/tests" className={`mobile-category-item mobile-tone-${organ.color || "green"}`}>
+            <div className="mobile-category-card" ref={mobileOrgansRef} data-loop={mobileOrgans.length > 1 ? "true" : "false"}>
+              {loopItems(mobileOrgans).map((organ, index) => (
+              <Link key={`${organ.name}-${index}`} to="/tests" className={`mobile-category-item mobile-tone-${organ.color || "green"}`}>
                 <span><Icon name={organ.icon || "Activity"} /></span>
                 <strong>{organ.name}</strong>
               </Link>
@@ -658,11 +675,11 @@ function HomePage() {
               <h2>Popular Health Packages</h2>
               <Link to="/packages">View All <ArrowRight /></Link>
             </div>
-            <div className="mobile-card-grid" ref={mobilePackagesRef}>
-              {mobilePackages.map((item) => {
+            <div className="mobile-card-grid" ref={mobilePackagesRef} data-loop={mobilePackages.length > 1 ? "true" : "false"}>
+              {loopItems(mobilePackages).map((item, index) => {
                 const isAdded = mobileAddedKeys.has(cartItemKey(item.id, "package"));
                 return (
-                  <article className="mobile-package-card" key={item.id}>
+                  <article className="mobile-package-card" key={`${item.id}-${index}`}>
                     <div className="mobile-card-image">
                       <img src={item.image} alt={item.name} />
                       <span>{discountLabel(item)}</span>
@@ -690,11 +707,11 @@ function HomePage() {
               <h2>Popular Tests</h2>
               <Link to="/tests">View All Tests <ArrowRight /></Link>
             </div>
-            <div className="mobile-card-grid" ref={mobileTestsRef}>
-              {mobileTests.map((item) => {
+            <div className="mobile-card-grid" ref={mobileTestsRef} data-loop={mobileTests.length > 1 ? "true" : "false"}>
+              {loopItems(mobileTests).map((item, index) => {
                 const isAdded = mobileAddedKeys.has(cartItemKey(item.id, "test"));
                 return (
-                  <article className="mobile-test-card" key={item.id}>
+                  <article className="mobile-test-card" key={`${item.id}-${index}`}>
                     <div className="mobile-card-image">
                       <img src={item.image} alt={item.name} />
                       <span>{discountLabel(item)}</span>
@@ -721,9 +738,9 @@ function HomePage() {
               <div className="mobile-section-heading">
                 <h2>Patient Reviews</h2>
               </div>
-              <div className="mobile-review-slider" ref={mobileReviewsRef}>
-                {displayHomeData.reviews.slice(0, 6).map((review, index) => (
-                  <article className="mobile-review-card" key={review.id || review.name || index}>
+              <div className="mobile-review-slider" ref={mobileReviewsRef} data-loop={displayHomeData.reviews.length > 1 ? "true" : "false"}>
+                {loopItems(displayHomeData.reviews.slice(0, 6)).map((review, index) => (
+                  <article className="mobile-review-card" key={`${review.id || review.name || "review"}-${index}`}>
                     <div>
                       <strong>{review.name || "Upchar Customer"}</strong>
                       <span><Star /><Star /><Star /><Star /><Star /></span>
@@ -741,9 +758,9 @@ function HomePage() {
               <div className="mobile-section-heading">
                 <h2>Why Choose Upchar?</h2>
               </div>
-              <div className="mobile-mini-slider" ref={mobileWhyRef}>
-                {displayHomeData.whyChoose.map((item) => (
-                  <article className="mobile-mini-card" key={item.title || item.name}>
+              <div className="mobile-mini-slider" ref={mobileWhyRef} data-loop={displayHomeData.whyChoose.length > 1 ? "true" : "false"}>
+                {loopItems(displayHomeData.whyChoose).map((item, index) => (
+                  <article className="mobile-mini-card" key={`${item.title || item.name}-${index}`}>
                     <span><Icon name={item.icon || "ShieldCheck"} /></span>
                     <strong>{item.title || item.name}</strong>
                     <p>{item.description}</p>
@@ -758,9 +775,9 @@ function HomePage() {
               <div className="mobile-section-heading">
                 <h2>How It Works</h2>
               </div>
-              <div className="mobile-mini-slider" ref={mobileHowRef}>
-                {displayHomeData.howItWorks.map((item, index) => (
-                  <article className="mobile-mini-card" key={item.title || index}>
+              <div className="mobile-mini-slider" ref={mobileHowRef} data-loop={displayHomeData.howItWorks.length > 1 ? "true" : "false"}>
+                {loopItems(displayHomeData.howItWorks).map((item, index) => (
+                  <article className="mobile-mini-card" key={`${item.title || "step"}-${index}`}>
                     <span><Icon name={item.icon || "ClipboardList"} /></span>
                     <strong>{item.title}</strong>
                     <p>{item.description}</p>
@@ -776,9 +793,9 @@ function HomePage() {
                 <h2>From Our Blogs</h2>
                 <Link to="/blog">View All <ArrowRight /></Link>
               </div>
-              <div className="mobile-blog-slider" ref={mobileBlogsRef}>
-                {displayHomeData.blogs.slice(0, 8).map((blog) => (
-                  <Link className="mobile-blog-card" to={`/blog/${blog.slug}`} key={blog.id || blog.slug}>
+              <div className="mobile-blog-slider" ref={mobileBlogsRef} data-loop={displayHomeData.blogs.length > 1 ? "true" : "false"}>
+                {loopItems(displayHomeData.blogs.slice(0, 8)).map((blog, index) => (
+                  <Link className="mobile-blog-card" to={`/blog/${blog.slug}`} key={`${blog.id || blog.slug}-${index}`}>
                     <img src={blog.image} alt={blog.title} />
                     <span>{blog.category || "Health Tips"}</span>
                     <strong>{blog.title}</strong>
