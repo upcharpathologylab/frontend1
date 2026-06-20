@@ -82,7 +82,7 @@ const formatProfileSummary = (summary = {}) => ({
 });
 
 const prescriptionTypes = new Set(["image/jpeg", "image/png", "application/pdf"]);
-const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
+const uploadPrescriptionPath = "/profile?section=upload-prescription";
 
 function UploadPrescriptionModal({ file, onClose, onFileChange, onSend, previewUrl, profile, sending }) {
   const isImage = file && file.type !== "application/pdf";
@@ -158,7 +158,7 @@ function MyAccountPage() {
   const [cartItems, setCartItems] = useState(() => getCartItems());
   const tab = searchParams.get("tab");
   const section = searchParams.get("section") || "profile";
-  const activeSection = section === "saved-packages" ? "saved" : section;
+  const activeSection = section === "saved-packages" ? "saved" : section === "upload-prescription" ? "prescription" : section;
 
   useEffect(() => {
     document.title = "My Account / Profile | Upchar Pathology";
@@ -204,7 +204,7 @@ function MyAccountPage() {
   }, []);
 
   useEffect(() => {
-    const wantsUploadPrescription = tab === "upload-prescription" || tab === "prescription" || section === "prescription";
+    const wantsUploadPrescription = tab === "upload-prescription" || tab === "prescription" || section === "upload-prescription" || section === "prescription";
     if (!wantsUploadPrescription) return;
 
     if (!getStoredUser()) {
@@ -214,6 +214,17 @@ function MyAccountPage() {
 
     setPrescriptionModalOpen(true);
   }, [navigate, section, tab]);
+
+  useEffect(() => {
+    if (section !== "reports") return;
+
+    if (!getStoredUser()) {
+      navigate(`/?auth=signin&returnTo=${encodeURIComponent("/profile?section=reports")}`, { replace: true });
+      return;
+    }
+
+    navigate("/my-account/reports", { replace: true });
+  }, [navigate, section]);
 
   const showToast = (message) => {
     setToast(message);
@@ -312,7 +323,7 @@ function MyAccountPage() {
     setPrescriptionFile(null);
     if (prescriptionPreviewUrl) URL.revokeObjectURL(prescriptionPreviewUrl);
     setPrescriptionPreviewUrl("");
-    if (tab === "upload-prescription" || tab === "prescription" || section === "prescription") {
+    if (tab === "upload-prescription" || tab === "prescription" || section === "upload-prescription" || section === "prescription") {
       setSearchParams({ section: "profile" }, { replace: true });
     }
   };

@@ -119,6 +119,7 @@ function App() {
         <Route path="/booking-confirmation" element={<BookingConfirmationPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/contact-us" element={<ContactPage />} />
+        <Route path="/profile" element={<MyAccountPage />} />
         <Route path="/my-account" element={<MyAccountPage />} />
         <Route path="/my-account/addresses" element={<AccountAddressesPage />} />
         <Route path="/my-account/appointments" element={<Navigate to="/my-account?section=appointments" replace />} />

@@ -163,7 +163,9 @@ function SectionSkeleton({ className = "bg-white" }) {
   );
 }
 
-const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
+const profilePath = "/profile";
+const uploadPrescriptionPath = `${profilePath}?section=upload-prescription`;
+const reportsPath = `${profilePath}?section=reports`;
 const mobileCartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
 const loopItems = (items = []) => (items.length > 1 ? [...items, ...items] : items);
 
@@ -515,8 +517,8 @@ function HomePage() {
     { label: "Tests", icon: TestTube2, href: "/tests" },
     { label: "Packages", icon: Package, href: "/packages" },
     { label: "Upload Prescription", icon: ClipboardList, href: uploadPrescriptionPath, action: "upload-prescription", featured: true },
-    { label: "Reports", icon: FileText, href: "/my-account/reports", protected: true },
-    { label: "Profile", icon: UserRound, href: "/my-account", protected: true }
+    { label: "Reports", icon: FileText, href: reportsPath, protected: true },
+    { label: "Profile", icon: UserRound, href: profilePath, protected: true }
   ];
   const locationLabel = "Map";
   const mapQuery = serviceLocation ? `${serviceLocation.centerName || ""} ${serviceLocation.fullAddress || ""}`.trim() : "";
