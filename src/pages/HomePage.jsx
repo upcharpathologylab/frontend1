@@ -398,7 +398,14 @@ function HomePage() {
         const firstCard = node.firstElementChild;
         const step = firstCard ? firstCard.getBoundingClientRect().width + 12 : node.clientWidth * 0.7;
         const nearEnd = node.scrollLeft + node.clientWidth + step >= node.scrollWidth;
-        node.scrollTo({ left: nearEnd ? 0 : node.scrollLeft + step, behavior: "smooth" });
+        if (nearEnd) {
+          node.scrollTo({ left: 0, behavior: "auto" });
+          window.requestAnimationFrame(() => {
+            node.scrollTo({ left: step, behavior: "smooth" });
+          });
+          return;
+        }
+        node.scrollTo({ left: node.scrollLeft + step, behavior: "smooth" });
       });
     }, 1000);
 
