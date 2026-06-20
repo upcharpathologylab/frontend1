@@ -1296,8 +1296,8 @@ footer li,
     background: #fff;
     padding: 0.9rem 0.7rem;
     box-shadow: 0 8px 18px rgba(6, 25, 68, 0.06);
-    scroll-snap-type: x proximity;
-    scroll-behavior: smooth;
+    scroll-snap-type: none;
+    scroll-behavior: auto;
     scrollbar-width: none;
   }
 
@@ -1467,8 +1467,8 @@ footer li,
     overflow-x: auto;
     overflow-y: hidden;
     padding: 0.1rem 0.05rem 0.45rem;
-    scroll-snap-type: x proximity;
-    scroll-behavior: smooth;
+    scroll-snap-type: none;
+    scroll-behavior: auto;
     scrollbar-width: none;
   }
 
@@ -1633,8 +1633,8 @@ footer li,
     overflow-x: auto;
     overflow-y: hidden;
     padding: 0.1rem 0.05rem 0.45rem;
-    scroll-snap-type: x proximity;
-    scroll-behavior: smooth;
+    scroll-snap-type: none;
+    scroll-behavior: auto;
     scrollbar-width: none;
   }
 
@@ -1705,8 +1705,8 @@ footer li,
     overflow-x: auto;
     overflow-y: hidden;
     padding: 0.1rem 0.05rem 0.45rem;
-    scroll-snap-type: x proximity;
-    scroll-behavior: smooth;
+    scroll-snap-type: none;
+    scroll-behavior: auto;
     scrollbar-width: none;
   }
 

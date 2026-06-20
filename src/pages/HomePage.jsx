@@ -402,28 +402,44 @@ function HomePage() {
         node.addEventListener("touchstart", pause, { passive: true });
         node.addEventListener("touchend", resume, { passive: true });
         node.addEventListener("touchcancel", resume, { passive: true });
+        node.addEventListener("mouseenter", pause);
+        node.addEventListener("mouseleave", resume);
         return () => {
           node.removeEventListener("touchstart", pause);
           node.removeEventListener("touchend", resume);
           node.removeEventListener("touchcancel", resume);
+          node.removeEventListener("mouseenter", pause);
+          node.removeEventListener("mouseleave", resume);
         };
       });
-    const timer = window.setInterval(() => {
+    let animationFrame = 0;
+    let previousTime = 0;
+    const scrollSpeed = 0.055;
+
+    const animateSliders = (time) => {
+      if (!previousTime) previousTime = time;
+      const delta = Math.min(time - previousTime, 48);
+      previousTime = time;
+
       refs.forEach((ref) => {
         const node = ref.current;
         if (!node || node.scrollWidth <= node.clientWidth || pausedMobileSlidersRef.current.has(node)) return;
-        const firstCard = node.firstElementChild;
-        const step = firstCard ? firstCard.getBoundingClientRect().width + 12 : node.clientWidth * 0.7;
         const loopWidth = node.dataset.loop === "true" ? node.scrollWidth / 2 : 0;
-        if (loopWidth && node.scrollLeft >= loopWidth) {
-          node.scrollTo({ left: node.scrollLeft - loopWidth, behavior: "auto" });
+        if (!loopWidth) return;
+
+        node.scrollLeft += delta * scrollSpeed;
+        if (node.scrollLeft >= loopWidth) {
+          node.scrollLeft -= loopWidth;
         }
-        node.scrollTo({ left: node.scrollLeft + step, behavior: "smooth" });
       });
-    }, 1000);
+
+      animationFrame = window.requestAnimationFrame(animateSliders);
+    };
+
+    animationFrame = window.requestAnimationFrame(animateSliders);
 
     return () => {
-      window.clearInterval(timer);
+      window.cancelAnimationFrame(animationFrame);
       cleanupHandlers.forEach((cleanup) => cleanup());
       pausedMobileSlidersRef.current.clear();
     };
