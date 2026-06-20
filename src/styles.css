@@ -401,6 +401,34 @@
     height: 22px;
   }
 
+  .bg-navy-950.pb-7.pt-4,
+  .bg-navy-950.pb-7.pt-4 .container-page,
+  .bg-navy-950.pb-7.pt-4 [class*="rounded-xl"],
+  .bg-navy-950.pb-7.pt-4 [class*="relative"] {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .bg-navy-950.pb-7.pt-4 [class*="top-full"][class*="z-40"] {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-height: 320px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    margin-top: 8px !important;
+    margin-bottom: 20px !important;
+    z-index: 10 !important;
+  }
+
+  .bg-navy-950.pb-7.pt-4 [class*="top-full"][class*="z-40"] > div {
+    grid-template-columns: 22px minmax(0, 1fr) 50px 64px 104px !important;
+    gap: 0.35rem !important;
+    align-items: center !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
   footer > a.fixed {
     width: 46px;
     height: 46px;
