@@ -8,7 +8,6 @@ import {
   Home as HomeIcon,
   MapPin,
   Menu,
-  MessageCircle,
   Package,
   Plus,
   Search,
@@ -28,7 +27,6 @@ import Logo from "../components/Logo.jsx";
 import { getStoredUser } from "../components/auth/authStorage.js";
 import { fallbackHomeData, mergeHomeData } from "../data/homeData.js";
 import { addCartItem, cartEventName, cartItemKey, getCartCount, getCartItems, hasCartItem } from "../utils/cart.js";
-import { resolveContactInfo } from "../utils/contactInfo.js";
 import { applyHomeContentOverrides, getContentSection } from "../utils/contentOverrides.js";
 import { price } from "../utils.js";
 import BlogSection from "../sections/BlogSection.jsx";
@@ -186,7 +184,6 @@ function HomePage() {
   const navigate = useNavigate();
   const [homeData, setHomeData] = useState(null);
   const [homeContent, setHomeContent] = useState(null);
-  const [contactContent, setContactContent] = useState(null);
   const [blogContent, setBlogContent] = useState(null);
   const [homepageBanners, setHomepageBanners] = useState([]);
   const [homepageBannersLoaded, setHomepageBannersLoaded] = useState(false);
@@ -239,13 +236,6 @@ function HomePage() {
     getPageContent("home")
       .then((content) => {
         if (mounted) setHomeContent(content);
-      })
-      .catch(() => {});
-
-    getPageContent("contact-us")
-      .then((page) => {
-        const section = (page?.sections || []).find((item) => item.sectionKey === "contact-info") || null;
-        if (mounted) setContactContent(section);
       })
       .catch(() => {});
 
@@ -367,7 +357,6 @@ function HomePage() {
   }, [displayHomeData.hero, homepageBanners]);
   const mobilePackages = useMemo(() => activePackages.slice(0, 4), [activePackages]);
   const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
-  const contact = resolveContactInfo(contactContent, displayHomeData.siteSettings || {}, serviceLocation);
   const openHeroLink = (href = "/packages") => {
     if (!href || href === "#booking" || href.startsWith("#")) {
       navigate("/packages");
@@ -477,6 +466,11 @@ function HomePage() {
   ];
   const locationLabel = "Map";
   const mapQuery = serviceLocation ? `${serviceLocation.centerName || ""} ${serviceLocation.fullAddress || ""}`.trim() : "";
+  const mobileMapLink = serviceLocation?.googlePlaceUrl?.trim()
+    || serviceLocation?.googleDirectionUrl?.trim()
+    || (mapQuery ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}` : "");
+  const mobileDirectionLink = serviceLocation?.googleDirectionUrl?.trim()
+    || (mapQuery ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}` : mobileMapLink);
   const mobileMapEmbedUrl = serviceLocation?.googleMapEmbedUrl?.trim()
     || (serviceLocation?.latitude != null && serviceLocation?.longitude != null
       ? `https://maps.google.com/maps?q=${serviceLocation.latitude},${serviceLocation.longitude}&z=15&output=embed`
@@ -773,21 +767,11 @@ function HomePage() {
             </section>
           ) : null}
 
-          <section className="mobile-trust-help">
-            <div>
-              <strong>Trusted by 10,000+ Happy Customers</strong>
-              <p><b>4.8</b> <Star /><Star /><Star /><Star /><Star /> <span>(2,500+ Reviews)</span></p>
-            </div>
-            <a href={contact.whatsappHref || `https://wa.me/${displayHomeData.siteSettings.whatsappNumber}`} target="_blank" rel="noreferrer">
-              <MessageCircle />
-              <span><strong>Need Help?</strong> Chat on WhatsApp</span>
-            </a>
-          </section>
-
           {mobileMapEmbedUrl ? (
             <section className="mobile-map-section">
               <div className="mobile-section-heading">
                 <h2>Find Us</h2>
+                {mobileDirectionLink ? <a href={mobileDirectionLink} target="_blank" rel="noreferrer">Get Directions <ArrowRight /></a> : null}
               </div>
               <iframe title={serviceLocation?.centerName || "Upchar Pathology location"} src={mobileMapEmbedUrl} loading="lazy" />
             </section>
