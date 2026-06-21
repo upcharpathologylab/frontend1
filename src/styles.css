@@ -1255,32 +1255,91 @@ footer li,
     box-shadow: 0 12px 24px rgba(6, 25, 68, 0.12);
   }
 
-  .mobile-search-results a {
+  .mobile-search-result-card {
     display: grid;
-    grid-template-columns: 3.4rem 1fr auto;
+    grid-template-columns: 3.4rem minmax(0, 1fr);
     align-items: center;
     gap: 0.5rem;
     border-radius: 0.65rem;
     padding: 0.55rem;
     color: #061944;
+    cursor: pointer;
   }
 
-  .mobile-search-results span {
-    color: #64748b;
+  .mobile-search-result-card + .mobile-search-result-card {
+    border-top: 1px solid #e7edf5;
+  }
+
+  .mobile-search-result-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.55rem;
+    border-radius: 0.35rem;
+    background: #ecfdf5;
+    color: #0ba660;
     font-size: 0.66rem;
-    font-weight: 900;
+    font-weight: 1000;
     text-transform: uppercase;
   }
 
-  .mobile-search-results strong {
+  .mobile-search-result-copy {
+    min-width: 0;
+  }
+
+  .mobile-search-result-copy strong {
+    display: block;
+    overflow: hidden;
+    color: #061944;
     font-size: 0.8rem;
+    font-weight: 1000;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-search-result-copy small {
+    display: block;
+    overflow: hidden;
+    margin-top: 0.1rem;
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-search-result-action {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+  }
+
+  .mobile-search-result-action b {
+    color: #0ba660;
+    font-size: 0.9rem;
     font-weight: 1000;
   }
 
-  .mobile-search-results small {
+  .mobile-search-result-action button {
+    display: inline-flex;
+    min-width: 5.5rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border: 1px solid #0ba660;
+    border-radius: 0.45rem;
+    background: #fff;
     color: #0ba660;
     font-size: 0.72rem;
     font-weight: 1000;
+  }
+
+  .mobile-search-result-action button svg {
+    width: 0.9rem;
+    height: 0.9rem;
   }
 
   .mobile-category-card {

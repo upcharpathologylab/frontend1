@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Search, ShoppingCart } from "lucide-react";
+import { ArrowRight, Check, Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AuthModal from "../components/auth/AuthModal.jsx";
 import { getStoredUser } from "../components/auth/authStorage.js";
@@ -12,7 +12,6 @@ const cartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id,
 function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState({});
   const [addedKeys, setAddedKeys] = useState(() => cartKeys());
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signin");
@@ -25,7 +24,7 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
       ...tests.map((item) => ({ ...item, resultType: "Test" })),
       ...packages.map((item) => ({ ...item, resultType: "Package" }))
     ]
-      .filter((item) => item.name.toLowerCase().startsWith(term))
+      .filter((item) => `${item.name} ${item.subtitle || ""} ${item.description || ""} ${item.testCount || ""}`.toLowerCase().includes(term))
       .slice(0, 10);
   }, [packages, query, tests]);
 
@@ -69,15 +68,27 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
   };
 
   const resultKey = (item) => `${item.resultType}-${item.id}`;
+  const itemSlug = (item) =>
+    String(item.slug || item.packageSlug || item.testSlug || item.id || item.name || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  const resultPath = (item) => `/${item.resultType.toLowerCase() === "test" ? "tests" : "packages"}/${itemSlug(item)}`;
 
-  const addResultToCart = (item) => {
+  const openResult = (item) => {
+    const path = resultPath(item);
+    if (path.endsWith("/")) return;
+    navigate(path);
+  };
+
+  const addResultToCart = (event, item) => {
+    event.stopPropagation();
     const type = item.resultType.toLowerCase();
     if (hasCartItem(item.id, type)) {
       setAddedKeys(cartKeys());
       return;
     }
-    const key = resultKey(item);
-    setSelected((current) => ({ ...current, [key]: true }));
     addCartItem({
       ...item,
       type,
@@ -110,31 +121,48 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
                 </button>
               </div>
               {query.trim() && (
-                <div className="absolute inset-x-0 top-full z-40 mt-2 max-h-[420px] overflow-y-auto rounded-lg border border-blue-100 bg-white p-2 text-navy-900 shadow-soft">
+                <div className="absolute inset-x-0 top-full z-40 mt-2 max-h-[430px] overflow-y-auto rounded-lg border border-blue-100 bg-white p-3 text-navy-900 shadow-soft">
                   {results.map((item) => {
                     const key = resultKey(item);
-                    const isAdded = addedKeys.has(cartItemKey(item.id, item.resultType.toLowerCase()));
+                    const type = item.resultType.toLowerCase();
+                    const isAdded = addedKeys.has(cartItemKey(item.id, type));
+                    const description = item.description || item.subtitle || item.testCount || item.testsIncluded || "";
                     return (
-                      <div className="grid gap-2 border-b border-blue-50 px-3 py-3 last:border-0 sm:grid-cols-[24px_minmax(0,1fr)_70px_90px_120px] sm:items-center" key={key}>
-                        <input
-                          type="checkbox"
-                          checked={Boolean(selected[key])}
-                          onChange={(event) => setSelected((current) => ({ ...current, [key]: event.target.checked }))}
-                          aria-label={`Select ${item.name}`}
-                        />
-                        <span className="truncate text-sm font-black">{item.name}</span>
-                        <span className="text-xs font-bold text-navy-600">{item.resultType}</span>
-                        <span className="text-sm font-black text-upchar-green">{price(item.discountedPrice)}</span>
-                        <button
-                          type="button"
-                          onClick={() => !isAdded && addResultToCart(item)}
-                          className={`inline-flex h-9 items-center justify-center gap-1 rounded-md bg-upchar-green px-3 text-xs font-black text-white transition ${
-                            isAdded ? "scale-105 bg-upchar-greenDark ring-2 ring-green-200" : ""
-                          }`}
-                        >
-                          <ShoppingCart className="h-3.5 w-3.5" />
-                          {isAdded ? "Added" : "Add to Cart"}
-                        </button>
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        className="grid w-full cursor-pointer gap-3 border-b border-blue-100 px-2 py-3 text-left transition last:border-0 hover:bg-green-50/45 sm:grid-cols-[76px_minmax(0,1fr)_160px] sm:items-center"
+                        key={key}
+                        onClick={() => openResult(item)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") openResult(item);
+                        }}
+                      >
+                        <span className="inline-flex h-7 w-fit items-center justify-center rounded-md bg-green-50 px-4 text-[11px] font-black uppercase text-upchar-green sm:w-[58px] sm:px-0">
+                          {item.resultType}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-black text-navy-900">{item.name}</span>
+                          {description ? <span className="mt-1 block truncate text-xs font-semibold text-navy-500">{description}</span> : null}
+                        </span>
+                        <span className="flex items-center justify-between gap-3 sm:justify-end">
+                          <span className="text-lg font-black text-upchar-green">{price(item.discountedPrice)}</span>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              if (!isAdded) addResultToCart(event, item);
+                            }}
+                            className={`inline-flex h-9 min-w-[86px] items-center justify-center gap-1 rounded-md border px-3 text-xs font-black transition ${
+                              isAdded
+                                ? "border-upchar-green bg-green-50 text-upchar-green"
+                                : "border-upchar-green bg-white text-upchar-green hover:bg-upchar-green hover:text-white"
+                            }`}
+                          >
+                            {isAdded ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                            {isAdded ? "Added ✓" : "Add"}
+                          </button>
+                        </span>
                       </div>
                     );
                   })}

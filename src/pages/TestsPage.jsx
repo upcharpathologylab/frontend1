@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
+import { useParams } from "react-router-dom";
 import { assetUrl, getTests } from "../api/api.js";
 import { TestCard } from "../components/listing/CatalogCard.jsx";
 import { matchesSearch, sortCatalogItems } from "../components/listing/catalogUtils.js";
@@ -20,6 +21,12 @@ const sortTests = (items, sort) => {
 };
 
 const cartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
+const slugify = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
 const normalizeTest = (item, index) => {
   const originalPrice = item.price ?? item.originalPrice ?? item.oldPrice ?? 0;
@@ -53,6 +60,7 @@ const normalizeTest = (item, index) => {
 };
 
 function TestsPage() {
+  const { slug } = useParams();
   const [items, setItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const sort = "popular";
@@ -98,9 +106,11 @@ function TestsPage() {
   }, []);
 
   const filteredItems = useMemo(() => {
-    const values = items.filter((item) => matchesSearch(item, searchTerm));
+    const values = slug
+      ? items.filter((item) => [item.slug, item.id, item.testCode, item.name].some((value) => slugify(value) === slug))
+      : items.filter((item) => matchesSearch(item, searchTerm));
     return sortTests(values, sort);
-  }, [items, searchTerm, sort]);
+  }, [items, searchTerm, slug, sort]);
 
   const showToast = (message) => {
     setToast(message);
@@ -140,7 +150,7 @@ function TestsPage() {
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 className="min-w-0 flex-1 border-0 bg-transparent text-sm font-bold text-navy-900 outline-none placeholder:text-navy-400"
-                placeholder="Search for tests..."
+                placeholder={slug ? "Search all tests..." : "Search for tests..."}
               />
             </label>
 
@@ -176,7 +186,7 @@ function TestsPage() {
             {!loading && !error && !filteredItems.length ? (
               <div className="mt-6 rounded-lg border border-blue-100 bg-white p-8 text-center shadow-sm">
                 <h3 className="text-xl font-black text-navy-900">No tests found</h3>
-                <p className="mt-2 text-sm font-semibold text-navy-600">Try searching another test name.</p>
+                <p className="mt-2 text-sm font-semibold text-navy-600">{slug ? "This test is not available right now." : "Try searching another test name."}</p>
               </div>
             ) : null}
           </div>

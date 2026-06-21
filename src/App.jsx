@@ -131,12 +131,14 @@ function App() {
         <Route path="/my-account/saved-packages" element={<Navigate to="/my-account?section=saved-packages" replace />} />
         <Route path="/my-account/account-settings" element={<AccountSettingsPage />} />
         <Route path="/packages" element={<PackagesPage />} />
+        <Route path="/packages/:slug" element={<PackagesPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment-failed" element={<PaymentFailedPage />} />
         <Route path="/terms-conditions" element={<PolicyPage />} />
         <Route path="/privacy-policy" element={<PolicyPage />} />
         <Route path="/refund-policy" element={<PolicyPage />} />
         <Route path="/tests" element={<TestsPage />} />
+        <Route path="/tests/:slug" element={<TestsPage />} />
       </Routes>
     </BrowserRouter>
   );

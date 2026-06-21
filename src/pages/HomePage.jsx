@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
+  Check,
   ChevronDown,
   ClipboardList,
   FileText,
@@ -407,6 +408,16 @@ function HomePage() {
       .slice(0, 6);
   }, [activePackages, activeTests, mobileQuery]);
 
+  const searchResultPath = (item) => {
+    const slug = slugify(item.slug || item.packageSlug || item.testSlug || item.id || item.name, item.id);
+    return `/${item.resultType === "package" ? "packages" : "tests"}/${slug}`;
+  };
+
+  const openMobileSearchResult = (item) => {
+    setMobileQuery("");
+    navigate(searchResultPath(item));
+  };
+
   useEffect(() => {
     const syncMobileCart = () => {
       setMobileAddedKeys(mobileCartKeys());
@@ -528,6 +539,10 @@ function HomePage() {
       subtitle: item.subtitle,
       testCount: item.testCount,
       image: item.image,
+      description: item.description,
+      badge: item.badge,
+      icon: item.icon,
+      color: item.color,
       price: item.discountedPrice,
       oldPrice: item.originalPrice,
       discount: item.discount,
@@ -708,17 +723,43 @@ function HomePage() {
             </div>
             {mobileSearchResults.length > 0 && (
               <div className="mobile-search-results">
-                {mobileSearchResults.map((item) => (
-                  <Link
-                    key={`${item.resultType}-${item.id}`}
-                    to={item.resultType === "package" ? "/packages" : "/tests"}
-                    onClick={() => setMobileQuery("")}
-                  >
-                    <span>{item.resultType}</span>
-                    <strong>{item.name}</strong>
-                    <small>{price(item.discountedPrice || item.originalPrice || 0)}</small>
-                  </Link>
-                ))}
+                {mobileSearchResults.map((item) => {
+                  const type = item.resultType;
+                  const isAdded = mobileAddedKeys.has(cartItemKey(item.id, type));
+                  const description = item.description || item.subtitle || item.testCount || item.testsIncluded || "";
+
+                  return (
+                    <div
+                      className="mobile-search-result-card"
+                      key={`${item.resultType}-${item.id}`}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => openMobileSearchResult(item)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") openMobileSearchResult(item);
+                      }}
+                    >
+                      <span className="mobile-search-result-label">{item.resultType}</span>
+                      <div className="mobile-search-result-copy">
+                        <strong>{item.name}</strong>
+                        {description ? <small>{description}</small> : null}
+                      </div>
+                      <div className="mobile-search-result-action">
+                        <b>{price(item.discountedPrice || item.originalPrice || 0)}</b>
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            if (!isAdded) addMobileCartItem(item, type);
+                          }}
+                        >
+                          {isAdded ? <Check /> : <Plus />}
+                          {isAdded ? "Added" : "Add"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>
