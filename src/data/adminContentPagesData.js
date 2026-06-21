@@ -93,17 +93,6 @@ const policyPageSections = (slug) => [
 export const pageSectionDefinitions = {
   home: [
     {
-      sectionKey: "hero",
-      label: "Hero Section",
-      fields: ["title", "subtitle", "description", "imageUrl"],
-      defaults: {
-        title: "Book Lab Tests Online from",
-        subtitle: "Trusted Partner Labs",
-        description: "We are a service provider connecting you with NABL accredited labs & trusted collection partners.",
-        imageUrl: ""
-      }
-    },
-    {
       sectionKey: "why-choose",
       label: "Why Choose Us Section",
       fields: ["title", "subtitle", "description", "imageUrl"],
@@ -112,19 +101,6 @@ export const pageSectionDefinitions = {
         subtitle: "Upchar?",
         description: "Trusted by thousands of patients across India for accurate diagnostics, affordable pricing, and fast report delivery.",
         imageUrl: ""
-      }
-    },
-    {
-      sectionKey: "packages",
-      label: "Packages Section",
-      fields: ["title", "subtitle", "description", "imageUrl"],
-      repeater: packageCardRepeater,
-      defaults: {
-        title: "Special Care for",
-        subtitle: "You & Your Family",
-        description: "Choose from our most popular health packages",
-        imageUrl: "",
-        cards: defaultHomePackageCards
       }
     },
     {
