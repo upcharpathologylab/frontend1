@@ -44,7 +44,7 @@ function CartItem({ item, onQuantityChange, onRemove }) {
   const itemTotal = Number(item.price || 0) * quantity;
 
   return (
-    <article className="grid grid-cols-[44px_minmax(0,1fr)_64px_74px_34px] items-center gap-2 rounded-lg border border-blue-100 bg-white px-2 py-2 shadow-sm sm:grid-cols-[82px_minmax(0,1fr)_210px_148px_48px] sm:gap-5 sm:px-5 sm:py-4 lg:grid-cols-[96px_minmax(0,1fr)_280px_148px_48px]">
+    <article className="grid grid-cols-[44px_minmax(0,1fr)_72px_72px] items-center gap-2 rounded-lg border border-blue-100 bg-white px-2 py-2 shadow-sm sm:grid-cols-[82px_minmax(0,1fr)_210px_148px_48px] sm:gap-5 sm:px-5 sm:py-4 lg:grid-cols-[96px_minmax(0,1fr)_280px_148px_48px]">
       <div className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-20 sm:w-20 lg:h-24 lg:w-24 ${item.image ? "bg-green-50" : colorStyles[item.color] || colorStyles.green}`}>
         {item.image ? (
           <SmartImage
@@ -63,8 +63,8 @@ function CartItem({ item, onQuantityChange, onRemove }) {
 
       <div className="min-w-0">
         <h3 className="line-clamp-2 text-[12px] font-black leading-tight text-navy-900 sm:text-xl sm:leading-snug">{item.name}</h3>
-        <p className="mt-0.5 truncate text-[11px] font-black text-upchar-blue sm:mt-1 sm:text-base">{item.subtitle}</p>
-        <div className="mt-1 flex min-w-0 items-center gap-1 sm:mt-2 sm:flex-wrap sm:gap-x-2 sm:gap-y-1">
+        <p className="mt-0.5 hidden truncate text-[11px] font-black text-upchar-blue sm:mt-1 sm:block sm:text-base">{item.subtitle}</p>
+        <div className="mt-1 hidden min-w-0 items-center gap-1 sm:mt-2 sm:flex sm:flex-wrap sm:gap-x-2 sm:gap-y-1">
           {item.badge ? (
             <span className="inline-flex max-w-[72px] shrink-0 items-center gap-1 truncate rounded-md bg-green-100 px-1.5 py-0.5 text-[9px] font-black text-upchar-green sm:max-w-none sm:px-2 sm:py-1 sm:text-[11px]">
               <Star className="h-2.5 w-2.5 shrink-0 fill-current sm:h-3 sm:w-3" />
@@ -83,25 +83,26 @@ function CartItem({ item, onQuantityChange, onRemove }) {
       <div className="min-w-0 sm:col-span-1 sm:block sm:border-t-0 sm:pt-0">
         <div>
           <div className="flex min-w-0 flex-col gap-0.5 sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-4 sm:gap-y-1">
-            <p className="truncate text-sm font-black leading-none text-upchar-green sm:text-2xl sm:leading-normal">{price(item.price)}</p>
-            <p className="truncate text-[10px] font-bold leading-none text-navy-400 line-through sm:text-sm sm:leading-normal">{price(item.oldPrice)}</p>
+            <p className="order-1 truncate text-[10px] font-bold leading-none text-navy-400 line-through sm:order-2 sm:text-sm sm:leading-normal">{price(item.oldPrice)}</p>
+            <p className="order-2 truncate text-sm font-black leading-none text-upchar-green sm:order-1 sm:text-2xl sm:leading-normal">{price(item.price)}</p>
             <p className="truncate text-[9px] font-black uppercase leading-none text-upchar-green sm:text-sm sm:leading-normal">{item.discount}</p>
           </div>
         </div>
-        <p className="mt-1 truncate text-[10px] font-semibold leading-tight text-navy-500 sm:mt-2 sm:text-base sm:leading-normal">Total ({quantity} item): <span className="font-black">{price(itemTotal)}</span></p>
+        <p className="mt-1 hidden truncate text-[10px] font-semibold leading-tight text-navy-500 sm:mt-2 sm:block sm:text-base sm:leading-normal">Total ({quantity} item): <span className="font-black">{price(itemTotal)}</span></p>
       </div>
 
-      <div className="justify-self-center sm:col-start-auto">
+      <div className="hidden justify-self-center sm:col-start-auto sm:block">
         <QuantityStepper quantity={quantity} onChange={(nextQuantity) => onQuantityChange(item, nextQuantity)} />
       </div>
 
       <button
         type="button"
-        className="flex h-8 w-8 items-center justify-center justify-self-end rounded-md border border-red-400 text-red-500 transition hover:bg-red-50 sm:col-start-auto sm:h-12 sm:w-12 sm:rounded-lg"
+        className="flex h-8 w-full items-center justify-center gap-1 justify-self-end rounded-md border border-red-400 px-1 text-[11px] font-black text-red-500 transition hover:bg-red-50 sm:col-start-auto sm:h-12 sm:w-12 sm:px-0 sm:rounded-lg"
         onClick={() => onRemove(item)}
         aria-label={`Remove ${item.name}`}
       >
         <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
+        <span className="sm:hidden">Remove</span>
       </button>
     </article>
   );

@@ -132,6 +132,7 @@ function PackagesPage() {
       discount: item.discount,
       badge: item.badge,
       icon: item.icon,
+      image: item.image,
       color: item.color
     });
     setAddedKeys(cartKeys());

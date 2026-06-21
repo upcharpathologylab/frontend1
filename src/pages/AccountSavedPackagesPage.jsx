@@ -45,6 +45,7 @@ function AccountSavedPackagesPage() {
       subtitle: item.subtitle,
       description: item.description,
       icon: item.icon,
+      image: item.image,
       color: item.color
     });
     showToast(`${item.title} added to cart.`);
