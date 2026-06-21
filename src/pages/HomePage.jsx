@@ -832,8 +832,8 @@ function HomePage() {
                         <del>{price(item.originalPrice || item.discountedPrice || 0)}</del>
                         <strong>{price(item.discountedPrice || item.originalPrice || 0)}</strong>
                       </div>
-                      <button type="button" className={`mobile-add-circle ${isAdded ? "is-added" : ""}`} onClick={() => addMobileCartItem(item, "test")}>
-                        <Plus />
+                      <button type="button" className={isAdded ? "is-added" : ""} onClick={() => addMobileCartItem(item, "test")}>
+                        <ShoppingCart /> {isAdded ? "Added" : "Add to Cart"}
                       </button>
                     </div>
                   </article>
