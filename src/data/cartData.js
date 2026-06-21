@@ -1,5 +1,5 @@
-import cartDoctor from "../assets/cart-doctor.png";
-import cartGift from "../assets/cart-gift.png";
+import cartDoctor from "../assets/cart-doctor.webp";
+import cartGift from "../assets/cart-gift.webp";
 
 export const defaultCartItems = [
   {

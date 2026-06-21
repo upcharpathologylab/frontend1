@@ -20,8 +20,11 @@ export const api = axios.create({
 
 export function assetUrl(value) {
   if (!value || typeof value !== "string") return value;
-  const normalized = value.trim().replace(/^["']|["']$/g, "");
+  let normalized = value.trim().replace(/^["']|["']$/g, "");
   if (!normalized || /^[a-z]:\\/i.test(normalized) || normalized.includes("\\")) return "";
+  if (normalized === "/images/home-banner.png" || normalized === "images/home-banner.png") {
+    normalized = normalized.startsWith("/") ? "/images/home-banner.webp" : "images/home-banner.webp";
+  }
   if (/^(https?:)?\/\//i.test(normalized) || normalized.startsWith("data:")) {
     if (import.meta.env.PROD && /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?\/uploads\//i.test(normalized)) {
       return normalized.replace(/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i, API_ASSET_ORIGIN);

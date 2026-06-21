@@ -27,7 +27,7 @@ function NeedHelpCard() {
   return (
     <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-sm">
       <div className="grid gap-5 sm:grid-cols-[120px_1fr] sm:items-center xl:grid-cols-1">
-        <img src={cartOfferAssets.doctor} alt="Doctor support specialist" className="h-32 w-32 rounded-lg object-cover object-top" />
+        <img src={cartOfferAssets.doctor} alt="Doctor support specialist" className="h-32 w-32 rounded-lg object-cover object-top" width="128" height="128" loading="lazy" decoding="async" />
         <div>
           <h2 className="text-2xl font-black text-navy-900">Need Help?</h2>
           <p className="mt-2 text-sm font-semibold leading-6 text-navy-700">Our support team is here to assist you.</p>

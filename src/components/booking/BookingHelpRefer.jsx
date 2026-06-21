@@ -5,7 +5,7 @@ function BookingHelpRefer() {
   return (
     <section className="mt-8 grid overflow-hidden rounded-lg border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-green-50 shadow-sm lg:grid-cols-[1.2fr_0.9fr]">
       <div className="grid gap-5 p-6 sm:grid-cols-[130px_1fr] sm:items-center">
-        <img src={cartOfferAssets.doctor} alt="Doctor support specialist" className="h-32 w-32 rounded-lg object-cover object-top" />
+        <img src={cartOfferAssets.doctor} alt="Doctor support specialist" className="h-32 w-32 rounded-lg object-cover object-top" width="128" height="128" loading="lazy" decoding="async" />
         <div>
           <h2 className="text-2xl font-black text-navy-900">Need Help?</h2>
           <p className="mt-2 text-sm font-semibold leading-6 text-navy-700">Our health experts are here to help you.</p>

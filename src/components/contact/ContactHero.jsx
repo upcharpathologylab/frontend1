@@ -1,4 +1,4 @@
-import contactHero from "../../assets/contact-hero.png";
+import contactHero from "../../assets/contact-hero.webp";
 import { imageValue } from "../../utils/contentOverrides.js";
 
 function ContactHero({ content }) {
@@ -17,7 +17,7 @@ function ContactHero({ content }) {
         </div>
 
         <div className="hidden justify-end lg:flex">
-          <img src={imageValue(content?.imageUrl, contactHero)} alt="Support headset with call, email and chat icons" className="h-56 w-[560px] rounded-xl object-cover object-right" />
+          <img src={imageValue(content?.imageUrl, contactHero)} alt="Support headset with call, email and chat icons" className="h-56 w-[560px] rounded-xl object-cover object-right" width="560" height="224" loading="eager" decoding="async" fetchPriority="high" />
         </div>
       </div>
     </section>

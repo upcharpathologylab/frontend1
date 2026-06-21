@@ -1,5 +1,5 @@
 import { ShieldCheck } from "lucide-react";
-import aboutHero from "../../assets/about-hero.png";
+import aboutHero from "../../assets/about-hero.webp";
 import { imageValue, textValue } from "../../utils/contentOverrides.js";
 
 function AboutHero({ content }) {
@@ -41,7 +41,7 @@ function AboutHero({ content }) {
           </div>
 
           <div className="relative hidden h-[390px] overflow-hidden rounded-xl lg:block">
-            <img src={imageValue(content?.imageUrl, aboutHero)} alt="Doctor using a microscope in a pathology lab" className="absolute inset-0 h-full w-full object-cover" />
+            <img src={imageValue(content?.imageUrl, aboutHero)} alt="Doctor using a microscope in a pathology lab" className="absolute inset-0 h-full w-full object-cover" width="576" height="430" loading="eager" decoding="async" fetchPriority="high" />
             <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/15 to-transparent" />
           </div>
         </div>

@@ -1,4 +1,4 @@
-import upcharLogo from "../assets/upchar-logo.png";
+import upcharLogo from "../assets/upchar-logo.webp";
 
 function Logo({ light = false, size = "default" }) {
   const large = size === "large";

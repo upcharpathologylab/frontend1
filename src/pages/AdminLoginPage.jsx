@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Eye, EyeOff, LockKeyhole, LogIn, ShieldCheck, UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "../api/api.js";
-import upcharLogo from "../assets/upchar-logo.png";
+import upcharLogo from "../assets/upchar-logo.webp";
 import { hasAdminSession, storeAdminAuthSession } from "../components/auth/authStorage.js";
 
 function AdminLoginPage() {

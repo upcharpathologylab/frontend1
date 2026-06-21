@@ -1,5 +1,5 @@
-import heroBg from "../assets/hero-bg.png";
-import testsHero from "../assets/tests-hero.png";
+import heroBg from "../assets/hero-bg.webp";
+import testsHero from "../assets/tests-hero.webp";
 
 const image = (id, width = 900) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=80`;

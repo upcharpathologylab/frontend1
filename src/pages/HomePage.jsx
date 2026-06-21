@@ -25,6 +25,7 @@ import Header from "../components/Header.jsx";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
 import SmartImage from "../components/SmartImage.jsx";
+import upcharLogo from "../assets/upchar-logo.webp";
 import { getStoredUser } from "../components/auth/authStorage.js";
 import { fallbackHomeData, mergeHomeData } from "../data/homeData.js";
 import { addCartItem, cartEventName, cartItemKey, getCartCount, getCartItems, hasCartItem } from "../utils/cart.js";
@@ -365,17 +366,26 @@ function HomePage() {
 
   useEffect(() => {
     const firstHeroImage = assetUrl(heroSlides[0]?.image);
-    if (!firstHeroImage || typeof document === "undefined") return undefined;
+    if (typeof document === "undefined") return undefined;
 
-    const preload = document.createElement("link");
-    preload.rel = "preload";
-    preload.as = "image";
-    preload.href = firstHeroImage;
-    preload.fetchPriority = "high";
-    document.head.appendChild(preload);
+    const preloaded = [];
+    const addPreload = (href, options = {}) => {
+      if (!href || document.head.querySelector(`link[rel="preload"][as="image"][href="${href}"]`)) return;
+      const preload = document.createElement("link");
+      preload.rel = "preload";
+      preload.as = "image";
+      preload.href = href;
+      preload.fetchPriority = options.fetchPriority || "high";
+      if (options.imageSizes) preload.imageSizes = options.imageSizes;
+      document.head.appendChild(preload);
+      preloaded.push(preload);
+    };
+
+    addPreload(upcharLogo, { fetchPriority: "high" });
+    addPreload(firstHeroImage, { fetchPriority: "high", imageSizes: "100vw" });
 
     return () => {
-      preload.remove();
+      preloaded.forEach((preload) => preload.remove());
     };
   }, [heroSlides]);
 
@@ -641,7 +651,7 @@ function HomePage() {
                   .map((point) => point.label)
                   .filter((label) => /home|report|fast|sample/i.test(label))
                   .slice(0, 2);
-                const image = slide.image || "/images/home-banner.png";
+                const image = slide.image || "/images/home-banner.webp";
                 const primary = slide.buttons?.[0] || { label: "Book Now", href: "/packages" };
                 const secondary = slide.buttons?.[1] || { label: "View Packages", href: "/packages" };
 

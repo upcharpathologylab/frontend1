@@ -34,7 +34,7 @@ function CartOfferBanner() {
   return (
     <section className="mt-8 grid overflow-hidden rounded-lg border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-green-50 shadow-sm lg:grid-cols-[1.1fr_0.7fr_1fr]">
       <div className="grid gap-5 p-6 sm:grid-cols-[130px_1fr] sm:items-center">
-        <img src={cartOfferAssets.doctor} alt="Doctor support specialist" className="h-32 w-32 rounded-lg object-cover object-top" />
+        <img src={cartOfferAssets.doctor} alt="Doctor support specialist" className="h-32 w-32 rounded-lg object-cover object-top" width="128" height="128" loading="lazy" decoding="async" />
         <div>
           <h2 className="text-xl font-black text-navy-900">Not sure which test is right for you?</h2>
           <p className="mt-2 text-sm font-semibold leading-6 text-navy-700">
@@ -65,7 +65,7 @@ function CartOfferBanner() {
             Book your tests now and save more on your health.
           </p>
         </div>
-        <img src={cartOfferAssets.gift} alt="Health offer gift" className="mx-auto h-32 w-32 object-contain" />
+        <img src={cartOfferAssets.gift} alt="Health offer gift" className="mx-auto h-32 w-32 object-contain" width="128" height="128" loading="lazy" decoding="async" />
       </div>
     </section>
   );
