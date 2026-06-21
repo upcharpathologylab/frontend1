@@ -20,7 +20,7 @@ import {
   X
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { assetUrl, getFeaturedServiceLocation, getHomeData, getHomepageBanners, getPackages, getPageContent, getTestimonials, getTests } from "../api/api.js";
+import { imageUrl, getFeaturedServiceLocation, getHomeData, getHomepageBanners, getPackages, getPageContent, getTestimonials, getTests } from "../api/api.js";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import Icon from "../components/Icon.jsx";
@@ -51,7 +51,7 @@ const normalizeHomePackage = (item, index) => ({
   originalPrice: item.price ?? item.originalPrice ?? 0,
   discountedPrice: item.finalPrice ?? item.discountedPrice ?? item.price ?? item.originalPrice ?? 0,
   discount: item.discountPercent ? `${item.discountPercent}% OFF` : item.discount || "",
-  image: assetUrl(item.packageImage || item.image || ""),
+  image: imageUrl(item.packageImage || item.image || item.imageUrl || item.thumbnail || "", item.updatedAt || item.createdAt),
   icon: item.icon || "Gift",
   color: item.color || "green",
   buttonText: item.buttonText || "Book Now",
@@ -70,7 +70,7 @@ const normalizeHomeTest = (item, index) => ({
   originalPrice: item.price ?? item.originalPrice ?? 0,
   discountedPrice: item.finalPrice ?? item.discountedPrice ?? item.price ?? item.originalPrice ?? 0,
   discount: item.discountPercent ? `${item.discountPercent}% OFF` : item.discount || "",
-  image: assetUrl(item.testImage || item.image || ""),
+  image: imageUrl(item.testImage || item.image || item.imageUrl || item.thumbnail || "", item.updatedAt || item.createdAt),
   icon: item.icon || "TestTube2",
   color: item.badgeType || item.color || "green",
   badge: item.badge || "",
@@ -158,16 +158,8 @@ const bannerToHero = (banner, fallbackHero) => {
       }
     ],
     offerText: offerText || fallbackHero.offerText,
-    image: versionedImageUrl(image, banner.updatedAt || banner.createdAt) || ""
+    image: imageUrl(image, banner.updatedAt || banner.createdAt) || ""
   };
-};
-
-const versionedImageUrl = (value, version) => {
-  const url = assetUrl(value);
-  if (!url || !version || !String(url).includes("/uploads/")) return url;
-  if (/[?&]v=/.test(String(url))) return url;
-  const separator = String(url).includes("?") ? "&" : "?";
-  return `${url}${separator}v=${encodeURIComponent(new Date(version).getTime() || version)}`;
 };
 
 function SectionSkeleton({ className = "bg-white" }) {
@@ -360,7 +352,7 @@ function HomePage() {
       .map((blog, index) => ({
         id: blog.id || `blog-${index + 1}`,
         slug: slugify(blog.id || blog.slug || blog.title, `blog-${index + 1}`),
-        image: assetUrl(blog.image),
+        image: imageUrl(blog.image || blog.imageUrl || blog.thumbnail || "", blog.updatedAt || blog.publishDate || blog.date),
         title: blog.title,
         shortDescription: blog.shortDescription || blog.description,
         content: blog.content || blog.shortDescription || blog.description,
@@ -392,7 +384,7 @@ function HomePage() {
   const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
 
   useEffect(() => {
-    const firstHeroImage = homepageBannersLoaded ? versionedImageUrl(heroSlides[0]?.image, heroSlides[0]?.updatedAt) : "";
+    const firstHeroImage = homepageBannersLoaded ? imageUrl(heroSlides[0]?.image, heroSlides[0]?.updatedAt) : "";
     if (typeof document === "undefined") return undefined;
 
     const preloaded = [];
@@ -693,7 +685,7 @@ function HomePage() {
                     .map((point) => point.label)
                     .filter((label) => /home|report|fast|sample/i.test(label))
                     .slice(0, 2);
-                  const image = versionedImageUrl(slide.image, slide.updatedAt);
+                  const image = imageUrl(slide.image, slide.updatedAt);
                   const primary = slide.buttons?.[0] || { label: "Book Now", href: "/packages" };
                   const secondary = slide.buttons?.[1] || { label: "View Packages", href: "/packages" };
 

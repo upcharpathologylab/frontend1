@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, CalendarDays, NotebookPen } from "lucide-react";
 import { Link } from "react-router-dom";
-import { assetUrl, getPageContent } from "../api/api.js";
+import { imageUrl, getPageContent } from "../api/api.js";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import SmartImage from "../components/SmartImage.jsx";
@@ -22,7 +22,7 @@ const contentBlogs = (content) => {
         .map((blog, index) => ({
           id: blog.id || `blog-${index + 1}`,
           slug: slugify(blog.id || blog.title, `blog-${index + 1}`),
-          image: assetUrl(blog.image),
+          image: imageUrl(blog.image || blog.imageUrl || blog.thumbnail || "", blog.updatedAt || blog.publishDate || blog.date),
           title: blog.title,
           shortDescription: blog.description,
           content: blog.content || blog.description,
@@ -82,7 +82,7 @@ function BlogListPage() {
                 {blogs.map((blog) => (
                   <article className="group overflow-hidden rounded-xl border border-blue-100 bg-white shadow-card transition hover:-translate-y-1 hover:shadow-soft" key={blog.slug}>
                     <div className="h-56 overflow-hidden">
-                      <SmartImage src={assetUrl(blog.image)} alt={blog.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                      <SmartImage src={blog.image} alt={blog.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                     </div>
                     <div className="p-6">
                       <div className="flex flex-wrap items-center gap-3 text-xs font-black uppercase tracking-wide text-upchar-green">

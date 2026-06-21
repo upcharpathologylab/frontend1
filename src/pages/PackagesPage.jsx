@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { assetUrl, getPackages } from "../api/api.js";
+import { imageUrl, getPackages } from "../api/api.js";
 import { PackageCard } from "../components/listing/CatalogCard.jsx";
 import { matchesSearch, sortCatalogItems } from "../components/listing/catalogUtils.js";
 import Header from "../components/Header.jsx";
@@ -29,7 +29,7 @@ const normalizePackage = (item, index) => {
     description: item.description || "Curated health package with home sample collection.",
     testCount: item.testsIncluded || item.testCount || "30+ Tests",
     testsIncluded: item.testsIncluded || item.testCount || "30+ Tests",
-    image: assetUrl(item.packageImage || item.image || ""),
+    image: imageUrl(item.packageImage || item.image || item.imageUrl || item.thumbnail || "", item.updatedAt || item.createdAt),
     icon: item.icon || "Gift",
     color: item.color || "green",
     badge: item.badge || "",

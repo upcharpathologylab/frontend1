@@ -1,4 +1,4 @@
-import { assetUrl } from "../api/api.js";
+import { imageUrl } from "../api/api.js";
 
 export function getContentSection(content, sectionKey) {
   return (content?.sections || []).find((section) => section.sectionKey === sectionKey) || null;
@@ -10,7 +10,7 @@ export function textValue(value, fallback) {
 
 export function imageValue(value, fallback) {
   if (typeof value !== "string" || !value.trim()) return fallback;
-  return assetUrl(value) || fallback;
+  return imageUrl(value) || fallback;
 }
 
 const editableText = (value, fallback = "") => (typeof value === "string" ? value : fallback);
@@ -55,7 +55,7 @@ export function sectionCards(section, fallbackItems = []) {
       discount: discountValue(originalPrice, discountedPrice, fallback.discount || ""),
       badge,
       isPopular: Boolean(badge),
-      image: assetUrl(editableText(card.image, fallback.image || "")) || fallback.image || "",
+      image: imageUrl(editableText(card.image, fallback.image || "")) || fallback.image || "",
       buttonText: textValue(card.buttonText, fallback.buttonText || "Book Now"),
       buttonLink: textValue(card.buttonLink, fallback.buttonLink || "#booking"),
       isActive: true,

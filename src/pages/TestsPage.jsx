@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { assetUrl, getTests } from "../api/api.js";
+import { imageUrl, getTests } from "../api/api.js";
 import { TestCard } from "../components/listing/CatalogCard.jsx";
 import { matchesSearch, sortCatalogItems } from "../components/listing/catalogUtils.js";
 import Header from "../components/Header.jsx";
@@ -33,7 +33,7 @@ const normalizeTest = (item, index) => {
   const discountedPrice = item.finalPrice ?? item.discountedPrice ?? originalPrice;
   const hasDiscountPercent = item.discountPercent !== undefined && item.discountPercent !== null && item.discountPercent !== "";
 
-  const image = assetUrl(item.testImage || item.image || "");
+  const image = imageUrl(item.testImage || item.image || item.imageUrl || item.thumbnail || "", item.updatedAt || item.createdAt);
 
   return {
     ...item,

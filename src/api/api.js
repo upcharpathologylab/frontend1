@@ -20,6 +20,13 @@ export const api = axios.create({
   timeout: 20000
 });
 
+const forceHttpsForSecureFrontend = (url) => {
+  if (typeof window !== "undefined" && window.location?.protocol === "https:" && /^http:\/\//i.test(url)) {
+    return url.replace(/^http:\/\//i, "https://");
+  }
+  return url;
+};
+
 export function assetUrl(value) {
   if (!value || typeof value !== "string") return value;
   let normalized = value.trim().replace(/^["']|["']$/g, "");
@@ -29,19 +36,28 @@ export function assetUrl(value) {
   }
   if (/^(https?:)?\/\//i.test(normalized) || normalized.startsWith("data:")) {
     if (import.meta.env.PROD && /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?\/uploads\//i.test(normalized)) {
-      return normalized.replace(/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i, API_ASSET_ORIGIN);
+      return forceHttpsForSecureFrontend(normalized.replace(/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i, API_ASSET_ORIGIN));
     }
-    return normalized;
+    return forceHttpsForSecureFrontend(normalized);
   }
-  if (normalized.startsWith("/api/uploads/")) return `${API_ASSET_ORIGIN}${normalized.replace(/^\/api/, "")}`;
-  if (normalized.startsWith("api/uploads/")) return `${API_ASSET_ORIGIN}/${normalized.replace(/^api\//, "")}`;
-  if (normalized.startsWith("/uploads/")) return `${API_ASSET_ORIGIN}${normalized}`;
-  if (normalized.startsWith("uploads/")) return `${API_ASSET_ORIGIN}/${normalized}`;
+  if (normalized.startsWith("/api/uploads/")) return forceHttpsForSecureFrontend(`${API_ASSET_ORIGIN}${normalized.replace(/^\/api/, "")}`);
+  if (normalized.startsWith("api/uploads/")) return forceHttpsForSecureFrontend(`${API_ASSET_ORIGIN}/${normalized.replace(/^api\//, "")}`);
+  if (normalized.startsWith("/uploads/")) return forceHttpsForSecureFrontend(`${API_ASSET_ORIGIN}${normalized}`);
+  if (normalized.startsWith("uploads/")) return forceHttpsForSecureFrontend(`${API_ASSET_ORIGIN}/${normalized}`);
   if (!normalized.startsWith("/") && !/\.(png|jpe?g|webp|gif|svg)(\?|#|$)/i.test(normalized)) return "";
   return normalized;
 }
 
-export const getImageUrl = assetUrl;
+export function imageUrl(value, version) {
+  const url = assetUrl(value);
+  if (!url || !version || !String(url).includes("/uploads/") || /[?&]v=/.test(String(url))) return url;
+  const parsedVersion = new Date(version).getTime();
+  const versionToken = Number.isFinite(parsedVersion) ? parsedVersion : version;
+  const separator = String(url).includes("?") ? "&" : "?";
+  return `${url}${separator}v=${encodeURIComponent(versionToken)}`;
+}
+
+export const getImageUrl = imageUrl;
 
 const getAuthConfig = () => {
   const token = localStorage.getItem(AUTH_TOKEN_KEY);

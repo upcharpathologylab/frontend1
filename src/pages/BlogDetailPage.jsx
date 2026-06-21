@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CalendarDays, UserRound } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import { assetUrl, getPageContent } from "../api/api.js";
+import { imageUrl, getPageContent } from "../api/api.js";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import SmartImage from "../components/SmartImage.jsx";
@@ -22,7 +22,7 @@ const contentBlogs = (content) => {
         .map((blog, index) => ({
           id: blog.id || `blog-${index + 1}`,
           slug: slugify(blog.id || blog.title, `blog-${index + 1}`),
-          image: assetUrl(blog.image),
+          image: imageUrl(blog.image || blog.imageUrl || blog.thumbnail || "", blog.updatedAt || blog.publishDate || blog.date),
           title: blog.title,
           shortDescription: blog.description,
           content: blog.content || blog.description,
@@ -89,7 +89,7 @@ function BlogDetailPage() {
                   </span>
                 </div>
                 <div className="mt-8 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-card">
-                  <SmartImage src={assetUrl(blog.image)} alt={blog.title} className="h-80 w-full object-cover" />
+                  <SmartImage src={blog.image} alt={blog.title} className="h-80 w-full object-cover" />
                 </div>
                 <div className="mt-8 rounded-2xl border border-blue-100 bg-white p-6 text-base font-semibold leading-8 text-navy-700 shadow-sm lg:p-8">
                   {(blog.content || blog.shortDescription).split("\n").filter(Boolean).map((paragraph) => (
