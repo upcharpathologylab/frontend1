@@ -1619,7 +1619,8 @@ footer li,
     font-weight: 1000;
   }
 
-  .mobile-package-card .mobile-price-row strong {
+  .mobile-package-card .mobile-price-row strong,
+  .mobile-test-card .mobile-price-row strong {
     color: #0ba660;
   }
 
@@ -1629,7 +1630,8 @@ footer li,
     font-weight: 800;
   }
 
-  .mobile-package-card button:not(.mobile-add-circle) {
+  .mobile-package-card button:not(.mobile-add-circle),
+  .mobile-test-card button:not(.mobile-add-circle) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1644,12 +1646,14 @@ footer li,
     font-weight: 1000;
   }
 
-  .mobile-package-card button svg {
+  .mobile-package-card button svg,
+  .mobile-test-card button svg {
     width: 1.15rem;
     height: 1.15rem;
   }
 
   .mobile-package-card button.is-added,
+  .mobile-test-card button.is-added,
   .mobile-add-circle.is-added {
     background: #0ba660;
     color: #fff;
@@ -1673,10 +1677,6 @@ footer li,
   .mobile-add-circle svg {
     width: 1.35rem;
     height: 1.35rem;
-  }
-
-  .mobile-test-card .mobile-card-body {
-    padding-bottom: 3.25rem;
   }
 
   .mobile-reviews-section {
