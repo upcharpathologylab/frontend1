@@ -130,6 +130,8 @@ const bannerToHero = (banner, fallbackHero) => {
 
   return {
     ...fallbackHero,
+    id: banner.id || banner._id || fallbackHero.id,
+    updatedAt: banner.updatedAt || banner.createdAt || fallbackHero.updatedAt,
     title: banner.headingLine1 || banner.bannerTitle || fallbackHero.title,
     highlightText: banner.headingHighlightText || "",
     subtitle: banner.description || banner.bannerDescription || fallbackHero.subtitle,
@@ -147,8 +149,15 @@ const bannerToHero = (banner, fallbackHero) => {
       }
     ],
     offerText: offerText || fallbackHero.offerText,
-    image: assetUrl(banner.bannerImage) || fallbackHero.image
+    image: versionedImageUrl(banner.bannerImage, banner.updatedAt || banner.createdAt) || fallbackHero.image
   };
+};
+
+const versionedImageUrl = (value, version) => {
+  const url = assetUrl(value);
+  if (!url || !version || !String(url).includes("/uploads/")) return url;
+  const separator = String(url).includes("?") ? "&" : "?";
+  return `${url}${separator}v=${encodeURIComponent(new Date(version).getTime() || version)}`;
 };
 
 function SectionSkeleton({ className = "bg-white" }) {
@@ -356,17 +365,18 @@ function HomePage() {
   const activePackages = useMemo(() => homePackages.filter((item) => item.isActive), [homePackages]);
   const activeTests = useMemo(() => homeTests.filter((item) => item.isActive), [homeTests]);
   const heroSlides = useMemo(() => {
+    if (!homepageBannersLoaded) return [];
     const activeBanners = homepageBanners
       .filter((banner) => banner.status === "Active" && banner.isActive !== false)
       .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
     const slides = activeBanners.map((banner) => bannerToHero(banner, fallbackHomeData.hero));
     return slides.length ? slides : [displayHomeData.hero || fallbackHomeData.hero];
-  }, [displayHomeData.hero, homepageBanners]);
+  }, [displayHomeData.hero, homepageBanners, homepageBannersLoaded]);
   const mobilePackages = useMemo(() => activePackages.slice(0, 4), [activePackages]);
   const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
 
   useEffect(() => {
-    const firstHeroImage = assetUrl(heroSlides[0]?.image);
+    const firstHeroImage = homepageBannersLoaded ? versionedImageUrl(heroSlides[0]?.image, heroSlides[0]?.updatedAt) : "";
     if (typeof document === "undefined") return undefined;
 
     const preloaded = [];
@@ -388,7 +398,7 @@ function HomePage() {
     return () => {
       preloaded.forEach((preload) => preload.remove());
     };
-  }, [heroSlides]);
+  }, [heroSlides, homepageBannersLoaded]);
 
   const openHeroLink = (href = "/packages") => {
     if (!href || href === "#booking" || href.startsWith("#")) {
@@ -656,60 +666,66 @@ function HomePage() {
         )}
 
         <main className="mobile-home-main">
-          <section className="mobile-hero-slider" aria-label="Health offers">
-            <div className="mobile-hero-track">
-              {heroSlides.map((slide, index) => {
-                const offerParts = String(slide.offerText || "UP TO 60% OFF on selected health packages").split(" on ");
-                const offerTitle = offerParts[0] || "UP TO 60% OFF";
-                const offerSubtitle = offerParts[1] || slide.highlightText || "Selected Health Packages";
-                const benefits = (slide.trustPoints || [])
-                  .map((point) => point.label)
-                  .filter((label) => /home|report|fast|sample/i.test(label))
-                  .slice(0, 2);
-                const image = slide.image || "/images/home-banner.webp";
-                const primary = slide.buttons?.[0] || { label: "Book Now", href: "/packages" };
-                const secondary = slide.buttons?.[1] || { label: "View Packages", href: "/packages" };
+          {homepageBannersLoaded ? (
+            <section className="mobile-hero-slider" aria-label="Health offers">
+              <div className="mobile-hero-track">
+                {heroSlides.map((slide, index) => {
+                  const offerParts = String(slide.offerText || "UP TO 60% OFF on selected health packages").split(" on ");
+                  const offerTitle = offerParts[0] || "UP TO 60% OFF";
+                  const offerSubtitle = offerParts[1] || slide.highlightText || "Selected Health Packages";
+                  const benefits = (slide.trustPoints || [])
+                    .map((point) => point.label)
+                    .filter((label) => /home|report|fast|sample/i.test(label))
+                    .slice(0, 2);
+                  const image = versionedImageUrl(slide.image, slide.updatedAt) || "/images/home-banner.webp";
+                  const primary = slide.buttons?.[0] || { label: "Book Now", href: "/packages" };
+                  const secondary = slide.buttons?.[1] || { label: "View Packages", href: "/packages" };
 
-                return (
-                  <article className="mobile-hero-card" key={`${slide.title}-${index}`}>
-                    <div className="mobile-hero-copy">
-                      <span>Limited Time Offer</span>
-                      <h1>{offerTitle}</h1>
-                      <p>{offerSubtitle}</p>
-                      <div className="mobile-hero-features">
-                        {(benefits.length ? benefits : ["Home Sample Collection", "Fast Reports"]).map((label) => (
-                          <div key={label}>
-                            <ShieldCheck />
-                            <small>{label}</small>
-                          </div>
-                        ))}
+                  return (
+                    <article className="mobile-hero-card" key={`${slide.title}-${index}`}>
+                      <div className="mobile-hero-copy">
+                        <span>Limited Time Offer</span>
+                        <h1>{offerTitle}</h1>
+                        <p>{offerSubtitle}</p>
+                        <div className="mobile-hero-features">
+                          {(benefits.length ? benefits : ["Home Sample Collection", "Fast Reports"]).map((label) => (
+                            <div key={label}>
+                              <ShieldCheck />
+                              <small>{label}</small>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mobile-hero-actions">
+                          <button type="button" onClick={() => openHeroLink(primary.href)}>
+                            {primary.label || "Book Now"} <ArrowRight />
+                          </button>
+                          <button type="button" onClick={() => openHeroLink(secondary.href)}>
+                            {secondary.label || "View Packages"}
+                          </button>
+                        </div>
                       </div>
-                      <div className="mobile-hero-actions">
-                        <button type="button" onClick={() => openHeroLink(primary.href)}>
-                          {primary.label || "Book Now"} <ArrowRight />
-                        </button>
-                        <button type="button" onClick={() => openHeroLink(secondary.href)}>
-                          {secondary.label || "View Packages"}
-                        </button>
-                      </div>
-                    </div>
-                    <SmartImage
-                      src={image}
-                      alt={slide.title || "Upchar health offer"}
-                      loading={index === 0 ? "eager" : "lazy"}
-                      fetchPriority={index === 0 ? "high" : "auto"}
-                      width="430"
-                      height="160"
-                      sizes="100vw"
-                    />
-                  </article>
-                );
-              })}
-            </div>
-            <div className="mobile-hero-dots">
-              {heroSlides.map((slide, index) => <i key={`${slide.title}-${index}`} />)}
-            </div>
-          </section>
+                      <SmartImage
+                        src={image}
+                        alt={slide.title || "Upchar health offer"}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        fetchPriority={index === 0 ? "high" : "auto"}
+                        width="430"
+                        height="160"
+                        sizes="100vw"
+                      />
+                    </article>
+                  );
+                })}
+              </div>
+              <div className="mobile-hero-dots">
+                {heroSlides.map((slide, index) => <i key={`${slide.title}-${index}`} />)}
+              </div>
+            </section>
+          ) : (
+            <section className="mobile-hero-slider" aria-label="Health offers">
+              <div className="mobile-hero-card animate-pulse bg-blue-50" />
+            </section>
+          )}
 
           <section className="mobile-search-panel">
             <div className="mobile-search-bar">
