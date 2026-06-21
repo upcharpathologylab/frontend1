@@ -30,7 +30,7 @@ import upcharLogo from "../assets/upchar-logo.webp";
 import { getStoredUser } from "../components/auth/authStorage.js";
 import { fallbackHomeData, mergeHomeData } from "../data/homeData.js";
 import { addCartItem, cartEventName, cartItemKey, getCartCount, getCartItems, hasCartItem } from "../utils/cart.js";
-import { applyHomeContentOverrides, getContentSection } from "../utils/contentOverrides.js";
+import { getContentSection } from "../utils/contentOverrides.js";
 import { price } from "../utils.js";
 import BlogSection from "../sections/BlogSection.jsx";
 import BookingMapSection from "../sections/BookingMapSection.jsx";
@@ -149,13 +149,14 @@ const bannerToHero = (banner, fallbackHero) => {
       }
     ],
     offerText: offerText || fallbackHero.offerText,
-    image: versionedImageUrl(banner.bannerImage, banner.updatedAt || banner.createdAt) || fallbackHero.image
+    image: versionedImageUrl(banner.bannerImage, banner.updatedAt || banner.createdAt) || ""
   };
 };
 
 const versionedImageUrl = (value, version) => {
   const url = assetUrl(value);
   if (!url || !version || !String(url).includes("/uploads/")) return url;
+  if (/[?&]v=/.test(String(url))) return url;
   const separator = String(url).includes("?") ? "&" : "?";
   return `${url}${separator}v=${encodeURIComponent(new Date(version).getTime() || version)}`;
 };
@@ -327,7 +328,7 @@ function HomePage() {
   }, []);
 
   const displayHomeData = useMemo(() => {
-    const baseData = applyHomeContentOverrides(homeData || fallbackHomeData, homeContent);
+    const baseData = homeData || fallbackHomeData;
     const topBanner = homepageBanners
       .filter((banner) => banner.status === "Active" && banner.isActive !== false)
       .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))[0];
@@ -364,14 +365,20 @@ function HomePage() {
   const packageContent = getContentSection(homeContent, "packages");
   const activePackages = useMemo(() => homePackages.filter((item) => item.isActive), [homePackages]);
   const activeTests = useMemo(() => homeTests.filter((item) => item.isActive), [homeTests]);
+  const activeHomepageBanners = useMemo(
+    () =>
+      homepageBanners
+        .filter((banner) => banner.status === "Active" && banner.isActive !== false)
+        .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0)),
+    [homepageBanners]
+  );
   const heroSlides = useMemo(() => {
     if (!homepageBannersLoaded) return [];
-    const activeBanners = homepageBanners
-      .filter((banner) => banner.status === "Active" && banner.isActive !== false)
-      .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0));
-    const slides = activeBanners.map((banner) => bannerToHero(banner, fallbackHomeData.hero));
+    const slides = activeHomepageBanners.map((banner) => bannerToHero(banner, fallbackHomeData.hero));
+    if (!slides.length && loading) return [];
     return slides.length ? slides : [displayHomeData.hero || fallbackHomeData.hero];
-  }, [displayHomeData.hero, homepageBanners, homepageBannersLoaded]);
+  }, [activeHomepageBanners, displayHomeData.hero, homepageBannersLoaded, loading]);
+  const heroReady = heroSlides.length > 0;
   const mobilePackages = useMemo(() => activePackages.slice(0, 4), [activePackages]);
   const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
 
@@ -606,7 +613,7 @@ function HomePage() {
       <div className="desktop-home-shell">
         <Header data={displayHomeData} />
         <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
-          {homepageBannersLoaded ? (
+          {heroReady ? (
             <HeroSection data={displayHomeData} loading={loading} tests={activeTests} packages={activePackages} slides={heroSlides} />
           ) : (
             <section className="relative min-h-[430px] overflow-hidden bg-navy-950 lg:h-[350px] lg:min-h-0">
@@ -666,7 +673,7 @@ function HomePage() {
         )}
 
         <main className="mobile-home-main">
-          {homepageBannersLoaded ? (
+          {heroReady ? (
             <section className="mobile-hero-slider" aria-label="Health offers">
               <div className="mobile-hero-track">
                 {heroSlides.map((slide, index) => {
@@ -677,7 +684,7 @@ function HomePage() {
                     .map((point) => point.label)
                     .filter((label) => /home|report|fast|sample/i.test(label))
                     .slice(0, 2);
-                  const image = versionedImageUrl(slide.image, slide.updatedAt) || "/images/home-banner.webp";
+                  const image = versionedImageUrl(slide.image, slide.updatedAt);
                   const primary = slide.buttons?.[0] || { label: "Book Now", href: "/packages" };
                   const secondary = slide.buttons?.[1] || { label: "View Packages", href: "/packages" };
 

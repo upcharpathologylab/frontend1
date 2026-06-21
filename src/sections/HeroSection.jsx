@@ -5,9 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Icon from "../components/Icon.jsx";
 import AuthModal from "../components/auth/AuthModal.jsx";
 import { getStoredUser } from "../components/auth/authStorage.js";
-import { assetUrl } from "../api/api.js";
 import SmartImage from "../components/SmartImage.jsx";
-import heroBackground from "../assets/hero-bg.webp";
 import BookingMapSection from "./BookingMapSection.jsx";
 
 function HeroSection({ data, loading, tests, packages, slides = [] }) {
@@ -88,7 +86,7 @@ function HeroSection({ data, loading, tests, packages, slides = [] }) {
             <article className="desktop-hero-slide" key={`${slide.title}-${slideIndex}`}>
               <div className="absolute inset-0">
                 <SmartImage
-                  src={slide.image || heroBackground}
+                  src={slide.image}
                   alt=""
                   className="h-full w-full object-cover object-[62%_center]"
                   loading={slideIndex === 0 ? "eager" : "lazy"}
