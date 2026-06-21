@@ -13,6 +13,8 @@ const API_BASE_URL = configuredApiUrl
   ? `${normalizeOrigin(configuredApiUrl)}/api`
   : `${API_ASSET_ORIGIN}/api`;
 
+export const API_UPLOAD_ORIGIN = API_ASSET_ORIGIN;
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 20000

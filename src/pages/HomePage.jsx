@@ -117,6 +117,14 @@ const isActiveBlog = (blog = {}) => {
   return blog.isActive === true || blog.status === true || status === "active" || status === "published";
 };
 
+const isActiveBanner = (banner = {}) => {
+  const status = String(banner.status ?? "").trim().toLowerCase();
+  return banner.isActive !== false && !["inactive", "archived", "draft"].includes(status);
+};
+
+const bannerImageValue = (banner = {}) =>
+  banner.bannerImage || banner.image || banner.imageUrl || banner.bannerImageUrl || "";
+
 const bannerToHero = (banner, fallbackHero) => {
   if (!banner) return fallbackHero;
 
@@ -127,6 +135,7 @@ const bannerToHero = (banner, fallbackHero) => {
     icon: fallbackTrustPoints[index]?.icon || "BadgeCheck"
   }));
   const offerText = [banner.offerText, banner.offerHighlightText].filter(Boolean).join(" on ");
+  const image = bannerImageValue(banner);
 
   return {
     ...fallbackHero,
@@ -149,7 +158,7 @@ const bannerToHero = (banner, fallbackHero) => {
       }
     ],
     offerText: offerText || fallbackHero.offerText,
-    image: versionedImageUrl(banner.bannerImage, banner.updatedAt || banner.createdAt) || ""
+    image: versionedImageUrl(image, banner.updatedAt || banner.createdAt) || ""
   };
 };
 
@@ -330,7 +339,7 @@ function HomePage() {
   const displayHomeData = useMemo(() => {
     const baseData = homeData || fallbackHomeData;
     const topBanner = homepageBanners
-      .filter((banner) => banner.status === "Active" && banner.isActive !== false)
+      .filter((banner) => isActiveBanner(banner) && bannerImageValue(banner))
       .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))[0];
     const bannerHero = bannerToHero(topBanner, baseData.hero);
     const reviewData = testimonials.length
@@ -368,7 +377,7 @@ function HomePage() {
   const activeHomepageBanners = useMemo(
     () =>
       homepageBanners
-        .filter((banner) => banner.status === "Active" && banner.isActive !== false)
+        .filter((banner) => isActiveBanner(banner) && bannerImageValue(banner))
         .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0)),
     [homepageBanners]
   );
