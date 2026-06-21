@@ -167,11 +167,11 @@ function CartPage() {
             <div className="min-w-0">
               <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
                 <h2 className="text-2xl font-black text-navy-900">Cart Items ({summary.itemCount})</h2>
-                <div className="mt-5 hidden border-y border-blue-100 py-3 text-sm font-black text-navy-700 lg:grid lg:grid-cols-[1fr_180px_150px_110px_36px]">
+                <div className="mt-5 hidden border-y border-blue-100 py-3 text-sm font-black text-navy-700 lg:grid lg:grid-cols-[60px_minmax(0,1fr)_180px_122px_36px] lg:items-center">
+                  <span />
                   <span>Test / Package</span>
-                  <span>Price</span>
+                  <span>Price / Total</span>
                   <span>Quantity</span>
-                  <span>Total</span>
                   <span />
                 </div>
 

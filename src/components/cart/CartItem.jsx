@@ -1,5 +1,6 @@
 import { Minus, Plus, X } from "lucide-react";
 import Icon from "../Icon.jsx";
+import SmartImage from "../SmartImage.jsx";
 import { price } from "../../utils.js";
 
 const colorStyles = {
@@ -43,42 +44,56 @@ function CartItem({ item, onQuantityChange, onRemove }) {
   const itemTotal = Number(item.price || 0) * quantity;
 
   return (
-    <article className="grid gap-5 border-t border-blue-100 py-6 first:border-t-0 lg:grid-cols-[1fr_180px_150px_110px_36px] lg:items-center">
-      <div className="grid gap-4 sm:grid-cols-[86px_1fr] sm:items-center">
-        <span className={`flex h-20 w-20 items-center justify-center rounded-full ${colorStyles[item.color] || colorStyles.green}`}>
-          <Icon name={item.icon} className="h-10 w-10" />
-        </span>
-        <div>
-          <h3 className="text-base font-black text-navy-900">{item.name}</h3>
-          <p className="mt-1 text-sm font-black text-upchar-blue">{item.subtitle}</p>
-          <p className="mt-2 max-w-sm text-sm font-semibold leading-6 text-navy-600">{item.description}</p>
+    <article className="grid grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-3 border-t border-blue-100 py-3 first:border-t-0 sm:grid-cols-[56px_minmax(0,1fr)_150px_112px_36px] sm:gap-4 lg:grid-cols-[60px_minmax(0,1fr)_180px_122px_36px]">
+      <div className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg sm:h-14 sm:w-14 ${item.image ? "bg-blue-50" : colorStyles[item.color] || colorStyles.green}`}>
+        {item.image ? (
+          <SmartImage
+            src={item.image}
+            alt={item.name}
+            className="h-full w-full object-cover"
+            fallbackClassName="h-full min-h-0 rounded-lg"
+            width="56"
+            height="56"
+            sizes="56px"
+          />
+        ) : (
+          <Icon name={item.icon} className="h-7 w-7 sm:h-8 sm:w-8" />
+        )}
+      </div>
+
+      <div className="min-w-0">
+        <h3 className="line-clamp-2 text-sm font-black leading-snug text-navy-900 sm:text-base">{item.name}</h3>
+        <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="max-w-full truncate text-xs font-black text-upchar-blue sm:text-sm">{item.subtitle}</span>
           {item.badge ? (
-            <span className="mt-2 inline-flex rounded-md border border-upchar-green px-2.5 py-1 text-[11px] font-black text-upchar-green">
+            <span className="inline-flex shrink-0 rounded-md border border-upchar-green px-2 py-0.5 text-[10px] font-black text-upchar-green">
               {item.badge}
             </span>
           ) : null}
         </div>
       </div>
 
-      <div>
-        <p className="text-lg font-black text-upchar-green">{price(item.price)}</p>
-        <p className="mt-1 text-sm font-bold text-navy-400 line-through">{price(item.oldPrice)}</p>
-        <p className="mt-3 text-sm font-black text-upchar-green">{item.discount}</p>
+      <div className="col-span-3 grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg bg-blue-50/45 px-3 py-2 sm:col-span-1 sm:block sm:bg-transparent sm:p-0">
+        <div>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <p className="text-sm font-black text-upchar-green sm:text-base">{price(item.price)}</p>
+            <p className="text-xs font-bold text-navy-400 line-through">{price(item.oldPrice)}</p>
+          </div>
+          <p className="mt-0.5 text-xs font-black text-upchar-green">{item.discount}</p>
+        </div>
+        <div className="text-right sm:mt-1 sm:text-left">
+          <p className="text-[10px] font-black uppercase text-navy-500 sm:hidden">Total</p>
+          <p className="text-sm font-black text-navy-900 sm:text-upchar-green">{price(itemTotal)}</p>
+        </div>
       </div>
 
-      <div>
-        <p className="mb-2 text-xs font-black uppercase text-navy-500 lg:hidden">Quantity</p>
+      <div className="col-start-2 sm:col-start-auto">
         <QuantityStepper quantity={quantity} onChange={(nextQuantity) => onQuantityChange(item, nextQuantity)} />
-      </div>
-
-      <div>
-        <p className="mb-1 text-xs font-black uppercase text-navy-500 lg:hidden">Total</p>
-        <p className="text-lg font-black text-upchar-green">{price(itemTotal)}</p>
       </div>
 
       <button
         type="button"
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-blue-100 text-navy-400 transition hover:border-upchar-red hover:text-upchar-red"
+        className="col-start-3 flex h-9 w-9 items-center justify-center rounded-full border border-blue-100 text-navy-400 transition hover:border-upchar-red hover:text-upchar-red sm:col-start-auto"
         onClick={() => onRemove(item)}
         aria-label={`Remove ${item.name}`}
       >
