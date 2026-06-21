@@ -131,6 +131,7 @@ function TestsPage() {
       oldPrice: item.originalPrice,
       discount: item.discount,
       icon: item.icon,
+      cartImage: item.image || item.testImage || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0],
       image: item.image,
       imageUrl: item.imageUrl,
       testImage: item.testImage,

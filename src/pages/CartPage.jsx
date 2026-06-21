@@ -27,23 +27,25 @@ import { saveCheckoutData } from "../utils/checkout.js";
 
 const firstImage = (value) => (Array.isArray(value) ? value.find(Boolean) : "");
 
-const cartImageValue = (item = {}) => {
+const resolveCartImage = (item = {}) => {
   if (item.type === "package") {
-    return item.image || item.imageUrl || item.packageImage || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
+    return item.cartImage || item.image || item.imageUrl || item.packageImage || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
   }
   if (item.type === "test") {
-    return item.testImage || item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
+    return item.cartImage || item.testImage || item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
   }
-  return item.image || item.imageUrl || item.packageImage || item.testImage || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
+  return item.cartImage || item.image || item.imageUrl || item.packageImage || item.testImage || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
 };
 
 const normalizeCartItem = (item) => {
   const price = item.price ?? item.discountedPrice ?? item.finalPrice ?? 0;
   const oldPrice = item.oldPrice ?? item.originalPrice ?? item.price ?? price;
+  const cartImage = resolveCartImage(item);
 
   return {
     ...item,
-    image: cartImageValue(item),
+    cartImage,
+    image: cartImage,
     price,
     oldPrice,
     subtitle: item.subtitle || item.testCount || item.testsIncluded || "Health item",
@@ -67,10 +69,16 @@ function CartPage() {
     document.title = "Your Cart | Upchar Pathology";
 
     if (!hasStoredCart()) {
-      setCartItems(defaultCartItems);
-      setItems(defaultCartItems.map(normalizeCartItem));
+      const normalizedDefaults = defaultCartItems.map(normalizeCartItem);
+      setCartItems(normalizedDefaults);
+      setItems(normalizedDefaults);
     } else {
-      setItems(getCartItems().map(normalizeCartItem));
+      const storedItems = getCartItems();
+      const normalizedItems = storedItems.map(normalizeCartItem);
+      setItems(normalizedItems);
+      if (JSON.stringify(storedItems) !== JSON.stringify(normalizedItems)) {
+        setCartItems(normalizedItems);
+      }
     }
 
     const handleCartChange = () => {

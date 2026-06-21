@@ -42,13 +42,14 @@ function QuantityStepper({ quantity, onChange }) {
 function CartItem({ item, onQuantityChange, onRemove }) {
   const quantity = Number(item.quantity || 1);
   const itemTotal = Number(item.price || 0) * quantity;
+  const displayImage = item.cartImage || item.image;
 
   return (
     <article className="grid grid-cols-[44px_minmax(0,1fr)_72px_36px] items-center gap-2 rounded-lg border border-blue-100 bg-white px-2 py-2 shadow-sm sm:grid-cols-[82px_minmax(0,1fr)_210px_148px_48px] sm:gap-5 sm:px-5 sm:py-4 lg:grid-cols-[96px_minmax(0,1fr)_280px_148px_48px]">
-      <div className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-20 sm:w-20 lg:h-24 lg:w-24 ${item.image ? "bg-green-50" : colorStyles[item.color] || colorStyles.green}`}>
-        {item.image ? (
+      <div className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-20 sm:w-20 lg:h-24 lg:w-24 ${displayImage ? "bg-green-50" : colorStyles[item.color] || colorStyles.green}`}>
+        {displayImage ? (
           <SmartImage
-            src={item.image}
+            src={displayImage}
             alt={item.name}
             className="h-full w-full object-cover"
             fallbackClassName="h-full min-h-0 rounded-xl"
