@@ -144,15 +144,18 @@ function PackagesPage() {
       <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
         <section className="bg-gradient-to-b from-white to-blue-50/50 py-8 lg:py-10">
           <div className="container-page min-w-0">
-            <label className="mx-auto flex h-14 w-full max-w-3xl items-center gap-3 rounded-xl border border-blue-100 bg-white px-4 shadow-sm focus-within:border-upchar-green focus-within:ring-4 focus-within:ring-green-100">
-              <Search className="h-5 w-5 shrink-0 text-upchar-green" />
+            <div className="mx-auto flex h-16 w-full max-w-3xl items-center gap-3 rounded-full border-2 border-upchar-green bg-green-50/40 px-4 py-2 shadow-sm focus-within:ring-4 focus-within:ring-green-100 sm:h-[72px] sm:px-5">
+              <Search className="h-6 w-6 shrink-0 text-upchar-green" />
               <input
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                className="min-w-0 flex-1 border-0 bg-transparent text-sm font-bold text-navy-900 outline-none placeholder:text-navy-400"
+                className="h-full min-w-0 flex-1 border-0 bg-transparent text-center text-sm font-black text-navy-900 outline-none placeholder:text-navy-500 sm:text-base"
                 placeholder={slug ? "Search all packages..." : "Search for packages..."}
               />
-            </label>
+              <button type="button" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-upchar-green text-white shadow-sm transition hover:bg-upchar-greenDark sm:h-14 sm:w-14" aria-label="Search packages">
+                <Search className="h-6 w-6" />
+              </button>
+            </div>
 
             {loading ? (
               <div className="mt-6 rounded-lg border border-blue-100 bg-white p-8 text-center shadow-sm">
