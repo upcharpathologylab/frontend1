@@ -13,6 +13,11 @@ function Logo({ light = false, size = "default" }) {
         src={upcharLogo}
         alt="Upchar Pathology - Trusted Care. Accurate Reports."
         className={`${large ? "h-11 w-[200px] sm:h-12 sm:w-[230px] lg:h-14 lg:w-[270px]" : "h-10 w-[205px]"} object-contain object-left`}
+        width={large ? 270 : 205}
+        height={large ? 56 : 40}
+        loading="eager"
+        decoding="async"
+        fetchPriority="high"
       />
     </a>
   );

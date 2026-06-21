@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import { assetUrl } from "../../api/api.js";
+import SmartImage from "../SmartImage.jsx";
 import Icon from "../Icon.jsx";
 
 const tone = {
@@ -58,7 +59,16 @@ function ListingHero({ hero, searchTerm, onSearchChange, onQuickCategory }) {
             </div>
 
             <div className="relative hidden min-h-[220px] overflow-hidden rounded-xl lg:block">
-              <img src={assetUrl(hero.image)} alt={hero.imageAlt} className="absolute inset-0 h-full w-full object-cover object-right" />
+              <SmartImage
+                src={assetUrl(hero.image)}
+                alt={hero.imageAlt}
+                className="absolute inset-0 h-full w-full object-cover object-right"
+                loading="eager"
+                fetchPriority="high"
+                width="640"
+                height="320"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+              />
               <div className="absolute inset-0 bg-gradient-to-r from-white via-white/25 to-transparent" />
             </div>
           </div>

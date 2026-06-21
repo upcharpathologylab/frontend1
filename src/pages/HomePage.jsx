@@ -24,6 +24,7 @@ import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
+import SmartImage from "../components/SmartImage.jsx";
 import { getStoredUser } from "../components/auth/authStorage.js";
 import { fallbackHomeData, mergeHomeData } from "../data/homeData.js";
 import { addCartItem, cartEventName, cartItemKey, getCartCount, getCartItems, hasCartItem } from "../utils/cart.js";
@@ -361,6 +362,23 @@ function HomePage() {
   }, [displayHomeData.hero, homepageBanners]);
   const mobilePackages = useMemo(() => activePackages.slice(0, 4), [activePackages]);
   const mobileTests = useMemo(() => activeTests.slice(0, 4), [activeTests]);
+
+  useEffect(() => {
+    const firstHeroImage = assetUrl(heroSlides[0]?.image);
+    if (!firstHeroImage || typeof document === "undefined") return undefined;
+
+    const preload = document.createElement("link");
+    preload.rel = "preload";
+    preload.as = "image";
+    preload.href = firstHeroImage;
+    preload.fetchPriority = "high";
+    document.head.appendChild(preload);
+
+    return () => {
+      preload.remove();
+    };
+  }, [heroSlides]);
+
   const openHeroLink = (href = "/packages") => {
     if (!href || href === "#booking" || href.startsWith("#")) {
       navigate("/packages");
@@ -650,7 +668,15 @@ function HomePage() {
                         </button>
                       </div>
                     </div>
-                    <img src={image} alt={slide.title || "Upchar health offer"} />
+                    <SmartImage
+                      src={image}
+                      alt={slide.title || "Upchar health offer"}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                      width="430"
+                      height="160"
+                      sizes="100vw"
+                    />
                   </article>
                 );
               })}
@@ -713,7 +739,7 @@ function HomePage() {
                 return (
                   <article className="mobile-package-card" key={`${item.id}-${index}`}>
                     <div className="mobile-card-image">
-                      <img src={item.image} alt={item.name} />
+                      <SmartImage src={item.image} alt={item.name} width="260" height="130" sizes="64vw" />
                       <span>{discountLabel(item)}</span>
                     </div>
                     <div className="mobile-card-body">
@@ -745,7 +771,7 @@ function HomePage() {
                 return (
                   <article className="mobile-test-card" key={`${item.id}-${index}`}>
                     <div className="mobile-card-image">
-                      <img src={item.image} alt={item.name} />
+                      <SmartImage src={item.image} alt={item.name} width="260" height="130" sizes="64vw" />
                       <span>{discountLabel(item)}</span>
                     </div>
                     <div className="mobile-card-body">
@@ -828,7 +854,7 @@ function HomePage() {
               <div className="mobile-blog-slider" ref={mobileBlogsRef} data-loop={displayHomeData.blogs.length > 1 ? "true" : "false"}>
                 {loopItems(displayHomeData.blogs.slice(0, 8)).map((blog, index) => (
                   <Link className="mobile-blog-card" to={`/blog/${blog.slug}`} key={`${blog.id || blog.slug}-${index}`}>
-                    <img src={blog.image} alt={blog.title} />
+                    <SmartImage src={blog.image} alt={blog.title} width="180" height="110" sizes="33vw" />
                     <span>{blog.category || "Health Tips"}</span>
                     <strong>{blog.title}</strong>
                   </Link>

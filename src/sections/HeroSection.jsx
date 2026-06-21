@@ -6,6 +6,7 @@ import Icon from "../components/Icon.jsx";
 import AuthModal from "../components/auth/AuthModal.jsx";
 import { getStoredUser } from "../components/auth/authStorage.js";
 import { assetUrl } from "../api/api.js";
+import SmartImage from "../components/SmartImage.jsx";
 import heroBackground from "../assets/hero-bg.png";
 import BookingMapSection from "./BookingMapSection.jsx";
 
@@ -86,7 +87,17 @@ function HeroSection({ data, loading, tests, packages, slides = [] }) {
           {heroSlides.map((slide, slideIndex) => (
             <article className="desktop-hero-slide" key={`${slide.title}-${slideIndex}`}>
               <div className="absolute inset-0">
-                <img src={assetUrl(slide.image) || heroBackground} alt="" className="h-full w-full object-cover object-[62%_center]" aria-hidden="true" />
+                <SmartImage
+                  src={assetUrl(slide.image) || heroBackground}
+                  alt=""
+                  className="h-full w-full object-cover object-[62%_center]"
+                  loading={slideIndex === 0 ? "eager" : "lazy"}
+                  fetchPriority={slideIndex === 0 ? "high" : "auto"}
+                  width="1600"
+                  height="430"
+                  sizes="100vw"
+                  ariaHidden
+                />
               </div>
               <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/90 to-transparent" />
               <div className="absolute inset-y-0 left-0 w-[50%] bg-navy-950/30" />

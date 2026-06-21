@@ -1,6 +1,6 @@
 import { Clock3, Heart, Home, Star } from "lucide-react";
-import { assetUrl } from "../../api/api.js";
 import Icon from "../Icon.jsx";
+import SmartImage from "../SmartImage.jsx";
 import { price } from "../../utils.js";
 
 const colorStyles = {
@@ -66,7 +66,15 @@ function PackageCard({ item, viewMode = "grid", onAddToCart, onDetails, isAdded 
       <div className={`${isList ? "" : "pt-6 text-center"}`}>
         <span className={`mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full ${color.icon}`}>
           {item.image ? (
-            <img src={assetUrl(item.image)} alt={item.name} className="h-full w-full rounded-full object-cover" />
+            <SmartImage
+              src={item.image}
+              alt={item.name}
+              className="h-full w-full rounded-full object-cover"
+              fallbackClassName="min-h-0 rounded-full"
+              width="80"
+              height="80"
+              sizes="80px"
+            />
           ) : (
             <Icon name={item.icon} className="h-10 w-10" />
           )}
@@ -134,7 +142,15 @@ function TestCard({ item, viewMode = "grid", onAddToCart, onDetails, isAdded = f
       <div className={`${isList ? "" : "pt-6 text-center"}`}>
         <span className={`mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full ${color.icon}`}>
           {item.image ? (
-            <img src={assetUrl(item.image)} alt={item.name} className="h-full w-full rounded-full object-cover" />
+            <SmartImage
+              src={item.image}
+              alt={item.name}
+              className="h-full w-full rounded-full object-cover"
+              fallbackClassName="min-h-0 rounded-full"
+              width="80"
+              height="80"
+              sizes="80px"
+            />
           ) : (
             <Icon name={item.icon} className="h-10 w-10" />
           )}

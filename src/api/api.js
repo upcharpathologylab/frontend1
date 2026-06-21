@@ -22,7 +22,12 @@ export function assetUrl(value) {
   if (!value || typeof value !== "string") return value;
   const normalized = value.trim().replace(/^["']|["']$/g, "");
   if (!normalized || /^[a-z]:\\/i.test(normalized) || normalized.includes("\\")) return "";
-  if (/^(https?:)?\/\//i.test(normalized) || normalized.startsWith("data:")) return normalized;
+  if (/^(https?:)?\/\//i.test(normalized) || normalized.startsWith("data:")) {
+    if (import.meta.env.PROD && /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?\/uploads\//i.test(normalized)) {
+      return normalized.replace(/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i, API_ASSET_ORIGIN);
+    }
+    return normalized;
+  }
   if (normalized.startsWith("/api/uploads/")) return `${API_ASSET_ORIGIN}${normalized.replace(/^\/api/, "")}`;
   if (normalized.startsWith("api/uploads/")) return `${API_ASSET_ORIGIN}/${normalized.replace(/^api\//, "")}`;
   if (normalized.startsWith("/uploads/")) return `${API_ASSET_ORIGIN}${normalized}`;
