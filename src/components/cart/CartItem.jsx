@@ -44,7 +44,7 @@ function CartItem({ item, onQuantityChange, onRemove }) {
   const itemTotal = Number(item.price || 0) * quantity;
 
   return (
-    <article className="grid grid-cols-[44px_minmax(0,1fr)_72px_72px] items-center gap-2 rounded-lg border border-blue-100 bg-white px-2 py-2 shadow-sm sm:grid-cols-[82px_minmax(0,1fr)_210px_148px_48px] sm:gap-5 sm:px-5 sm:py-4 lg:grid-cols-[96px_minmax(0,1fr)_280px_148px_48px]">
+    <article className="grid grid-cols-[44px_minmax(0,1fr)_72px_36px] items-center gap-2 rounded-lg border border-blue-100 bg-white px-2 py-2 shadow-sm sm:grid-cols-[82px_minmax(0,1fr)_210px_148px_48px] sm:gap-5 sm:px-5 sm:py-4 lg:grid-cols-[96px_minmax(0,1fr)_280px_148px_48px]">
       <div className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl sm:h-20 sm:w-20 lg:h-24 lg:w-24 ${item.image ? "bg-green-50" : colorStyles[item.color] || colorStyles.green}`}>
         {item.image ? (
           <SmartImage
@@ -97,12 +97,11 @@ function CartItem({ item, onQuantityChange, onRemove }) {
 
       <button
         type="button"
-        className="flex h-8 w-full items-center justify-center gap-1 justify-self-end rounded-md border border-red-400 px-1 text-[11px] font-black text-red-500 transition hover:bg-red-50 sm:col-start-auto sm:h-12 sm:w-12 sm:px-0 sm:rounded-lg"
+        className="flex h-8 w-8 items-center justify-center justify-self-end rounded-md border border-red-400 text-red-500 transition hover:bg-red-50 sm:col-start-auto sm:h-12 sm:w-12 sm:rounded-lg"
         onClick={() => onRemove(item)}
         aria-label={`Remove ${item.name}`}
       >
         <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
-        <span className="sm:hidden">Remove</span>
       </button>
     </article>
   );

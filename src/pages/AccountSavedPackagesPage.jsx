@@ -46,6 +46,10 @@ function AccountSavedPackagesPage() {
       description: item.description,
       icon: item.icon,
       image: item.image,
+      imageUrl: item.imageUrl,
+      packageImage: item.packageImage,
+      thumbnail: item.thumbnail,
+      bannerImage: item.bannerImage,
       color: item.color
     });
     showToast(`${item.title} added to cart.`);

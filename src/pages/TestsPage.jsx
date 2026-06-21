@@ -132,6 +132,10 @@ function TestsPage() {
       discount: item.discount,
       icon: item.icon,
       image: item.image,
+      imageUrl: item.imageUrl,
+      testImage: item.testImage,
+      thumbnail: item.thumbnail,
+      bannerImage: item.bannerImage,
       color: item.color
     });
     setAddedKeys(cartKeys());

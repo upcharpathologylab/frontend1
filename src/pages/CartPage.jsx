@@ -25,12 +25,16 @@ import {
 } from "../utils/cart.js";
 import { saveCheckoutData } from "../utils/checkout.js";
 
+const cartImageValue = (item = {}) =>
+  item.image || item.imageUrl || item.packageImage || item.testImage || item.thumbnail || item.bannerImage || "";
+
 const normalizeCartItem = (item) => {
   const price = item.price ?? item.discountedPrice ?? item.finalPrice ?? 0;
   const oldPrice = item.oldPrice ?? item.originalPrice ?? item.price ?? price;
 
   return {
     ...item,
+    image: cartImageValue(item),
     price,
     oldPrice,
     subtitle: item.subtitle || item.testCount || item.testsIncluded || "Health item",
@@ -75,6 +79,7 @@ function CartPage() {
 
   const summary = useMemo(() => {
     const subtotal = items.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 1), 0);
+    const oldSubtotal = items.reduce((total, item) => total + Number(item.oldPrice || item.price || 0) * Number(item.quantity || 1), 0);
     const discount = items.length ? Math.floor(subtotal * 0.5) : 0;
     const safeCouponDiscount = Math.min(couponDiscount, Math.max(0, subtotal - discount));
     const totalPayable = Math.max(0, subtotal - discount - safeCouponDiscount);
@@ -82,6 +87,7 @@ function CartPage() {
 
     return {
       subtotal,
+      oldSubtotal,
       discount,
       couponDiscount: safeCouponDiscount,
       totalPayable,
@@ -154,7 +160,7 @@ function CartPage() {
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50/70 via-white to-white">
       <Header data={fallbackHomeData} />
       <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
-        <section className="container-page py-8 lg:py-10">
+        <section className="container-page pb-44 pt-8 sm:py-8 lg:py-10">
           <p className="text-sm font-black text-navy-800">
             <a href="/" className="text-upchar-blue">Home</a>
             <span className="mx-2 text-navy-400">&gt;</span>
@@ -194,7 +200,7 @@ function CartPage() {
               </section>
             </div>
 
-            <aside className="grid gap-5 self-start">
+            <aside className="fixed inset-x-0 bottom-0 z-40 grid gap-5 border-t border-blue-100 bg-white/95 p-3 shadow-[0_-10px_30px_rgba(15,23,42,0.12)] backdrop-blur sm:static sm:border-t-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-0 xl:self-start">
               <CartSummary summary={summary} onCheckout={handleCheckout} />
             </aside>
           </div>
