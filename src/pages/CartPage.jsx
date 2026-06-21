@@ -165,18 +165,11 @@ function CartPage() {
 
           <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_360px]">
             <div className="min-w-0">
-              <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
+              <section className="rounded-lg border border-blue-100 bg-white p-3 shadow-sm sm:p-4 lg:p-5">
                 <h2 className="text-2xl font-black text-navy-900">Cart Items ({summary.itemCount})</h2>
-                <div className="mt-5 hidden border-y border-blue-100 py-3 text-sm font-black text-navy-700 lg:grid lg:grid-cols-[60px_minmax(0,1fr)_180px_122px_36px] lg:items-center">
-                  <span />
-                  <span>Test / Package</span>
-                  <span>Price / Total</span>
-                  <span>Quantity</span>
-                  <span />
-                </div>
 
                 {items.length ? (
-                  <div>
+                  <div className="mt-4 grid gap-2">
                     {items.map((item) => (
                       <CartItem
                         item={item}
