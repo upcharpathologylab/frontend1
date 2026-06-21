@@ -29,7 +29,7 @@ const normalizePackage = (item, index) => {
     description: item.description || "Curated health package with home sample collection.",
     testCount: item.testsIncluded || item.testCount || "30+ Tests",
     testsIncluded: item.testsIncluded || item.testCount || "30+ Tests",
-    image: imageUrl(item.packageImage || item.image || item.imageUrl || item.thumbnail || "", item.updatedAt || item.createdAt),
+    image: imageUrl(item.packageImage || item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt),
     icon: item.icon || "Gift",
     color: item.color || "green",
     badge: item.badge || "",
@@ -137,6 +137,8 @@ function PackagesPage() {
       packageImage: item.packageImage,
       thumbnail: item.thumbnail,
       bannerImage: item.bannerImage,
+      coverImage: item.coverImage,
+      images: item.images,
       color: item.color
     });
     setAddedKeys(cartKeys());

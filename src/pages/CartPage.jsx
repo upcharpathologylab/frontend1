@@ -25,8 +25,17 @@ import {
 } from "../utils/cart.js";
 import { saveCheckoutData } from "../utils/checkout.js";
 
-const cartImageValue = (item = {}) =>
-  item.image || item.imageUrl || item.packageImage || item.testImage || item.thumbnail || item.bannerImage || "";
+const firstImage = (value) => (Array.isArray(value) ? value.find(Boolean) : "");
+
+const cartImageValue = (item = {}) => {
+  if (item.type === "package") {
+    return item.image || item.imageUrl || item.packageImage || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
+  }
+  if (item.type === "test") {
+    return item.testImage || item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
+  }
+  return item.image || item.imageUrl || item.packageImage || item.testImage || item.thumbnail || item.bannerImage || item.coverImage || firstImage(item.images) || "";
+};
 
 const normalizeCartItem = (item) => {
   const price = item.price ?? item.discountedPrice ?? item.finalPrice ?? 0;

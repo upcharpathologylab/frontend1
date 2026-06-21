@@ -50,6 +50,8 @@ function AccountSavedPackagesPage() {
       packageImage: item.packageImage,
       thumbnail: item.thumbnail,
       bannerImage: item.bannerImage,
+      coverImage: item.coverImage,
+      images: item.images,
       color: item.color
     });
     showToast(`${item.title} added to cart.`);

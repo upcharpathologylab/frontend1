@@ -33,7 +33,7 @@ const normalizeTest = (item, index) => {
   const discountedPrice = item.finalPrice ?? item.discountedPrice ?? originalPrice;
   const hasDiscountPercent = item.discountPercent !== undefined && item.discountPercent !== null && item.discountPercent !== "";
 
-  const image = imageUrl(item.testImage || item.image || item.imageUrl || item.thumbnail || "", item.updatedAt || item.createdAt);
+  const image = imageUrl(item.testImage || item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
 
   return {
     ...item,
@@ -136,6 +136,8 @@ function TestsPage() {
       testImage: item.testImage,
       thumbnail: item.thumbnail,
       bannerImage: item.bannerImage,
+      coverImage: item.coverImage,
+      images: item.images,
       color: item.color
     });
     setAddedKeys(cartKeys());

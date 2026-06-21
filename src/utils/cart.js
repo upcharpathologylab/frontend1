@@ -40,6 +40,9 @@ export const addCartItem = (item) => {
   const existing = items.find((cartItem) => cartItem.id === item.id && cartItem.type === item.type);
 
   if (existing) {
+    ["image", "imageUrl", "packageImage", "testImage", "thumbnail", "bannerImage", "coverImage", "images"].forEach((key) => {
+      if (!existing[key] && item[key]) existing[key] = item[key];
+    });
     existing.quantity = Number(existing.quantity || 1) + 1;
   } else {
     items.push({ ...item, quantity: Number(item.quantity || 1), addedAt: new Date().toISOString() });
