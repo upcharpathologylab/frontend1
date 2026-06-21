@@ -556,7 +556,6 @@ function HomePage() {
       name: item.name,
       subtitle: item.subtitle,
       testCount: item.testCount,
-      cartImage: item.image || item.imageUrl || item.packageImage || item.testImage || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0],
       image: item.image,
       imageUrl: item.imageUrl,
       packageImage: item.packageImage,

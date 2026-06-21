@@ -132,7 +132,6 @@ function PackagesPage() {
       discount: item.discount,
       badge: item.badge,
       icon: item.icon,
-      cartImage: item.image || item.imageUrl || item.packageImage || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0],
       image: item.image,
       imageUrl: item.imageUrl,
       packageImage: item.packageImage,
