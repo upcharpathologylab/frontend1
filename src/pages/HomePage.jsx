@@ -125,6 +125,16 @@ const isActiveBanner = (banner = {}) => {
 const bannerImageValue = (banner = {}) =>
   banner.bannerImage || banner.image || banner.imageUrl || banner.bannerImageUrl || "";
 
+const mobileImageValue = (item = {}, type = "") => {
+  if (type === "package") {
+    return imageUrl(item.image || item.packageImage || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
+  }
+  if (type === "test") {
+    return imageUrl(item.image || item.testImage || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
+  }
+  return imageUrl(item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
+};
+
 const bannerToHero = (banner, fallbackHero) => {
   if (!banner) return fallbackHero;
 
@@ -692,7 +702,7 @@ function HomePage() {
                     .map((point) => point.label)
                     .filter((label) => /home|report|fast|sample/i.test(label))
                     .slice(0, 2);
-                  const image = imageUrl(slide.image, slide.updatedAt);
+                  const image = mobileImageValue(slide);
                   const primary = slide.buttons?.[0] || { label: "Book Now", href: "/packages" };
                   const secondary = slide.buttons?.[1] || { label: "View Packages", href: "/packages" };
 
@@ -821,7 +831,7 @@ function HomePage() {
                 return (
                   <article className="mobile-package-card" key={`${item.id}-${index}`}>
                     <div className="mobile-card-image">
-                      <SmartImage src={item.image} alt={item.name} width="260" height="130" sizes="64vw" />
+                      <SmartImage src={mobileImageValue(item, "package")} alt={item.name} width="260" height="130" sizes="64vw" />
                       <span>{discountLabel(item)}</span>
                     </div>
                     <div className="mobile-card-body">
@@ -853,7 +863,7 @@ function HomePage() {
                 return (
                   <article className="mobile-test-card" key={`${item.id}-${index}`}>
                     <div className="mobile-card-image">
-                      <SmartImage src={item.image} alt={item.name} width="260" height="130" sizes="64vw" />
+                      <SmartImage src={mobileImageValue(item, "test")} alt={item.name} width="260" height="130" sizes="64vw" />
                       <span>{discountLabel(item)}</span>
                     </div>
                     <div className="mobile-card-body">
@@ -936,7 +946,7 @@ function HomePage() {
               <div className="mobile-blog-slider" ref={mobileBlogsRef} data-loop={displayHomeData.blogs.length > 1 ? "true" : "false"}>
                 {loopItems(displayHomeData.blogs.slice(0, 8)).map((blog, index) => (
                   <Link className="mobile-blog-card" to={`/blog/${blog.slug}`} key={`${blog.id || blog.slug}-${index}`}>
-                    <SmartImage src={blog.image} alt={blog.title} width="180" height="110" sizes="33vw" />
+                    <SmartImage src={mobileImageValue(blog)} alt={blog.title} width="180" height="110" sizes="33vw" />
                     <span>{blog.category || "Health Tips"}</span>
                     <strong>{blog.title}</strong>
                   </Link>
