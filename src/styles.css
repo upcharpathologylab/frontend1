@@ -278,13 +278,16 @@
   }
 
   .signup-otp-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    display: flex !important;
+    flex-wrap: nowrap;
+    justify-content: space-between;
     gap: 0.55rem;
+    width: 100%;
   }
 
   .signup-otp-grid input {
-    width: 100%;
+    width: clamp(2.35rem, 13vw, 3.7rem);
+    flex: 1 1 0;
     min-width: 0;
     height: 3.7rem;
     border-radius: 0.75rem;
