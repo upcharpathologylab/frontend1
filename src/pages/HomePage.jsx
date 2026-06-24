@@ -239,6 +239,7 @@ function HomePage() {
   const mobileHowRef = useRef(null);
   const mobileBlogsRef = useRef(null);
   const pausedMobileSlidersRef = useRef(new Set());
+  const mobileSliderStateRef = useRef(new Map());
 
   useEffect(() => {
     let mounted = true;
@@ -463,12 +464,18 @@ function HomePage() {
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia("(max-width: 768px)").matches) return undefined;
     const refs = [mobileOrgansRef, mobilePackagesRef, mobileTestsRef, mobileReviewsRef, mobileWhyRef, mobileHowRef, mobileBlogsRef];
+    const resumeAfterDelay = (node) => {
+      const state = mobileSliderStateRef.current.get(node) || {};
+      state.pauseUntil = performance.now() + 1000;
+      mobileSliderStateRef.current.set(node, state);
+      pausedMobileSlidersRef.current.delete(node);
+    };
     const cleanupHandlers = refs
       .map((ref) => ref.current)
       .filter(Boolean)
       .map((node) => {
         const pause = () => pausedMobileSlidersRef.current.add(node);
-        const resume = () => pausedMobileSlidersRef.current.delete(node);
+        const resume = () => resumeAfterDelay(node);
         node.addEventListener("touchstart", pause, { passive: true });
         node.addEventListener("touchend", resume, { passive: true });
         node.addEventListener("touchcancel", resume, { passive: true });
@@ -485,6 +492,15 @@ function HomePage() {
     let animationFrame = 0;
     let previousTime = 0;
     const scrollSpeed = 0.055;
+    const pauseDuration = 1000;
+
+    const getSlideDistance = (node) => {
+      const firstCard = node.children[0];
+      if (!firstCard) return node.clientWidth;
+      const styles = window.getComputedStyle(node);
+      const gap = parseFloat(styles.columnGap || styles.gap || "0") || 0;
+      return firstCard.getBoundingClientRect().width + gap;
+    };
 
     const animateSliders = (time) => {
       if (!previousTime) previousTime = time;
@@ -497,9 +513,28 @@ function HomePage() {
         const loopWidth = node.dataset.loop === "true" ? node.scrollWidth / 2 : 0;
         if (!loopWidth) return;
 
+        const slideDistance = getSlideDistance(node);
+        const existingState = mobileSliderStateRef.current.get(node);
+        const state = existingState || {};
+        if (!Number.isFinite(state.nextPauseAt)) {
+          state.nextPauseAt = node.scrollLeft + slideDistance;
+        }
+        if (!Number.isFinite(state.pauseUntil)) {
+          state.pauseUntil = time + pauseDuration;
+        }
+        if (!existingState) mobileSliderStateRef.current.set(node, state);
+
+        if (time < state.pauseUntil) return;
+
         node.scrollLeft += delta * scrollSpeed;
         if (node.scrollLeft >= loopWidth) {
           node.scrollLeft -= loopWidth;
+          state.nextPauseAt -= loopWidth;
+        }
+
+        if (node.scrollLeft >= state.nextPauseAt) {
+          state.pauseUntil = time + pauseDuration;
+          state.nextPauseAt += slideDistance;
         }
       });
 
@@ -512,6 +547,7 @@ function HomePage() {
       window.cancelAnimationFrame(animationFrame);
       cleanupHandlers.forEach((cleanup) => cleanup());
       pausedMobileSlidersRef.current.clear();
+      mobileSliderStateRef.current.clear();
     };
   }, [displayHomeData.blogs, displayHomeData.howItWorks, displayHomeData.organs, displayHomeData.reviews, displayHomeData.whyChoose, mobilePackages, mobileTests]);
 
