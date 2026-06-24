@@ -218,7 +218,9 @@ function CartPage() {
           <CartOfferBanner />
         </section>
       </main>
-      <Footer data={fallbackHomeData} />
+      <div className="cart-profile-mobile-hidden-footer">
+        <Footer data={fallbackHomeData} />
+      </div>
 
       <AnimatePresence>
         {toast ? (

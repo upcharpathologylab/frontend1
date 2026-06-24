@@ -445,7 +445,9 @@ function MyAccountPage() {
           </div>
         </section>
       </main>
-      <Footer data={fallbackHomeData} />
+      <div className="cart-profile-mobile-hidden-footer">
+        <Footer data={fallbackHomeData} />
+      </div>
 
       {profileModalOpen ? (
         <EditProfileModal profile={profile} onClose={() => setProfileModalOpen(false)} onSave={handleProfileSave} />
