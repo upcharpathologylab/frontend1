@@ -23,6 +23,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { imageUrl, getFeaturedServiceLocation, getHomeData, getHomepageBanners, getPackages, getPageContent, getTestimonials, getTests } from "../api/api.js";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
+import AuthModal from "../components/auth/AuthModal.jsx";
 import Icon from "../components/Icon.jsx";
 import Logo from "../components/Logo.jsx";
 import SmartImage from "../components/SmartImage.jsx";
@@ -231,6 +232,8 @@ function HomePage() {
   const [mobileQuery, setMobileQuery] = useState("");
   const [mobileAddedKeys, setMobileAddedKeys] = useState(() => mobileCartKeys());
   const [mobileCartCount, setMobileCartCount] = useState(() => getCartCount());
+  const [mobileProfileAuthOpen, setMobileProfileAuthOpen] = useState(false);
+  const [mobileProfileAuthMode, setMobileProfileAuthMode] = useState("signin");
   const mobileOrgansRef = useRef(null);
   const mobilePackagesRef = useRef(null);
   const mobileTestsRef = useRef(null);
@@ -574,6 +577,21 @@ function HomePage() {
     navigate(`/?auth=signin&returnTo=${encodeURIComponent(route)}`);
   };
 
+  const openMobileProfile = () => {
+    setMobileMenuOpen(false);
+    if (getStoredUser()) {
+      navigate(profilePath);
+      return;
+    }
+    setMobileProfileAuthMode("signin");
+    setMobileProfileAuthOpen(true);
+  };
+
+  const handleMobileProfileAuthSuccess = () => {
+    setMobileProfileAuthOpen(false);
+    navigate(profilePath, { replace: true });
+  };
+
   const handleMobileNavAction = (item) => {
     setMobileMenuOpen(false);
     if (item.action === "upload-prescription") {
@@ -581,7 +599,7 @@ function HomePage() {
       return;
     }
     if (item.action === "profile") {
-      openProtectedMobileRoute(profilePath);
+      openMobileProfile();
       return;
     }
     if (item.protected) {
@@ -1060,6 +1078,14 @@ function HomePage() {
           })}
         </nav>
       </div>
+
+      <AuthModal
+        isOpen={mobileProfileAuthOpen}
+        mode={mobileProfileAuthMode}
+        onModeChange={setMobileProfileAuthMode}
+        onClose={() => setMobileProfileAuthOpen(false)}
+        onSuccess={handleMobileProfileAuthSuccess}
+      />
 
       <AnimatePresence>
         {usingFallback && !loading && (
