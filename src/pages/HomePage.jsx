@@ -467,6 +467,10 @@ function HomePage() {
     const resumeAfterDelay = (node) => {
       const state = mobileSliderStateRef.current.get(node) || {};
       state.pauseUntil = performance.now() + 1000;
+      state.isAnimating = false;
+      state.animationStart = 0;
+      state.startScrollLeft = node.scrollLeft;
+      state.targetScrollLeft = node.scrollLeft;
       mobileSliderStateRef.current.set(node, state);
       pausedMobileSlidersRef.current.delete(node);
     };
@@ -490,9 +494,8 @@ function HomePage() {
         };
       });
     let animationFrame = 0;
-    let previousTime = 0;
-    const scrollSpeed = 0.055;
     const pauseDuration = 1000;
+    const slideDuration = 520;
 
     const getSlideDistance = (node) => {
       const firstCard = node.children[0];
@@ -503,10 +506,6 @@ function HomePage() {
     };
 
     const animateSliders = (time) => {
-      if (!previousTime) previousTime = time;
-      const delta = Math.min(time - previousTime, 48);
-      previousTime = time;
-
       refs.forEach((ref) => {
         const node = ref.current;
         if (!node || node.scrollWidth <= node.clientWidth || pausedMobileSlidersRef.current.has(node)) return;
@@ -516,9 +515,6 @@ function HomePage() {
         const slideDistance = getSlideDistance(node);
         const existingState = mobileSliderStateRef.current.get(node);
         const state = existingState || {};
-        if (!Number.isFinite(state.nextPauseAt)) {
-          state.nextPauseAt = node.scrollLeft + slideDistance;
-        }
         if (!Number.isFinite(state.pauseUntil)) {
           state.pauseUntil = time + pauseDuration;
         }
@@ -526,15 +522,24 @@ function HomePage() {
 
         if (time < state.pauseUntil) return;
 
-        node.scrollLeft += delta * scrollSpeed;
-        if (node.scrollLeft >= loopWidth) {
-          node.scrollLeft -= loopWidth;
-          state.nextPauseAt -= loopWidth;
+        if (!state.isAnimating) {
+          state.isAnimating = true;
+          state.animationStart = time;
+          state.startScrollLeft = node.scrollLeft;
+          state.targetScrollLeft = node.scrollLeft + slideDistance;
         }
 
-        if (node.scrollLeft >= state.nextPauseAt) {
+        const progress = Math.min((time - state.animationStart) / slideDuration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        node.scrollLeft = state.startScrollLeft + (state.targetScrollLeft - state.startScrollLeft) * easedProgress;
+
+        if (progress >= 1) {
+          node.scrollLeft = state.targetScrollLeft;
+          if (node.scrollLeft >= loopWidth) {
+            node.scrollLeft -= loopWidth;
+          }
+          state.isAnimating = false;
           state.pauseUntil = time + pauseDuration;
-          state.nextPauseAt += slideDistance;
         }
       });
 
