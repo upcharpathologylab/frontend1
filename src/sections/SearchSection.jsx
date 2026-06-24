@@ -9,7 +9,7 @@ import { addCartItem, cartEventName, cartItemKey, getCartItems, hasCartItem } fr
 
 const cartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
 
-function SearchSection({ quickCards, whatsappNumber, tests, packages, onUploadPrescription }) {
+function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [addedKeys, setAddedKeys] = useState(() => cartKeys());
@@ -42,6 +42,16 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages, onUploadPr
     if (title === "Health Packages") return "#packages";
     if (title === "Download Report") return "/my-account/reports";
     return "#booking";
+  };
+
+  const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
+
+  const openUploadPrescription = () => {
+    if (getStoredUser()) {
+      navigate(uploadPrescriptionPath);
+      return;
+    }
+    navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`);
   };
 
   const openReports = () => {
@@ -170,7 +180,7 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages, onUploadPr
                 card.title === "Upload Prescription" ? (
                   <button
                     type="button"
-                    onClick={onUploadPrescription}
+                    onClick={openUploadPrescription}
                     className={`group flex h-[50px] items-center justify-center gap-3 px-2 text-base font-bold text-white transition hover:text-upchar-green ${
                       index ? "xl:border-l xl:border-white/25" : ""
                     }`}

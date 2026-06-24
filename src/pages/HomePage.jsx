@@ -431,6 +431,18 @@ function HomePage() {
     }
     navigate(href);
   };
+
+  const isUploadPrescriptionAction = (button = {}) =>
+    String(button.label || "").toLowerCase().includes("prescription") ||
+    String(button.href || "").toLowerCase().includes("upload-prescription");
+
+  const openMobileHeroAction = (button) => {
+    if (isUploadPrescriptionAction(button)) {
+      openMobilePrescription();
+      return;
+    }
+    openHeroLink(button?.href);
+  };
   const mobileSearchResults = useMemo(() => {
     const term = mobileQuery.trim().toLowerCase();
     if (!term) return [];
@@ -712,7 +724,6 @@ function HomePage() {
             whatsappNumber={displayHomeData.siteSettings.whatsappNumber}
             tests={activeTests}
             packages={activePackages}
-            onUploadPrescription={openMobilePrescription}
           />
           {packagesLoaded ? <SpecialCareSection packages={activePackages} content={packageContent} /> : <SectionSkeleton className="bg-gradient-to-b from-white to-blue-50/40" />}
           <VitalOrgansSection organs={displayHomeData.organs} />
@@ -791,10 +802,10 @@ function HomePage() {
                           ))}
                         </div>
                         <div className="mobile-hero-actions">
-                          <button type="button" onClick={() => openHeroLink(primary.href)}>
+                          <button type="button" onClick={() => openMobileHeroAction(primary)}>
                             {primary.label || "Book Now"} <ArrowRight />
                           </button>
-                          <button type="button" onClick={() => openHeroLink(secondary.href)}>
+                          <button type="button" onClick={() => openMobileHeroAction(secondary)}>
                             {secondary.label || "View Packages"}
                           </button>
                         </div>
