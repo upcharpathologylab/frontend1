@@ -65,9 +65,9 @@ function PasswordField({ value, onChange, error }) {
 
 function PhoneField({ value, onChange, error }) {
   return (
-    <label>
+    <label className="signup-phone-field">
       <FieldLabel>Phone Number</FieldLabel>
-      <div className={`flex h-10 overflow-hidden rounded-lg border bg-white md:h-11 ${error ? "border-red-300" : "border-blue-100"}`}>
+      <div className={`signup-phone-input flex h-10 overflow-hidden rounded-lg border bg-white md:h-11 ${error ? "border-red-300" : "border-blue-100"}`}>
         <div className="grid w-11 place-items-center border-r border-blue-100 text-navy-600 md:w-12">
           <Phone className="h-4 w-4 md:h-5 md:w-5" />
         </div>
@@ -95,7 +95,7 @@ function OtpBoxes({ value, onChange, error }) {
   return (
     <div>
       <FieldLabel>Enter OTP</FieldLabel>
-      <div className="grid grid-cols-6 gap-1.5">
+      <div className="signup-otp-grid grid grid-cols-6 gap-1.5">
         {value.map((digit, index) => (
           <input
             key={index}
@@ -191,14 +191,17 @@ function SignUpForm({ onModeChange, onSuccess }) {
 
   return (
     <form onSubmit={submit} noValidate className="auth-card auth-card-signup">
+      <h2 className="signup-mobile-title">Sign Up</h2>
       <div className="grid gap-2 md:gap-2.5">
         <TextField label="Full Name" name="fullName" value={values.fullName} onChange={update} placeholder="Enter your full name" error={errors.fullName} icon={UserRound} />
         <PasswordField value={values.password} onChange={update} error={errors.password} />
-        <PhoneField value={values.phone} onChange={update} error={errors.phone} />
 
-        <button type="button" onClick={sendOtp} disabled={sendingOtp || cooldown > 0} className="auth-outline-btn">
-          {sendingOtp ? "Sending..." : "Send OTP"}
-        </button>
+        <div className="signup-phone-row">
+          <PhoneField value={values.phone} onChange={update} error={errors.phone} />
+          <button type="button" onClick={sendOtp} disabled={sendingOtp || cooldown > 0} className="auth-outline-btn signup-send-otp-btn">
+            {sendingOtp ? "Sending..." : "Send OTP"}
+          </button>
+        </div>
         <p className="flex items-center gap-1.5 text-[11px] font-bold text-navy-500 md:text-xs">
           <ShieldCheck className="h-3.5 w-3.5" /> We will send an OTP to your phone number
         </p>
