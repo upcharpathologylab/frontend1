@@ -232,8 +232,9 @@ function HomePage() {
   const [mobileQuery, setMobileQuery] = useState("");
   const [mobileAddedKeys, setMobileAddedKeys] = useState(() => mobileCartKeys());
   const [mobileCartCount, setMobileCartCount] = useState(() => getCartCount());
-  const [mobileProfileAuthOpen, setMobileProfileAuthOpen] = useState(false);
-  const [mobileProfileAuthMode, setMobileProfileAuthMode] = useState("signin");
+  const [mobileAuthOpen, setMobileAuthOpen] = useState(false);
+  const [mobileAuthMode, setMobileAuthMode] = useState("signin");
+  const mobileAuthReturnToRef = useRef(profilePath);
   const mobileOrgansRef = useRef(null);
   const mobilePackagesRef = useRef(null);
   const mobileTestsRef = useRef(null);
@@ -559,37 +560,35 @@ function HomePage() {
     };
   }, [displayHomeData.blogs, displayHomeData.howItWorks, displayHomeData.organs, displayHomeData.reviews, displayHomeData.whyChoose, mobilePackages, mobileTests]);
 
-  const openMobilePrescription = () => {
-    setMobileMenuOpen(false);
-    if (getStoredUser()) {
-      navigate(uploadPrescriptionPath);
-      return;
-    }
-    navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`);
+  const openMobileAuthForRoute = (route) => {
+    mobileAuthReturnToRef.current = route;
+    setMobileAuthMode("signin");
+    setMobileAuthOpen(true);
   };
 
-  const openProtectedMobileRoute = (route) => {
-    setMobileMenuOpen(false);
+  const openMobileProtectedRoute = (route) => {
     if (getStoredUser()) {
       navigate(route);
       return;
     }
-    navigate(`/?auth=signin&returnTo=${encodeURIComponent(route)}`);
+    openMobileAuthForRoute(route);
+  };
+
+  const openMobilePrescription = () => {
+    setMobileMenuOpen(false);
+    openMobileProtectedRoute(uploadPrescriptionPath);
   };
 
   const openMobileProfile = () => {
     setMobileMenuOpen(false);
-    if (getStoredUser()) {
-      navigate(profilePath);
-      return;
-    }
-    setMobileProfileAuthMode("signin");
-    setMobileProfileAuthOpen(true);
+    openMobileProtectedRoute(profilePath);
   };
 
-  const handleMobileProfileAuthSuccess = () => {
-    setMobileProfileAuthOpen(false);
-    navigate(profilePath, { replace: true });
+  const handleMobileAuthSuccess = () => {
+    const returnTo = mobileAuthReturnToRef.current || profilePath;
+    setMobileAuthOpen(false);
+    mobileAuthReturnToRef.current = profilePath;
+    navigate(returnTo, { replace: true });
   };
 
   const handleMobileNavAction = (item) => {
@@ -603,7 +602,8 @@ function HomePage() {
       return;
     }
     if (item.protected) {
-      openProtectedMobileRoute(item.href);
+      setMobileMenuOpen(false);
+      openMobileProtectedRoute(item.href);
       return;
     }
     navigate(item.href);
@@ -1080,11 +1080,11 @@ function HomePage() {
       </div>
 
       <AuthModal
-        isOpen={mobileProfileAuthOpen}
-        mode={mobileProfileAuthMode}
-        onModeChange={setMobileProfileAuthMode}
-        onClose={() => setMobileProfileAuthOpen(false)}
-        onSuccess={handleMobileProfileAuthSuccess}
+        isOpen={mobileAuthOpen}
+        mode={mobileAuthMode}
+        onModeChange={setMobileAuthMode}
+        onClose={() => setMobileAuthOpen(false)}
+        onSuccess={handleMobileAuthSuccess}
       />
 
       <AnimatePresence>
