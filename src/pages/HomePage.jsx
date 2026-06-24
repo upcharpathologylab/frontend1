@@ -19,7 +19,7 @@ import {
   UserRound,
   X
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { imageUrl, getFeaturedServiceLocation, getHomeData, getHomepageBanners, getPackages, getPageContent, getTestimonials, getTests } from "../api/api.js";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
@@ -209,6 +209,7 @@ const savingText = (item) => {
 
 function HomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [homeData, setHomeData] = useState(null);
   const [homeContent, setHomeContent] = useState(null);
   const [blogContent, setBlogContent] = useState(null);
@@ -538,11 +539,20 @@ function HomePage() {
       openMobilePrescription();
       return;
     }
+    if (item.action === "profile") {
+      openProtectedMobileRoute(profilePath);
+      return;
+    }
     if (item.protected) {
       openProtectedMobileRoute(item.href);
       return;
     }
     navigate(item.href);
+  };
+
+  const isMobileNavActive = (item) => {
+    if (item.href === "/") return location.pathname === "/";
+    return location.pathname === item.href || (item.href === profilePath && location.pathname === "/my-account");
   };
 
   const openMobileLocation = () => {
@@ -596,7 +606,7 @@ function HomePage() {
     { label: "Packages", icon: Package, href: "/packages" },
     { label: "Upload Prescription", icon: ClipboardList, href: uploadPrescriptionPath, action: "upload-prescription", featured: true },
     { label: "Reports", icon: FileText, href: reportsPath, protected: true },
-    { label: "Profile", icon: UserRound, href: profilePath, protected: true }
+    { label: "Profile", icon: UserRound, href: profilePath, action: "profile", protected: true }
   ];
   const locationLabel = "Map";
   const mapQuery = serviceLocation ? `${serviceLocation.centerName || ""} ${serviceLocation.fullAddress || ""}`.trim() : "";
@@ -983,17 +993,24 @@ function HomePage() {
         </main>
 
         <nav className="mobile-bottom-nav">
-          {mobileNav.slice(0, 3).map(({ label, icon: NavIcon, href }) => (
-            <Link key={label} to={href}><NavIcon /><span>{label}</span></Link>
-          ))}
+          {mobileNav.slice(0, 3).map((item) => {
+            const NavIcon = item.icon;
+            return (
+              <Link key={item.label} to={item.href} className={isMobileNavActive(item) ? "is-active" : ""}>
+                <NavIcon />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
           {mobileNav.slice(3).map((item) => {
             const NavIcon = item.icon;
             return (
               <button
                 type="button"
-                className={item.featured ? "mobile-upload-nav" : ""}
+                className={`${item.featured ? "mobile-upload-nav" : ""} ${isMobileNavActive(item) ? "is-active" : ""}`.trim()}
                 key={item.label}
                 onClick={() => handleMobileNavAction(item)}
+                aria-current={isMobileNavActive(item) ? "page" : undefined}
               >
                 <NavIcon />
                 <span>{item.featured ? <>Upload<br />Prescription</> : item.label}</span>
