@@ -29,12 +29,14 @@ function CartSummary({ summary, onCheckout }) {
           <span className="block text-xs font-black text-navy-700 sm:text-xl sm:text-navy-900">Total Amount</span>
           <span className="mt-1 block truncate text-[11px] font-bold text-navy-400 line-through sm:hidden">{price(summary.oldSubtotal || summary.subtotal)}</span>
         </div>
-        <span className="shrink-0 text-2xl font-black text-upchar-green sm:text-4xl">{price(summary.totalPayable)}</span>
+        <span className="shrink-0 text-2xl font-black text-upchar-green sm:hidden">{price(summary.mobileTotalPayable ?? summary.totalPayable)}</span>
+        <span className="hidden shrink-0 text-4xl font-black text-upchar-green sm:block">{price(summary.totalPayable)}</span>
       </div>
 
       <p className="mt-2 flex items-center justify-start gap-2 text-xs font-bold text-upchar-green sm:mt-5 sm:justify-center sm:text-sm">
         <TicketCheck className="h-5 w-5" />
-        You save {price(summary.totalSavings)} on this order
+        <span className="sm:hidden">You save {price(summary.mobileTotalSavings ?? summary.totalSavings)} on this order</span>
+        <span className="hidden sm:inline">You save {price(summary.totalSavings)} on this order</span>
       </p>
 
       <div className="mt-5 hidden rounded-lg border border-green-200 bg-green-50 p-4 sm:block">

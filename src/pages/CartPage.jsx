@@ -26,6 +26,7 @@ import {
 import { saveCheckoutData } from "../utils/checkout.js";
 
 const firstImage = (value) => (Array.isArray(value) ? value.find(Boolean) : "");
+const isMobileCartView = () => typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
 
 const cartImageValue = (item = {}) => {
   if (item.type === "package") {
@@ -92,6 +93,9 @@ function CartPage() {
     const discount = items.length ? Math.floor(subtotal * 0.5) : 0;
     const safeCouponDiscount = Math.min(couponDiscount, Math.max(0, subtotal - discount));
     const totalPayable = Math.max(0, subtotal - discount - safeCouponDiscount);
+    const mobileSavings = Math.max(0, oldSubtotal - subtotal);
+    const mobileCouponDiscount = Math.min(couponDiscount, subtotal);
+    const mobileTotalPayable = Math.max(0, subtotal - mobileCouponDiscount);
     const itemCount = items.reduce((total, item) => total + Number(item.quantity || 1), 0);
 
     return {
@@ -101,6 +105,9 @@ function CartPage() {
       couponDiscount: safeCouponDiscount,
       totalPayable,
       totalSavings: discount + safeCouponDiscount,
+      mobileCouponDiscount,
+      mobileTotalPayable,
+      mobileTotalSavings: mobileSavings + mobileCouponDiscount,
       itemCount
     };
   }, [couponDiscount, items]);
@@ -156,7 +163,17 @@ function CartPage() {
       return;
     }
 
-    saveCheckoutData(items, summary, appliedCoupon);
+    const checkoutSummary = isMobileCartView()
+      ? {
+        ...summary,
+        discount: Math.max(0, summary.oldSubtotal - summary.subtotal),
+        couponDiscount: summary.mobileCouponDiscount,
+        totalPayable: summary.mobileTotalPayable,
+        totalSavings: summary.mobileTotalSavings
+      }
+      : summary;
+
+    saveCheckoutData(items, checkoutSummary, appliedCoupon);
     if (!getStoredUser()) {
       navigate(`/?auth=signin&returnTo=${encodeURIComponent("/payment")}`);
       return;
