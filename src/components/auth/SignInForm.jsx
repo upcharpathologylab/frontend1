@@ -19,9 +19,9 @@ function FieldLabel({ children }) {
 
 function PhoneField({ value, onChange, error }) {
   return (
-    <label>
+    <label className="signin-phone-field">
       <FieldLabel>Phone Number</FieldLabel>
-      <div className={`flex h-10 overflow-hidden rounded-lg border bg-white md:h-12 ${error ? "border-red-300" : "border-blue-100"}`}>
+      <div className={`signin-phone-input flex h-10 overflow-hidden rounded-lg border bg-white md:h-12 ${error ? "border-red-300" : "border-blue-100"}`}>
         <div className="flex w-20 items-center justify-center gap-1.5 border-r border-blue-100 text-sm font-black text-navy-950 md:w-28 md:gap-2 md:text-base">
           +91 <ChevronDown className="h-4 w-4 md:h-5 md:w-5" />
         </div>
@@ -40,7 +40,7 @@ function PasswordField({ label = "Password", name = "password", value, onChange,
   return (
     <label>
       <FieldLabel>{label}</FieldLabel>
-      <div className={`auth-field ${error ? "border-red-300" : "border-blue-100"}`}>
+      <div className={`auth-field signin-password-input ${error ? "border-red-300" : "border-blue-100"}`}>
         <LockKeyhole className="h-5 w-5 shrink-0 text-navy-950 md:h-6 md:w-6" />
         <input name={name} type={visible ? "text" : "password"} value={value} onChange={onChange} placeholder={placeholder} className="auth-input" />
         <button type="button" onClick={() => setVisible((current) => !current)} className="grid h-9 w-9 place-items-center text-navy-950 md:h-10 md:w-10" aria-label="Toggle password">

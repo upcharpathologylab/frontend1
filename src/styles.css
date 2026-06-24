@@ -228,6 +228,80 @@
     padding: 1.25rem 1rem 1rem;
   }
 
+  .auth-card-signin {
+    max-height: 88dvh;
+    padding: 1.6rem 1rem 1rem;
+  }
+
+  .auth-card-signin .grid {
+    gap: 0.9rem;
+  }
+
+  .auth-card-signin label {
+    min-width: 0;
+  }
+
+  .signin-phone-input,
+  .auth-card-signin .signin-password-input,
+  .auth-card-signin .auth-primary-btn,
+  .auth-card-signin .auth-outline-btn {
+    height: 3.45rem;
+    border-width: 1px;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .auth-card-signin .signin-password-input {
+    padding-left: 1rem;
+    padding-right: 0.65rem;
+  }
+
+  .signin-phone-input > div:first-child {
+    width: 4.8rem;
+    gap: 0.25rem;
+    font-size: 0.95rem;
+  }
+
+  .signin-phone-input > div:last-child {
+    width: 3rem;
+  }
+
+  .signin-phone-input svg,
+  .auth-card-signin .signin-password-input > svg {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .signin-phone-input input,
+  .auth-card-signin .auth-input {
+    height: 100%;
+    padding-left: 1rem;
+    padding-right: 0.5rem;
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+
+  .auth-card-signin button[aria-label="Toggle password"] {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    place-items: center;
+  }
+
+  .auth-card-signin button[aria-label="Toggle password"] svg {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  [aria-label="Sign in"] > button[aria-label="Close auth popup"] {
+    top: 0.9rem;
+    right: 0.9rem;
+    z-index: 2;
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
   .signup-mobile-title {
     display: block;
     margin: 0 3rem 1rem 0;
@@ -495,7 +569,7 @@
   }
 
   .auth-card-signin {
-    padding: 1rem;
+    padding: 1.6rem 1rem 1rem;
   }
 
   footer {
