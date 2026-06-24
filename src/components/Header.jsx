@@ -47,7 +47,7 @@ function Dropdown({ label, items, align = "left" }) {
   );
 }
 
-function Header({ data }) {
+function Header({ data, showMobileCartAction = false }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -289,6 +289,18 @@ function Header({ data }) {
             </span>
           </a>
           </div>
+
+          {showMobileCartAction ? (
+            <Link
+              to="/cart"
+              className="mobile-header-cart-action"
+              aria-label={`Open cart with ${cartCount} item${cartCount === 1 ? "" : "s"}`}
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span>Add to Cart</span>
+              <b>{cartCount}</b>
+            </Link>
+          ) : null}
 
           <button
           type="button"

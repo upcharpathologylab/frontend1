@@ -146,7 +146,7 @@ function TestsPage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-white">
-      <Header data={fallbackHomeData} />
+      <Header data={fallbackHomeData} showMobileCartAction />
       <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
         <section className="bg-gradient-to-b from-white to-blue-50/50 py-8 lg:py-10">
           <div className="container-page min-w-0">
