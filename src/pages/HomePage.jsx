@@ -712,6 +712,7 @@ function HomePage() {
             whatsappNumber={displayHomeData.siteSettings.whatsappNumber}
             tests={activeTests}
             packages={activePackages}
+            onUploadPrescription={openMobilePrescription}
           />
           {packagesLoaded ? <SpecialCareSection packages={activePackages} content={packageContent} /> : <SectionSkeleton className="bg-gradient-to-b from-white to-blue-50/40" />}
           <VitalOrgansSection organs={displayHomeData.organs} />

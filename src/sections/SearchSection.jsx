@@ -9,13 +9,12 @@ import { addCartItem, cartEventName, cartItemKey, getCartItems, hasCartItem } fr
 
 const cartKeys = () => new Set(getCartItems().map((item) => cartItemKey(item.id, item.type)));
 
-function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
+function SearchSection({ quickCards, whatsappNumber, tests, packages, onUploadPrescription }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [addedKeys, setAddedKeys] = useState(() => cartKeys());
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signin");
-  const uploadPrescriptionPath = "/my-account?tab=upload-prescription";
   const results = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return [];
@@ -43,14 +42,6 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
     if (title === "Health Packages") return "#packages";
     if (title === "Download Report") return "/my-account/reports";
     return "#booking";
-  };
-
-  const openUploadPrescription = () => {
-    if (getStoredUser()) {
-      navigate(uploadPrescriptionPath);
-      return;
-    }
-    navigate(`/?auth=signin&returnTo=${encodeURIComponent(uploadPrescriptionPath)}`);
   };
 
   const openReports = () => {
@@ -179,7 +170,7 @@ function SearchSection({ quickCards, whatsappNumber, tests, packages }) {
                 card.title === "Upload Prescription" ? (
                   <button
                     type="button"
-                    onClick={openUploadPrescription}
+                    onClick={onUploadPrescription}
                     className={`group flex h-[50px] items-center justify-center gap-3 px-2 text-base font-bold text-white transition hover:text-upchar-green ${
                       index ? "xl:border-l xl:border-white/25" : ""
                     }`}
