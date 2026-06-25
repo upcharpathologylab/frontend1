@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AccountLayout from "../components/account/AccountLayout.jsx";
 import AccountToast from "../components/account/AccountToast.jsx";
@@ -120,9 +120,17 @@ function AccountBookingsPage() {
       title="My Bookings"
       subtitle="View and manage all your test bookings"
     >
-      <div className="grid gap-6 xl:grid-cols-[280px_1fr]">
+      <header className="mobile-bookings-header">
+        <Link to="/my-account" aria-label="Back to profile">
+          <ArrowLeft className="h-6 w-6" />
+        </Link>
+        <h1>My Bookings</h1>
+        <span aria-hidden="true" />
+      </header>
+
+      <div className="mobile-bookings-summary-wrap grid gap-6 xl:grid-cols-[280px_1fr]">
         <UserProfileCard profile={profile} />
-        <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
+        <section className="mobile-bookings-summary rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
           <h2 className="text-xl font-black text-navy-900">Booking Summary</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {summaryCards.map((card) => (
@@ -134,7 +142,7 @@ function AccountBookingsPage() {
 
       <AccountSyncNotice message={error} />
 
-      <section className="rounded-lg border border-blue-100 bg-white p-4 shadow-sm lg:p-5">
+      <section className="mobile-bookings-panel rounded-lg border border-blue-100 bg-white p-4 shadow-sm lg:p-5">
         <TabFilterBar
           tabs={tabs}
           activeTab={selectedTab}
@@ -150,7 +158,7 @@ function AccountBookingsPage() {
           {loading ? (
             <AccountLoadingState />
           ) : filteredBookings.length ? (
-            <div className="grid gap-4">
+            <div className="mobile-bookings-list grid gap-4">
               {filteredBookings.map((booking) => (
                 <BookingCard
                   key={booking.id}
@@ -161,12 +169,15 @@ function AccountBookingsPage() {
               ))}
             </div>
           ) : (
-            <AccountEmptyState title="No bookings found" text="Try a different tab or book a new test." />
+            <div className="mobile-bookings-empty">
+              <AccountEmptyState title="No bookings found" text="Try a different tab or book a new test." />
+              <Link to="/tests" className="mobile-bookings-empty-cta">Book a Test Now</Link>
+            </div>
           )}
         </div>
       </section>
 
-      <div className="flex flex-col gap-4 text-sm font-semibold text-navy-700 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mobile-bookings-pagination flex flex-col gap-4 text-sm font-semibold text-navy-700 sm:flex-row sm:items-center sm:justify-between">
         <p>Showing {filteredBookings.length ? `1 to ${filteredBookings.length}` : "0"} of {bookings.length} bookings</p>
         <div className="flex items-center gap-2">
           <button className="flex h-10 w-10 items-center justify-center rounded-md border border-blue-100 text-navy-800" type="button" aria-label="Previous">
@@ -189,7 +200,7 @@ function AccountBookingsPage() {
         </div>
       </div>
 
-      <section className="grid gap-5 rounded-lg border border-blue-100 bg-blue-50/50 p-5 shadow-sm lg:grid-cols-[1fr_auto] lg:items-center">
+      <section className="mobile-bookings-cta grid gap-5 rounded-lg border border-blue-100 bg-blue-50/50 p-5 shadow-sm lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
           <h2 className="text-xl font-black text-navy-900">Need to book a new test?</h2>
           <p className="mt-2 text-sm font-semibold text-navy-700">Choose from our wide range of health packages and tests.</p>
