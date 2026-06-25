@@ -146,6 +146,10 @@
   display: none;
 }
 
+.mobile-reports-header {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   html,
   body,
@@ -940,6 +944,328 @@
   .account-layout-bookings .account-layout-content > section:last-of-type .block.text-xs {
     font-size: 0.55rem;
     line-height: 1.2;
+  }
+
+  .account-layout-reports {
+    width: 100%;
+    min-height: 100vh;
+    background: #f8fbff;
+  }
+
+  .account-layout-reports > header,
+  .account-layout-reports footer,
+  .account-layout-reports .account-layout-heading,
+  .account-layout-reports .account-layout-sidebar {
+    display: none;
+  }
+
+  .account-layout-reports main {
+    padding-top: 0;
+  }
+
+  .account-layout-reports .container-page {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+
+  .account-layout-reports .account-layout-grid {
+    display: block;
+    margin: 0;
+  }
+
+  .account-layout-reports .account-layout-content {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0 0.875rem 1.25rem;
+  }
+
+  .mobile-reports-header {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr 2.5rem;
+    align-items: center;
+    margin: 0 -0.875rem;
+    padding: 1.1rem 0.875rem 0.95rem;
+    border-bottom: 1px solid #dfe8f4;
+    background: #ffffff;
+  }
+
+  .mobile-reports-header a,
+  .mobile-reports-header button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    border: 0;
+    background: transparent;
+    color: #071744;
+  }
+
+  .mobile-reports-header h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 1000;
+    line-height: 1.1;
+    color: #071744;
+  }
+
+  .mobile-reports-header button span {
+    position: absolute;
+    top: 0.15rem;
+    right: 0.15rem;
+    display: inline-flex;
+    min-width: 0.9rem;
+    height: 0.9rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #0ba660;
+    color: #ffffff;
+    font-size: 0.52rem;
+    font-weight: 1000;
+    line-height: 1;
+  }
+
+  .mobile-reports-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .mobile-reports-summary article {
+    min-height: 5.95rem;
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 0.3rem;
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.45rem;
+  }
+
+  .mobile-reports-summary article > span:first-child {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .mobile-reports-summary article > span:first-child svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .mobile-reports-summary article span span:first-child {
+    font-size: 0.55rem;
+    line-height: 1.15;
+  }
+
+  .mobile-reports-summary article span span:last-child {
+    margin-top: 0.28rem;
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+
+  .mobile-reports-body {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .mobile-reports-panel {
+    border-radius: 0.5rem;
+    padding: 0.85rem;
+  }
+
+  .mobile-reports-filters {
+    grid-template-columns: minmax(0, 1fr) minmax(8.2rem, 0.82fr) minmax(4.8rem, 0.38fr);
+    gap: 0.45rem;
+  }
+
+  .mobile-reports-filters label,
+  .mobile-reports-filters button {
+    height: 2.35rem;
+    min-width: 0;
+    gap: 0.35rem;
+    border-radius: 0.35rem;
+    padding: 0 0.55rem;
+    font-size: 0.58rem;
+    white-space: nowrap;
+  }
+
+  .mobile-reports-filters input {
+    font-size: 0.58rem;
+  }
+
+  .mobile-reports-filters svg {
+    width: 0.88rem;
+    height: 0.88rem;
+    flex-shrink: 0;
+  }
+
+  .mobile-reports-panel [role="tablist"] {
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .mobile-reports-panel [role="tablist"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-reports-panel [role="tablist"] button {
+    flex: 1 0 auto;
+    min-width: 5.8rem;
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+
+  .mobile-reports-panel .mt-5 {
+    margin-top: 0.85rem;
+  }
+
+  .mobile-reports-empty > div {
+    min-height: 10.8rem;
+    border-radius: 0.5rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .mobile-reports-list > div {
+    border-radius: 0.5rem;
+  }
+
+  .mobile-reports-list .divide-y > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+    padding: 0.85rem;
+  }
+
+  .mobile-reports-list .divide-y > div > span,
+  .mobile-reports-list .divide-y > div button {
+    font-size: 0.72rem;
+  }
+
+  .mobile-reports-body > aside {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.82fr);
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .mobile-reports-body > aside > section {
+    border-radius: 0.5rem;
+    padding: 0.85rem;
+  }
+
+  .mobile-reports-body > aside > section:first-child {
+    grid-row: span 2;
+  }
+
+  .mobile-reports-body > aside h2 {
+    font-size: 0.9rem;
+  }
+
+  .mobile-reports-body > aside > section:first-child .mt-5 {
+    gap: 0;
+    margin-top: 0.75rem;
+  }
+
+  .mobile-reports-body > aside > section:first-child button {
+    position: relative;
+    gap: 0.55rem;
+    border-width: 0 0 1px;
+    border-radius: 0;
+    padding: 0.75rem 0;
+  }
+
+  .mobile-reports-body > aside > section:first-child button::after {
+    content: "›";
+    margin-left: auto;
+    color: #071744;
+    font-size: 1.15rem;
+    line-height: 1;
+  }
+
+  .mobile-reports-body > aside > section:first-child button > span:first-child {
+    width: 2.25rem;
+    height: 2.25rem;
+    background: #eefdf4;
+    color: #0ba660;
+  }
+
+  .mobile-reports-body > aside > section:first-child .block.text-sm {
+    font-size: 0.68rem;
+    line-height: 1.15;
+  }
+
+  .mobile-reports-body > aside > section:first-child .block.text-xs {
+    font-size: 0.55rem;
+    line-height: 1.2;
+  }
+
+  .mobile-reports-body > aside > section:nth-child(2) .flex {
+    gap: 0.6rem;
+  }
+
+  .mobile-reports-body > aside > section:nth-child(2) span:first-child {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .mobile-reports-body > aside > section:nth-child(2) p {
+    margin-top: 0.45rem;
+    font-size: 0.58rem;
+    line-height: 1.35;
+  }
+
+  .mobile-reports-body > aside > section:nth-child(2) .inline-flex {
+    margin-top: 0.55rem;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.5rem;
+  }
+
+  .mobile-reports-body > aside > section:nth-child(3) p {
+    margin-top: 0.35rem;
+    font-size: 0.58rem;
+    line-height: 1.35;
+  }
+
+  .mobile-reports-body > aside > section:nth-child(3) button {
+    height: 2rem;
+    margin-top: 0.65rem;
+    font-size: 0.58rem;
+  }
+
+  .account-layout-reports .account-layout-content > section:last-of-type {
+    border-radius: 0.5rem;
+    padding: 0.85rem;
+  }
+
+  .account-layout-reports .account-layout-content > section:last-of-type > div {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .account-layout-reports .account-layout-content > section:last-of-type > div > div {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0.35rem;
+    min-height: 4.8rem;
+    border: 0;
+    padding: 0.45rem 0.2rem;
+    text-align: center;
+  }
+
+  .account-layout-reports .account-layout-content > section:last-of-type > div > div > span:first-child {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .account-layout-reports .account-layout-content > section:last-of-type .block.text-sm {
+    font-size: 0.55rem;
+    line-height: 1.1;
+  }
+
+  .account-layout-reports .account-layout-content > section:last-of-type .block.text-xs {
+    font-size: 0.48rem;
+    line-height: 1.15;
   }
 
   .profile-mobile-page {

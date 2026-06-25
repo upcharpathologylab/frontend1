@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronDown, Filter, Search } from "lucide-react";
+import { ArrowLeft, Bell, CalendarDays, ChevronDown, Filter, Search } from "lucide-react";
+import { Link } from "react-router-dom";
 import AccountLayout from "../components/account/AccountLayout.jsx";
 import AccountToast from "../components/account/AccountToast.jsx";
 import { AccountEmptyState, AccountLoadingState, AccountSyncNotice } from "../components/account/AccountState.jsx";
@@ -68,7 +69,18 @@ function AccountReportsPage() {
       subtitle="View and download your test reports (PDF)"
       actions={<HeroIllustration type="reports" />}
     >
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <header className="mobile-reports-header">
+        <Link to="/my-account" aria-label="Back to profile">
+          <ArrowLeft className="h-6 w-6" />
+        </Link>
+        <h1>My Reports</h1>
+        <button type="button" aria-label="Report notifications">
+          <Bell className="h-5 w-5" />
+          <span>{reportsSummaryCards[2]?.value || "0"}</span>
+        </button>
+      </header>
+
+      <section className="mobile-reports-summary grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {reportsSummaryCards.map((card) => (
           <SummaryCard key={card.title} {...card} />
         ))}
@@ -76,9 +88,9 @@ function AccountReportsPage() {
 
       <AccountSyncNotice message={error} />
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
-        <section className="min-w-0 rounded-lg border border-blue-100 bg-white p-4 shadow-sm lg:p-5">
-          <div className="grid gap-4 lg:grid-cols-[1fr_250px_150px]">
+      <div className="mobile-reports-body grid gap-6 xl:grid-cols-[1fr_300px]">
+        <section className="mobile-reports-panel min-w-0 rounded-lg border border-blue-100 bg-white p-4 shadow-sm lg:p-5">
+          <div className="mobile-reports-filters grid gap-4 lg:grid-cols-[1fr_250px_150px]">
             <label className="flex h-12 items-center gap-3 rounded-md border border-blue-100 px-4">
               <Search className="h-5 w-5 text-upchar-blue" />
               <input
@@ -107,9 +119,13 @@ function AccountReportsPage() {
             {loading ? (
               <AccountLoadingState />
             ) : filteredReports.length ? (
-              <ReportsTable rows={filteredReports} onAction={handleReportAction} />
+              <div className="mobile-reports-list">
+                <ReportsTable rows={filteredReports} onAction={handleReportAction} />
+              </div>
             ) : (
-              <AccountEmptyState title="No reports found" text="Try another search or filter." />
+              <div className="mobile-reports-empty">
+                <AccountEmptyState title="No reports found" text="Try another search or filter." />
+              </div>
             )}
           </div>
         </section>
