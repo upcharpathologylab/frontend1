@@ -1377,13 +1377,13 @@
   }
 
   .profile-mobile-identity {
-    display: grid;
-    grid-template-columns: 4.7rem minmax(0, 1fr) 5.9rem;
+    position: relative;
+    display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.7rem;
     width: 100%;
     min-height: 0;
-    padding: 2.15rem 0 0;
+    padding: 2.05rem 0.15rem 0;
     overflow: visible;
   }
 
@@ -1411,9 +1411,12 @@
   }
 
   .profile-mobile-info h2 {
-    font-size: 1.22rem;
+    font-size: clamp(1rem, 4.8vw, 1.28rem);
     line-height: 1.05;
-    overflow-wrap: anywhere;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .profile-mobile-hello {
@@ -1454,11 +1457,14 @@
 
   .profile-mobile-info p {
     min-width: 0;
-    overflow: visible;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .profile-mobile-info {
+    flex: 1 1 auto;
     min-width: 0;
     overflow: visible;
   }
@@ -1469,21 +1475,32 @@
   }
 
   .profile-mobile-edit {
-    position: static;
+    position: relative;
     display: inline-flex;
+    flex: 0 0 auto;
     align-self: center;
-    height: 2rem;
+    width: auto;
+    max-width: 5.8rem;
+    height: 2.15rem;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
+    gap: 0.35rem;
     margin-top: 0;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.14);
-    padding: 0 0.55rem;
+    padding: 0 0.65rem;
     color: #ffffff;
     font-size: 0.62rem;
     font-weight: 900;
     backdrop-filter: blur(8px);
+    white-space: nowrap;
+    z-index: 1;
+  }
+
+  .profile-mobile-edit svg {
+    flex: 0 0 auto;
+    width: 0.8rem;
+    height: 0.8rem;
   }
 
   .profile-mobile-stats {
@@ -2397,9 +2414,10 @@
 
 @media (max-width: 380px) {
   .profile-mobile-identity {
-    grid-template-columns: 4.35rem minmax(0, 1fr) auto;
-    gap: 0.55rem;
-    padding-top: 2.3rem;
+    display: flex;
+    grid-template-columns: none;
+    gap: 0.48rem;
+    padding: 2.2rem 0 0;
   }
 
   .profile-mobile-avatar {
@@ -2414,18 +2432,20 @@
   }
 
   .profile-mobile-info h2 {
-    font-size: 1.12rem;
+    font-size: 1.08rem;
   }
 
   .profile-mobile-info .mt-6 {
-    font-size: 0.6rem;
+    font-size: 0.58rem;
   }
 
   .profile-mobile-edit {
-    position: static;
+    position: relative;
+    flex: 0 0 auto;
     height: 1.9rem;
-    padding: 0 0.5rem;
-    font-size: 0.6rem;
+    max-width: 5rem;
+    padding: 0 0.42rem;
+    font-size: 0.55rem;
   }
 
   .profile-mobile-stat-card {
