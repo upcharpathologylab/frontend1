@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, Plus, ShieldCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, LogOut, Plus, ShieldCheck, UsersRound } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import AccountLayout from "../components/account/AccountLayout.jsx";
 import AddNewCard from "../components/account/AddNewCard.jsx";
 import ConfirmDeleteModal from "../components/account/ConfirmDeleteModal.jsx";
@@ -29,6 +29,23 @@ const toFamilyPayload = (member) => ({
   avatar: member.avatar || ""
 });
 
+const ageFromDate = (value) => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const monthDiff = today.getMonth() - date.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < date.getDate())) age -= 1;
+  return age;
+};
+
+const isChildMember = (member) => {
+  const age = ageFromDate(member.dateOfBirth);
+  if (age === null) return /son|daughter|child|kid/i.test(member.relation || "");
+  return age < 18;
+};
+
 function AccountFamilyMembersPage() {
   const navigate = useNavigate();
   const [members, setMembers] = useState([]);
@@ -39,6 +56,7 @@ function AccountFamilyMembersPage() {
   const [memberModal, setMemberModal] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [usingLocalFallback, setUsingLocalFallback] = useState(false);
+  const [mobileTab, setMobileTab] = useState("all");
 
   useEffect(() => {
     document.title = "Family Members | Upchar Pathology";
@@ -69,11 +87,20 @@ function AccountFamilyMembersPage() {
 
   const summary = useMemo(() => {
     const total = members.length;
+    const active = members.filter((member) => member.status !== "Inactive" && member.isActive !== false).length;
+    const children = members.filter(isChildMember).length;
+    const adults = Math.max(0, total - children);
     const male = members.filter((member) => member.gender === "Male").length;
     const female = members.filter((member) => member.gender === "Female").length;
     const bloodGroups = new Set(members.map((member) => member.bloodGroup).filter(Boolean)).size;
-    return { total, male, female, bloodGroups };
+    return { total, active, adults, children, male, female, bloodGroups };
   }, [members]);
+
+  const visibleMembers = useMemo(() => {
+    if (mobileTab === "adults") return members.filter((member) => !isChildMember(member));
+    if (mobileTab === "children") return members.filter(isChildMember);
+    return members;
+  }, [members, mobileTab]);
 
   const showToast = (message) => {
     setToast(message);
@@ -157,22 +184,49 @@ function AccountFamilyMembersPage() {
         </>
       }
     >
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <header className="mobile-family-header">
+        <Link to="/my-account" aria-label="Back to profile">
+          <ArrowLeft className="h-8 w-8" />
+        </Link>
+        <h1>Family Members</h1>
+        <span aria-hidden="true" />
+      </header>
+
+      <section className="mobile-family-summary">
+        <SummaryCard title="Total Members" value={summary.total} icon="UsersRound" color="blue" />
+        <SummaryCard title="Active Members" value={summary.active} icon="UserRoundCheck" color="green" />
+        <SummaryCard title="Adults" value={summary.adults} icon="UserRound" color="purple" />
+        <SummaryCard title="Children" value={summary.children} icon="UsersRound" color="orange" />
+      </section>
+
+      <section className="desktop-family-summary grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard title="Total Members" value={summary.total} icon="UsersRound" color="blue" />
         <SummaryCard title="Male Members" value={summary.male} icon="UserRound" color="green" />
         <SummaryCard title="Female Members" value={summary.female} icon="UsersRound" color="purple" />
         <SummaryCard title="Blood Groups" value={summary.bloodGroups} icon="Droplet" color="red" />
       </section>
 
+      <section className="mobile-family-tabs" aria-label="Family member filters">
+        {[
+          ["all", `All Members (${summary.total})`],
+          ["adults", `Adults (${summary.adults})`],
+          ["children", `Children (${summary.children})`]
+        ].map(([id, label]) => (
+          <button type="button" key={id} className={mobileTab === id ? "is-active" : ""} onClick={() => setMobileTab(id)}>
+            {label}
+          </button>
+        ))}
+      </section>
+
       {error ? <p className="rounded-lg border border-orange-100 bg-orange-50 p-4 text-sm font-bold text-navy-800">{error}</p> : null}
 
       {loading ? (
-        <section className="rounded-lg border border-blue-100 bg-white p-8 text-center text-sm font-black text-navy-700 shadow-sm">
+        <section className="mobile-family-empty rounded-lg border border-blue-100 bg-white p-8 text-center text-sm font-black text-navy-700 shadow-sm">
           Loading family members...
         </section>
-      ) : members.length ? (
-        <section className="grid gap-5">
-          {members.map((member) => (
+      ) : visibleMembers.length ? (
+        <section className="mobile-family-list grid gap-5">
+          {visibleMembers.map((member) => (
             <FamilyMemberCard
               key={member.id}
               member={member}
@@ -184,19 +238,24 @@ function AccountFamilyMembersPage() {
           ))}
         </section>
       ) : (
-        <section className="rounded-lg border border-blue-100 bg-white p-8 text-center shadow-sm">
+        <section className="mobile-family-empty rounded-lg border border-blue-100 bg-white p-8 text-center shadow-sm">
+          <span className="mobile-family-empty-icon">
+            <UsersRound className="h-7 w-7" />
+          </span>
           <h2 className="text-2xl font-black text-navy-900">No family members added</h2>
           <p className="mt-2 text-sm font-semibold text-navy-700">Add a family member to book tests faster.</p>
         </section>
       )}
 
-      <AddNewCard
-        title="Add New Family Member"
-        text={"Add your family member details\nfor easy booking and management."}
-        onClick={() => setMemberModal({})}
-      />
+      <div className="mobile-family-add">
+        <AddNewCard
+          title="Add Family Member"
+          text={"Add family member details\nfor easy booking"}
+          onClick={() => setMemberModal({})}
+        />
+      </div>
 
-      <section className="grid gap-4 rounded-lg border border-green-100 bg-green-50/50 p-6 shadow-sm sm:grid-cols-[64px_1fr]">
+      <section className="mobile-family-info grid gap-4 rounded-lg border border-green-100 bg-green-50/50 p-6 shadow-sm sm:grid-cols-[64px_1fr]">
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-upchar-green shadow-sm">
           <ShieldCheck className="h-8 w-8" />
         </span>
