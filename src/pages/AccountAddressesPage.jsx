@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Home, Plus, ShieldCheck } from "lucide-react";
+import { ArrowLeft, MapPin, Plus, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import AccountLayout from "../components/account/AccountLayout.jsx";
 import AddNewCard from "../components/account/AddNewCard.jsx";
 import AddressCard from "../components/account/AddressCard.jsx";
@@ -172,7 +173,15 @@ function AccountAddressesPage() {
         </button>
       }
     >
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <header className="mobile-address-header">
+        <Link to="/my-account" aria-label="Back to profile">
+          <ArrowLeft className="h-8 w-8" />
+        </Link>
+        <h1>My Addresses</h1>
+        <span aria-hidden="true" />
+      </header>
+
+      <section className="mobile-address-summary grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard title="Total Addresses" value={summary.total} icon="MapPin" color="blue" />
         <SummaryCard title="Primary Address" value={summary.primary} icon="Home" color="green" />
         <SummaryCard title="Office Address" value={summary.office} icon="Building2" color="blue" />
@@ -182,11 +191,11 @@ function AccountAddressesPage() {
       {error ? <p className="rounded-lg border border-orange-100 bg-orange-50 p-4 text-sm font-bold text-navy-800">{error}</p> : null}
 
       {loading ? (
-        <section className="rounded-lg border border-blue-100 bg-white p-8 text-center text-sm font-black text-navy-700 shadow-sm">
+        <section className="mobile-address-empty rounded-lg border border-blue-100 bg-white p-8 text-center text-sm font-black text-navy-700 shadow-sm">
           Loading addresses...
         </section>
       ) : addresses.length ? (
-        <section className="grid gap-5">
+        <section className="mobile-address-list grid gap-5">
           {addresses.map((address) => (
             <AddressCard
               key={address.id}
@@ -200,15 +209,20 @@ function AccountAddressesPage() {
           ))}
         </section>
       ) : (
-        <section className="rounded-lg border border-blue-100 bg-white p-8 text-center shadow-sm">
+        <section className="mobile-address-empty rounded-lg border border-blue-100 bg-white p-8 text-center shadow-sm">
+          <span className="mobile-address-empty-icon">
+            <MapPin className="h-7 w-7" />
+          </span>
           <h2 className="text-2xl font-black text-navy-900">No saved addresses</h2>
           <p className="mt-2 text-sm font-semibold text-navy-700">Add an address to make booking faster.</p>
         </section>
       )}
 
-      <AddNewCard title="Add New Address" text={"Add your new address\nfor easy booking"} onClick={() => setAddressModal({})} />
+      <div className="mobile-address-add">
+        <AddNewCard title="Add New Address" text={"Add your new address\nfor easy booking"} onClick={() => setAddressModal({})} />
+      </div>
 
-      <section className="grid gap-4 rounded-lg border border-green-100 bg-green-50/50 p-6 shadow-sm sm:grid-cols-[64px_1fr]">
+      <section className="mobile-address-primary grid gap-4 rounded-lg border border-green-100 bg-green-50/50 p-6 shadow-sm sm:grid-cols-[64px_1fr]">
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-upchar-green shadow-sm">
           <ShieldCheck className="h-8 w-8" />
         </span>

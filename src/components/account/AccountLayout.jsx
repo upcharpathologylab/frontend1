@@ -6,11 +6,11 @@ import { fallbackHomeData } from "../../data/homeData.js";
 
 function AccountLayout({ active, breadcrumbCurrent, title, subtitle, actions, children }) {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50/70 via-white to-white">
+    <div className={`account-layout account-layout-${active} min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50/70 via-white to-white`}>
       <Header data={fallbackHomeData} />
       <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
         <section className="container-page py-8 lg:py-10">
-          <div className="flex flex-wrap items-start justify-between gap-5">
+          <div className="account-layout-heading flex flex-wrap items-start justify-between gap-5">
             <div>
               <p className="text-sm font-black text-navy-800">
                 <Link to="/" className="text-upchar-blue">Home</Link>
@@ -25,9 +25,11 @@ function AccountLayout({ active, breadcrumbCurrent, title, subtitle, actions, ch
             {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
           </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
-            <AccountSidebar active={active} />
-            <div className="grid min-w-0 content-start gap-6">{children}</div>
+          <div className="account-layout-grid mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
+            <div className="account-layout-sidebar">
+              <AccountSidebar active={active} />
+            </div>
+            <div className="account-layout-content grid min-w-0 content-start gap-6">{children}</div>
           </div>
         </section>
       </main>
