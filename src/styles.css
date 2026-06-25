@@ -188,7 +188,10 @@
 @media (max-width: 768px) {
   .profile-mobile-page {
     background: #f6faff;
-    width: 100%;
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
   }
 
   .profile-mobile-page header {
@@ -196,13 +199,17 @@
   }
 
   .profile-mobile-shell {
-    width: 100%;
+    width: 100vw;
     max-width: none;
+    margin: 0;
     padding: 0;
   }
 
   .profile-mobile-page main {
+    width: 100vw;
+    margin: 0;
     padding-top: 0;
+    overflow-x: hidden;
   }
 
   .profile-mobile-page-title,
@@ -213,12 +220,13 @@
 
   .profile-mobile-layout {
     display: block;
+    width: 100vw;
     margin-top: 0;
   }
 
   .profile-mobile-content {
     display: grid;
-    width: 100%;
+    width: 100vw;
     gap: 1rem;
     padding: 0 0.75rem 1.25rem;
   }
@@ -628,6 +636,41 @@
     overflow-x: hidden;
   }
 
+  .profile-mobile-page .profile-mobile-shell.container-page {
+    width: 100vw;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
+  }
+
+  .profile-mobile-page .profile-mobile-layout {
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    gap: 0;
+  }
+
+  .profile-mobile-page .profile-mobile-content {
+    width: 100vw;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    gap: 1rem;
+    padding: 0 0.75rem 1.25rem;
+  }
+
+  .profile-mobile-page #profile-section {
+    width: 100vw;
+    margin: 0 -0.75rem;
+  }
+
+  .profile-mobile-page #profile-section .profile-mobile-hero {
+    width: 100vw;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
   .cart-profile-mobile-hidden-footer {
     display: none;
   }
@@ -667,43 +710,6 @@
     color: #0ba660;
     font-size: 0.68rem;
     line-height: 1;
-  }
-
-  @media (max-width: 380px) {
-    .profile-mobile-identity {
-      grid-template-columns: 5.8rem minmax(0, 1fr);
-      gap: 0.75rem;
-    }
-
-    .profile-mobile-avatar {
-      width: 5.8rem;
-      height: 5.8rem;
-      font-size: 2rem;
-    }
-
-    .profile-mobile-info h2 {
-      font-size: 1.45rem;
-    }
-
-    .profile-mobile-info .mt-6 {
-      font-size: 0.78rem;
-    }
-
-    .profile-mobile-stat-card {
-      grid-template-columns: 2rem 1fr;
-      gap: 0.55rem;
-      padding: 0.62rem;
-    }
-
-    .profile-mobile-stat-icon {
-      width: 2rem;
-      height: 2rem;
-    }
-
-    .profile-mobile-notification-card {
-      font-size: 0.68rem;
-      padding: 0.65rem;
-    }
   }
 
   .auth-card-signup {
@@ -1226,12 +1232,62 @@
   }
 }
 
+@media (max-width: 380px) {
+  .profile-mobile-identity {
+    grid-template-columns: 5.8rem minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .profile-mobile-avatar {
+    width: 5.8rem;
+    height: 5.8rem;
+    font-size: 2rem;
+  }
+
+  .profile-mobile-info h2 {
+    font-size: 1.45rem;
+  }
+
+  .profile-mobile-info .mt-6 {
+    font-size: 0.78rem;
+  }
+
+  .profile-mobile-stat-card {
+    grid-template-columns: 2rem 1fr;
+    gap: 0.55rem;
+    padding: 0.62rem;
+  }
+
+  .profile-mobile-stat-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .profile-mobile-notification-card {
+    font-size: 0.68rem;
+    padding: 0.65rem;
+  }
+}
+
 @media (max-width: 480px) {
   html {
     font-size: 12px;
   }
 
   .container-page {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .profile-mobile-page .profile-mobile-shell.container-page {
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .profile-mobile-page .profile-mobile-content {
+    width: 100vw;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
