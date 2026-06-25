@@ -1397,17 +1397,25 @@
   .profile-mobile-avatar {
     width: 4.7rem;
     height: 4.7rem;
+    overflow: hidden;
     font-size: 1.75rem;
     color: #08733c;
   }
 
   .profile-mobile-camera {
-    bottom: 0;
-    right: 0;
-    width: 1.55rem;
-    height: 1.55rem;
-    border-width: 0.2rem;
+    right: -0.28rem;
+    bottom: 0.25rem;
+    z-index: 2;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-width: 0.18rem;
     background: #ffffff;
+    box-shadow: 0 6px 14px rgba(7, 23, 68, 0.14);
+  }
+
+  .profile-mobile-camera svg {
+    width: 0.88rem;
+    height: 0.88rem;
   }
 
   .profile-mobile-info h2 {
@@ -2430,6 +2438,18 @@
   .profile-mobile-avatar-wrap {
     width: 4.35rem;
     height: 4.35rem;
+  }
+
+  .profile-mobile-camera {
+    right: -0.24rem;
+    bottom: 0.2rem;
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+
+  .profile-mobile-camera svg {
+    width: 0.8rem;
+    height: 0.8rem;
   }
 
   .profile-mobile-info h2 {
