@@ -174,12 +174,13 @@ function CartPage() {
       : summary;
 
     saveCheckoutData(items, checkoutSummary, appliedCoupon);
+    const paymentPath = "/payment?pay=1";
     if (!getStoredUser()) {
-      navigate(`/?auth=signin&returnTo=${encodeURIComponent("/payment")}`);
+      navigate(`/?auth=signin&returnTo=${encodeURIComponent(paymentPath)}`);
       return;
     }
 
-    navigate("/payment");
+    navigate(paymentPath);
   };
 
   return (

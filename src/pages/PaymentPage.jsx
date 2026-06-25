@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { createBookingLead, createRazorpayOrder, getUserAddresses, getUserProfile, verifyRazorpayPayment } from "../api/api.js";
 import CardPaymentForm from "../components/payment/CardPaymentForm.jsx";
@@ -118,6 +118,8 @@ const addressText = (address = {}) =>
 
 function PaymentPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const autoPayStartedRef = useRef(false);
   const [selectedMethod, setSelectedMethod] = useState("razorpay");
   const [loading, setLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
@@ -133,7 +135,7 @@ function PaymentPage() {
       saveCheckoutData(data.items, data.summary, data.appliedCoupon);
     }
     if (!getStoredUser()) {
-      navigate(`/?auth=signin&returnTo=${encodeURIComponent("/payment")}`, { replace: true });
+      navigate(`/?auth=signin&returnTo=${encodeURIComponent(`/payment${location.search || ""}`)}`, { replace: true });
     }
   }, []);
 
@@ -142,7 +144,7 @@ function PaymentPage() {
 
     if (!getStoredUser()) {
       saveCheckoutData(checkoutData.items, checkoutData.summary);
-      navigate(`/?auth=signin&returnTo=${encodeURIComponent("/payment")}`);
+      navigate(`/?auth=signin&returnTo=${encodeURIComponent(`/payment${location.search || ""}`)}`);
       return;
     }
 
@@ -290,6 +292,15 @@ function PaymentPage() {
       return;
     }
   };
+
+  useEffect(() => {
+    const shouldAutoPay = new URLSearchParams(location.search).get("pay") === "1";
+    if (!shouldAutoPay || autoPayStartedRef.current || loading || !checkoutData.items.length || !checkoutData.summary) return;
+
+    autoPayStartedRef.current = true;
+    setSelectedMethod("razorpay");
+    handlePayment();
+  }, [checkoutData, loading, location.search]);
 
   const summary = checkoutData.summary;
 
