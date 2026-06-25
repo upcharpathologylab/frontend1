@@ -2618,6 +2618,22 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .profile-mobile-stats.grid[class*="sm:grid-cols-2"]:not(form),
+  .profile-mobile-stats {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    width: calc(100% - 1.8rem) !important;
+    max-width: none !important;
+    overflow-x: hidden !important;
+  }
+
+  .profile-mobile-stat-card {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: none !important;
+  }
+
   form .grid,
   form [class*="grid-cols-2"],
   form [class*="sm:grid-cols-2"],
