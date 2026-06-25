@@ -188,26 +188,27 @@
 @media (max-width: 768px) {
   .profile-mobile-page {
     background: #f6faff;
-    width: 100vw;
+    width: 100%;
+    max-width: none;
     min-height: 100vh;
     margin: 0;
+    padding: 0;
     overflow-x: hidden;
   }
 
-  .profile-mobile-page header {
-    display: none;
-  }
-
   .profile-mobile-shell {
-    width: 100vw;
+    width: 100%;
     max-width: none;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
   }
 
   .profile-mobile-page main {
-    width: 100vw;
+    width: 100%;
+    max-width: none;
     margin: 0;
+    padding: 0;
     padding-top: 0;
     overflow-x: hidden;
   }
@@ -220,15 +221,21 @@
 
   .profile-mobile-layout {
     display: block;
-    width: 100vw;
-    margin-top: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 
   .profile-mobile-content {
     display: grid;
-    width: 100vw;
+    width: 100%;
+    max-width: none;
     gap: 1rem;
-    padding: 0 0.75rem 1.25rem;
+    margin: 0;
+    padding: 0 0.875rem 1.25rem;
+    overflow-x: hidden;
   }
 
   .profile-mobile-sidebar {
@@ -237,15 +244,17 @@
 
   .profile-mobile-hero {
     position: relative;
-    width: calc(100% + 1.5rem);
-    margin: 0 -0.75rem 7.25rem;
+    width: calc(100% + 1.75rem);
+    max-width: none;
+    height: auto;
+    margin: 0 -0.875rem;
     overflow: visible;
     border-radius: 0;
     background:
       radial-gradient(circle at 95% 18%, rgba(255, 255, 255, 0.14) 0 18%, transparent 18.5%),
       radial-gradient(circle at 98% 20%, transparent 0 28%, rgba(255, 255, 255, 0.1) 28.5% 29%, transparent 29.5%),
       linear-gradient(135deg, #061d62 0%, #0755f2 58%, #0638d8 100%);
-    padding: 1.25rem 1rem 9.25rem;
+    padding: 1rem 0.875rem;
     box-shadow: none;
   }
 
@@ -356,23 +365,22 @@
   }
 
   .profile-mobile-stats {
-    position: absolute;
-    left: 0.75rem;
-    right: 0.75rem;
-    bottom: -6.65rem;
+    position: static;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
     border-radius: 1.05rem;
     background: #ffffff;
-    padding: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.875rem;
     box-shadow: 0 14px 34px rgba(7, 23, 68, 0.12);
   }
 
   .profile-mobile-stat-card {
     display: grid;
     grid-template-columns: 2.2rem 1fr;
-    min-height: 4.65rem;
+    height: auto;
+    min-height: 4.4rem;
     align-items: center;
     gap: 0.7rem;
     border: 1px solid #e5edf7;
@@ -415,15 +423,17 @@
   .profile-mobile-stat-card p:first-of-type {
     margin-top: 0;
     color: #071744;
-    font-size: 1.15rem;
-    line-height: 1;
+    font-size: clamp(1rem, 4vw, 1.15rem);
+    line-height: 1.05;
+    white-space: nowrap;
   }
 
   .profile-mobile-stat-card p:last-of-type {
     margin-top: 0.25rem;
     color: #24365f;
-    font-size: 0.68rem;
-    line-height: 1.25;
+    font-size: clamp(0.66rem, 2.7vw, 0.76rem);
+    line-height: 1.2;
+    overflow-wrap: normal;
   }
 
   .profile-mobile-hero > .mt-8 {
@@ -434,7 +444,10 @@
     border-radius: 1rem;
     border-color: #e4ecf7;
     width: 100%;
+    max-width: none;
+    margin: 0;
     padding: 0.7rem;
+    overflow: hidden;
     box-shadow: 0 12px 28px rgba(7, 23, 68, 0.08);
   }
 
@@ -448,9 +461,11 @@
   .account-mobile-menu-card {
     min-width: 0;
     width: 100%;
+    max-width: none;
     border-left: 0;
     border-radius: 0.8rem;
-    min-height: 4.65rem;
+    height: auto;
+    min-height: 4.5rem;
     padding: 0.82rem 0.75rem;
   }
 
@@ -551,7 +566,10 @@
     border-color: #e6eef8;
     background: #ffffff;
     width: 100%;
+    max-width: none;
+    margin: 0;
     padding: 0.9rem;
+    overflow: hidden;
     box-shadow: 0 12px 28px rgba(7, 23, 68, 0.08);
   }
 
@@ -565,7 +583,8 @@
   }
 
   .profile-mobile-quick-actions a {
-    min-height: 7.35rem;
+    height: auto;
+    min-height: 7rem;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -637,7 +656,7 @@
   }
 
   .profile-mobile-page .profile-mobile-shell.container-page {
-    width: 100vw;
+    width: 100%;
     max-width: none;
     margin-left: 0;
     margin-right: 0;
@@ -645,30 +664,30 @@
   }
 
   .profile-mobile-page .profile-mobile-layout {
-    width: 100vw;
+    width: 100%;
     max-width: none;
     margin: 0;
     gap: 0;
   }
 
   .profile-mobile-page .profile-mobile-content {
-    width: 100vw;
+    width: 100%;
     max-width: none;
     min-width: 0;
     margin: 0;
     gap: 1rem;
-    padding: 0 0.75rem 1.25rem;
+    padding: 0 0.875rem 1.25rem;
   }
 
   .profile-mobile-page #profile-section {
-    width: 100vw;
-    margin: 0 -0.75rem;
+    width: 100%;
+    margin: 0;
   }
 
   .profile-mobile-page #profile-section .profile-mobile-hero {
-    width: 100vw;
-    margin-left: 0;
-    margin-right: 0;
+    width: calc(100% + 1.75rem);
+    margin-left: -0.875rem;
+    margin-right: -0.875rem;
   }
 
   .cart-profile-mobile-hidden-footer {
@@ -1280,16 +1299,16 @@
   }
 
   .profile-mobile-page .profile-mobile-shell.container-page {
-    width: 100vw;
+    width: 100%;
     max-width: none;
     margin: 0;
     padding: 0;
   }
 
   .profile-mobile-page .profile-mobile-content {
-    width: 100vw;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+    width: 100%;
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
   }
 
   h1 {
