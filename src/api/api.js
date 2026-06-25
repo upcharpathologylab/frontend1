@@ -7,10 +7,18 @@ const browserOrigin = typeof window !== "undefined" ? window.location.origin : "
 const productionApiOrigin = "https://api.upcharpathologylab.com";
 const isLocalOrigin = /^(https?:\/\/)?(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(browserOrigin);
 const defaultApiOrigin = import.meta.env.PROD && !isLocalOrigin ? productionApiOrigin : browserOrigin;
-const normalizeOrigin = (value) => String(value || "").trim().replace(/\/api\/?$/, "").replace(/\/$/, "");
-const API_ASSET_ORIGIN = normalizeOrigin(configuredBaseUrl || configuredApiUrl || defaultApiOrigin);
+const normalizeOrigin = (value) => {
+  const normalized = String(value || "").trim().replace(/\/api\/?$/, "").replace(/\/$/, "");
+  if (!normalized || normalized.startsWith("/")) return "";
+  return normalized;
+};
+const configuredAssetOrigin = normalizeOrigin(configuredBaseUrl || configuredApiUrl);
+const frontendOriginPattern = /^https?:\/\/(www\.)?upcharpathologylab\.com$/i;
+const API_ASSET_ORIGIN = frontendOriginPattern.test(configuredAssetOrigin)
+  ? productionApiOrigin
+  : configuredAssetOrigin || defaultApiOrigin;
 const API_BASE_URL = configuredApiUrl
-  ? `${normalizeOrigin(configuredApiUrl)}/api`
+  ? `${normalizeOrigin(configuredApiUrl) || defaultApiOrigin}/api`
   : `${API_ASSET_ORIGIN}/api`;
 
 export const API_UPLOAD_ORIGIN = API_ASSET_ORIGIN;
@@ -27,6 +35,20 @@ const forceHttpsForSecureFrontend = (url) => {
   return url;
 };
 
+const frontendUploadOriginPattern = /^(https?:)?\/\/(www\.)?upcharpathologylab\.com(?=\/uploads\/)/i;
+const localUploadOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?(?=\/uploads\/)/i;
+const uploadPathFromUrl = (value) => {
+  try {
+    const parsed = new URL(value, typeof window !== "undefined" ? window.location.origin : productionApiOrigin);
+    if (parsed.pathname.startsWith("/api/uploads/")) {
+      return `${parsed.pathname.replace(/^\/api/, "")}${parsed.search}${parsed.hash}`;
+    }
+    return parsed.pathname.startsWith("/uploads/") ? `${parsed.pathname}${parsed.search}${parsed.hash}` : "";
+  } catch {
+    return "";
+  }
+};
+
 export function assetUrl(value) {
   if (!value || typeof value !== "string") return value;
   let normalized = value.trim().replace(/^["']|["']$/g, "");
@@ -35,8 +57,9 @@ export function assetUrl(value) {
     normalized = normalized.startsWith("/") ? "/images/home-banner.webp" : "images/home-banner.webp";
   }
   if (/^(https?:)?\/\//i.test(normalized) || normalized.startsWith("data:")) {
-    if (import.meta.env.PROD && /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?\/uploads\//i.test(normalized)) {
-      return forceHttpsForSecureFrontend(normalized.replace(/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(?::\d+)?/i, API_ASSET_ORIGIN));
+    const uploadPath = !normalized.startsWith("data:") ? uploadPathFromUrl(normalized) : "";
+    if (uploadPath && (/\/api\/uploads\//i.test(normalized) || frontendUploadOriginPattern.test(normalized) || (import.meta.env.PROD && localUploadOriginPattern.test(normalized)))) {
+      return forceHttpsForSecureFrontend(`${API_ASSET_ORIGIN}${uploadPath}`);
     }
     return forceHttpsForSecureFrontend(normalized);
   }
