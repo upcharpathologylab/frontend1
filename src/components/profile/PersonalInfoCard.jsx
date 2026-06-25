@@ -28,7 +28,7 @@ function PersonalInfoCard({ profile, onEdit }) {
   ];
 
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
+    <section className="profile-mobile-personal rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="flex items-center gap-3 text-2xl font-black text-navy-900">
           <UserRound className="h-6 w-6 text-upchar-blue" />
@@ -57,12 +57,12 @@ function PersonalInfoCard({ profile, onEdit }) {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 rounded-lg border border-green-100 bg-green-50/40 p-4 sm:grid-cols-2">
-        <p className="flex items-center gap-3 text-sm font-bold text-navy-800">
+      <div className="profile-mobile-notifications mt-6 grid gap-4 rounded-lg border border-green-100 bg-green-50/40 p-4 sm:grid-cols-2">
+        <p className="profile-mobile-notification-card flex items-center gap-3 text-sm font-bold text-navy-800">
           <Phone className="h-5 w-5 text-upchar-green" />
           Mobile and WhatsApp updates enabled
         </p>
-        <p className="flex items-center gap-3 text-sm font-bold text-navy-800">
+        <p className="profile-mobile-notification-card flex items-center gap-3 text-sm font-bold text-navy-800">
           <Mail className="h-5 w-5 text-upchar-green" />
           Reports will be sent to your email
         </p>

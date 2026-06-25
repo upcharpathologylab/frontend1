@@ -359,11 +359,11 @@ function MyAccountPage() {
   }[activeSection];
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50/70 via-white to-white">
+    <div className="profile-mobile-page min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50/70 via-white to-white">
       <Header data={fallbackHomeData} />
       <main className="pt-[68px] md:pt-[104px] lg:pt-[108px]">
-        <section className="container-page py-8 lg:py-10">
-          <div className="flex flex-wrap items-start justify-between gap-5">
+        <section className="profile-mobile-shell container-page py-8 lg:py-10">
+          <div className="profile-mobile-page-title flex flex-wrap items-start justify-between gap-5">
             <div>
               <p className="text-sm font-black text-navy-800">
                 <Link to="/" className="text-upchar-blue">Home</Link>
@@ -378,17 +378,19 @@ function MyAccountPage() {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex h-12 items-center gap-3 rounded-lg border border-blue-100 bg-white px-7 text-sm font-black text-upchar-red shadow-sm transition hover:bg-red-50"
+              className="profile-desktop-logout inline-flex h-12 items-center gap-3 rounded-lg border border-blue-100 bg-white px-7 text-sm font-black text-upchar-red shadow-sm transition hover:bg-red-50"
             >
               <LogOut className="h-5 w-5" />
               Logout
             </button>
           </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
-            <AccountSidebar active={activeSection} onSectionSelect={selectAccountSection} />
+          <div className="profile-mobile-layout mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
+            <div className="profile-desktop-sidebar">
+              <AccountSidebar active={activeSection} onSectionSelect={selectAccountSection} />
+            </div>
 
-            <div className="grid min-w-0 gap-6">
+            <div className="profile-mobile-content grid min-w-0 gap-6">
               {comingSoonTitle ? (
                 <section className="rounded-lg border border-blue-100 bg-white p-6 text-center shadow-sm lg:p-9">
                   <h2 className="text-2xl font-black text-navy-900">{comingSoonTitle}</h2>
@@ -430,9 +432,14 @@ function MyAccountPage() {
                   profile={profile}
                   onProfileImageUpload={handleProfileImageUpload}
                   onProfileImageError={showToast}
+                  onEdit={() => setProfileModalOpen(true)}
+                  onLogout={handleLogout}
                   uploading={imageUploading}
                   uploadProgress={imageUploadProgress}
                 />
+              </div>
+              <div className="profile-mobile-sidebar">
+                <AccountSidebar active={activeSection} onSectionSelect={selectAccountSection} />
               </div>
               <div id="settings-section" className="scroll-mt-36">
                 <PersonalInfoCard profile={profile} onEdit={() => setProfileModalOpen(true)} />

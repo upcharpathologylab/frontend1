@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CalendarDays, Camera, Droplet, Mail, Phone, UserRound } from "lucide-react";
+import { CalendarDays, Camera, Droplet, FileText, LogOut, Mail, Pencil, Phone, UserRound, WalletCards } from "lucide-react";
 import { assetUrl } from "../../api/api.js";
 
 function Avatar({ name, profileImage, onUpload, onError, uploading, uploadProgress }) {
@@ -48,8 +48,8 @@ function Avatar({ name, profileImage, onUpload, onError, uploading, uploadProgre
   };
 
   return (
-    <div className="relative">
-      <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-blue-100 to-green-100 text-4xl font-black text-navy-900 shadow-lg lg:h-40 lg:w-40">
+    <div className="profile-mobile-avatar-wrap relative">
+      <div className="profile-mobile-avatar flex h-32 w-32 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-blue-100 to-green-100 text-4xl font-black text-navy-900 shadow-lg lg:h-40 lg:w-40">
         {imageUrl ? (
           <img src={imageUrl} alt={`${name} profile`} className="h-full w-full rounded-full object-cover" />
         ) : (
@@ -60,7 +60,7 @@ function Avatar({ name, profileImage, onUpload, onError, uploading, uploadProgre
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
-        className="absolute bottom-3 right-1 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white bg-green-50 text-upchar-green shadow-sm"
+        className="profile-mobile-camera absolute bottom-3 right-1 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white bg-green-50 text-upchar-green shadow-sm"
         aria-label="Change profile photo"
       >
         <Camera className="h-5 w-5" />
@@ -80,27 +80,36 @@ function Avatar({ name, profileImage, onUpload, onError, uploading, uploadProgre
   );
 }
 
-function OverviewBox({ label, value }) {
+function OverviewBox({ label, value, icon }) {
   return (
-    <div className="rounded-lg border border-white/15 bg-white/10 p-4">
+    <div className="profile-mobile-stat-card rounded-lg border border-white/15 bg-white/10 p-4">
+      <span className="profile-mobile-stat-icon hidden">
+        {icon}
+      </span>
       <p className="text-2xl font-black text-white">{value}</p>
       <p className="mt-1 text-xs font-bold text-blue-100">{label}</p>
     </div>
   );
 }
 
-function ProfileHeaderCard({ profile, onProfileImageUpload, onProfileImageError, uploading = false, uploadProgress = 0 }) {
+function ProfileHeaderCard({ profile, onProfileImageUpload, onProfileImageError, onEdit, onLogout, uploading = false, uploadProgress = 0 }) {
   const overview = [
-    ["Total Bookings", profile.totalBookings],
-    ["Reports Generated", profile.reportsGenerated],
-    ["Upcoming Appointments", profile.upcomingAppointments],
-    ["Total Spent", profile.totalSpent]
+    ["Total Bookings", profile.totalBookings, <CalendarDays className="h-5 w-5" />],
+    ["Reports Generated", profile.reportsGenerated, <FileText className="h-5 w-5" />],
+    ["Upcoming Appointments", profile.upcomingAppointments, <CalendarDays className="h-5 w-5" />],
+    ["Total Spent", profile.totalSpent, <WalletCards className="h-5 w-5" />]
   ];
 
   return (
-    <section className="overflow-hidden rounded-lg bg-gradient-to-br from-navy-900 via-upchar-blue to-navy-950 p-6 text-white shadow-card lg:p-9">
+    <section className="profile-mobile-hero overflow-hidden rounded-lg bg-gradient-to-br from-navy-900 via-upchar-blue to-navy-950 p-6 text-white shadow-card lg:p-9">
+      <div className="profile-mobile-actions hidden">
+        <button type="button" onClick={onLogout} className="profile-mobile-logout">
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
+      </div>
       <div className="grid gap-7 xl:grid-cols-[1fr_360px]">
-        <div className="grid gap-6 md:grid-cols-[170px_1fr] md:items-center">
+        <div className="profile-mobile-identity grid gap-6 md:grid-cols-[170px_1fr] md:items-center">
           <Avatar
             name={profile.fullName}
             profileImage={profile.profileImage}
@@ -109,11 +118,12 @@ function ProfileHeaderCard({ profile, onProfileImageUpload, onProfileImageError,
             uploading={uploading}
             uploadProgress={uploadProgress}
           />
-          <div>
+          <div className="profile-mobile-info">
+            <p className="profile-mobile-hello hidden">Hello,</p>
             <div className="flex flex-wrap items-center gap-3">
               <h2 className="text-3xl font-black sm:text-4xl">{profile.fullName}</h2>
               {profile.verified ? (
-                <span className="rounded-md bg-upchar-green px-3 py-1 text-sm font-black text-white">Verified</span>
+                <span className="profile-mobile-verified rounded-md bg-upchar-green px-3 py-1 text-sm font-black text-white">Verified</span>
               ) : null}
             </div>
             <div className="mt-6 grid gap-4 text-base font-semibold text-blue-50">
@@ -130,12 +140,16 @@ function ProfileHeaderCard({ profile, onProfileImageUpload, onProfileImageError,
                 Member since {profile.memberSince}
               </p>
             </div>
+            <button type="button" onClick={onEdit} className="profile-mobile-edit hidden">
+              <Pencil className="h-4 w-4" />
+              Edit Profile
+            </button>
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 xl:self-center">
-          {overview.map(([label, value]) => (
-            <OverviewBox label={label} value={value} key={label} />
+        <div className="profile-mobile-stats grid gap-3 sm:grid-cols-2 xl:self-center">
+          {overview.map(([label, value, icon]) => (
+            <OverviewBox label={label} value={value} icon={icon} key={label} />
           ))}
         </div>
       </div>

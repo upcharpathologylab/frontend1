@@ -5,7 +5,7 @@ import { quickActions } from "../../data/profileData.js";
 
 function QuickActions() {
   return (
-    <section className="rounded-lg border border-green-100 bg-green-50/40 p-5 shadow-sm lg:p-6">
+    <section className="profile-mobile-quick-actions rounded-lg border border-green-100 bg-green-50/40 p-5 shadow-sm lg:p-6">
       <h2 className="text-xl font-black text-navy-900">Quick Actions</h2>
       <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {quickActions.map((action) => (
