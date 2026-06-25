@@ -30,7 +30,7 @@ function ProfileSidebar({ activeSection, onSectionSelect }) {
         })}
       </nav>
 
-      <div className="mt-5 rounded-lg border border-green-100 bg-green-50/50 p-5 text-center lg:text-left">
+      <div className="profile-mobile-hidden-support mt-5 rounded-lg border border-green-100 bg-green-50/50 p-5 text-center lg:text-left">
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-upchar-green shadow-sm lg:mx-0">
           <Icon name="Headphones" className="h-7 w-7" />
         </span>

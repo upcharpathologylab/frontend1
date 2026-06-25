@@ -186,6 +186,10 @@
     display: none;
   }
 
+  .profile-mobile-hidden-support {
+    display: none;
+  }
+
   .mobile-header-cart-action {
     position: relative;
     display: inline-flex;
