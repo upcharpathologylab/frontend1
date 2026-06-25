@@ -261,6 +261,15 @@
     box-shadow: none;
   }
 
+  .profile-mobile-hero > .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    min-width: 0;
+    overflow: visible;
+  }
+
   .profile-mobile-actions {
     position: absolute;
     right: 0.875rem;
@@ -365,6 +374,11 @@
     min-width: 0;
     overflow: visible;
     white-space: nowrap;
+  }
+
+  .profile-mobile-info {
+    min-width: 0;
+    overflow: visible;
   }
 
   .profile-mobile-info svg {

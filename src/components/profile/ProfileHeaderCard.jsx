@@ -140,11 +140,11 @@ function ProfileHeaderCard({ profile, onProfileImageUpload, onProfileImageError,
                 Member since {profile.memberSince}
               </p>
             </div>
-            <button type="button" onClick={onEdit} className="profile-mobile-edit hidden">
-              <Pencil className="h-4 w-4" />
-              Edit Profile
-            </button>
           </div>
+          <button type="button" onClick={onEdit} className="profile-mobile-edit hidden">
+            <Pencil className="h-4 w-4" />
+            Edit Profile
+          </button>
         </div>
 
         <div className="profile-mobile-stats grid gap-3 sm:grid-cols-2 xl:self-center">
