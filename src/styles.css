@@ -1989,14 +1989,7 @@
   }
 
   .profile-mobile-camera {
-    right: -0.28rem;
-    bottom: 0.25rem;
-    z-index: 2;
-    width: 1.8rem;
-    height: 1.8rem;
-    border-width: 0.18rem;
-    background: #ffffff;
-    box-shadow: 0 6px 14px rgba(7, 23, 68, 0.14);
+    display: none;
   }
 
   .profile-mobile-camera svg {
@@ -2069,8 +2062,8 @@
   }
 
   .profile-mobile-edit {
+    display: none;
     position: relative;
-    display: inline-flex;
     flex: 0 0 auto;
     align-self: center;
     width: auto;
@@ -3027,6 +3020,7 @@
   }
 
   .profile-mobile-camera {
+    display: none;
     right: -0.24rem;
     bottom: 0.2rem;
     width: 1.65rem;
@@ -3047,6 +3041,7 @@
   }
 
   .profile-mobile-edit {
+    display: none;
     position: relative;
     flex: 0 0 auto;
     height: 1.9rem;
