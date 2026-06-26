@@ -1040,6 +1040,7 @@
     padding: 0 !important;
   }
 
+  .account-layout-reports main > section,
   .account-layout-reports .container-page {
     width: 100% !important;
     max-width: none !important;
@@ -1070,14 +1071,25 @@
   .mobile-reports-summary,
   .mobile-reports-body,
   .mobile-reports-panel,
+  .mobile-reports-filters,
+  .mobile-reports-list,
   .mobile-reports-empty,
+  .mobile-reports-empty > div,
   .mobile-reports-body > aside,
-  .mobile-reports-body > aside > section {
+  .mobile-reports-body > aside > section,
+  .account-layout-reports .rounded-lg,
+  .account-layout-reports .border-blue-100,
+  .account-layout-reports .border-green-100 {
     width: 100% !important;
     max-width: 100% !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
     box-sizing: border-box !important;
+  }
+
+  .account-layout-reports .mx-auto {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
 
   .mobile-reports-header {
