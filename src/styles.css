@@ -1534,11 +1534,11 @@
 
   .mobile-settings-camera {
     position: absolute;
-    right: -0.08rem;
-    bottom: 0.12rem;
+    right: -0.125rem;
+    bottom: 0.25rem;
     display: inline-flex;
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.125rem;
+    height: 1.125rem;
     align-items: center;
     justify-content: center;
     border: 1px solid #0b63ff;
@@ -1549,8 +1549,8 @@
   }
 
   .mobile-settings-camera svg {
-    width: 0.72rem;
-    height: 0.72rem;
+    width: 0.56rem;
+    height: 0.56rem;
   }
 
   .mobile-settings-profile-copy {
