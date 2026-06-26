@@ -509,6 +509,7 @@
 
   .account-layout-family .account-layout-content {
     display: grid !important;
+    justify-items: center;
     gap: 0.9rem;
     width: 100% !important;
     max-width: none !important;
@@ -516,6 +517,13 @@
     padding: 0 0.75rem 0.75rem !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
+  }
+
+  .account-layout-family .account-layout-content > * {
+    width: min(100%, 46rem);
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
   }
 
   .mobile-family-header {
@@ -784,6 +792,7 @@
 
   .account-layout-bookings .account-layout-content {
     display: grid !important;
+    justify-items: center;
     gap: 0.75rem;
     width: 100% !important;
     max-width: none !important;
@@ -800,10 +809,10 @@
   .mobile-bookings-empty,
   .mobile-bookings-pagination,
   .mobile-bookings-cta {
-    width: 100% !important;
+    width: min(100%, 46rem) !important;
     max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     box-sizing: border-box !important;
   }
 
@@ -1083,6 +1092,7 @@
 
   .account-layout-reports .account-layout-content {
     display: grid !important;
+    justify-items: center;
     gap: 0.75rem;
     width: 100% !important;
     max-width: none !important;
@@ -1105,16 +1115,16 @@
   .account-layout-reports .rounded-lg,
   .account-layout-reports .border-blue-100,
   .account-layout-reports .border-green-100 {
-    width: 100% !important;
+    width: min(100%, 46rem) !important;
     max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     box-sizing: border-box !important;
   }
 
   .account-layout-reports .mx-auto {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
   .mobile-reports-header {
@@ -4805,6 +4815,25 @@ footer li,
 @media (min-width: 769px) {
   .mobile-home-shell {
     display: none !important;
+  }
+
+  .account-layout-family .account-layout-content,
+  .account-layout-bookings .account-layout-content,
+  .account-layout-reports .account-layout-content {
+    width: 100%;
+    max-width: 980px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .account-layout-family .account-layout-content > *,
+  .account-layout-bookings .account-layout-content > *,
+  .account-layout-reports .account-layout-content > * {
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
   }
 }
 
