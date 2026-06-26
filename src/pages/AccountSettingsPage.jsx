@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { LogOut, ShieldCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, ChevronRight, LogOut, Pencil, ShieldCheck } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import AccountLayout from "../components/account/AccountLayout.jsx";
 import AccountToast from "../components/account/AccountToast.jsx";
 import ChangePassword from "../components/account/settings/ChangePassword.jsx";
@@ -44,6 +44,20 @@ const emptyProfile = {
   lastLogin: ""
 };
 
+const mobileAccountRows = [
+  { title: "Profile Information", subtitle: "View and update your personal information", icon: "UserRound", action: "edit" },
+  { title: "Change Password", subtitle: "Update your account password", icon: "LockKeyhole" },
+  { title: "Two-Factor Authentication", subtitle: "Add an extra layer of security", icon: "ShieldCheck", badge: "Inactive" },
+  { title: "Language Preference", subtitle: "Choose your preferred language", icon: "Search", value: "English" },
+  { title: "Dark Mode", subtitle: "Customize your app appearance", icon: "Palette", toggle: true },
+  { title: "Delete Account", subtitle: "Permanently delete your account", icon: "CircleX", danger: true }
+];
+
+const mobileSecurityRows = [
+  { title: "Login Activity", subtitle: "See your recent account activity", icon: "RotateCcw" },
+  { title: "Manage Devices", subtitle: "Manage devices connected to your account", icon: "Smartphone" }
+];
+
 const initialsFromProfile = (profile) =>
   profile.avatarInitials ||
   String(profile.fullName || "")
@@ -80,6 +94,34 @@ function SecurityBanner({ profile }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function MobileSettingsRow({ row, onAction }) {
+  return (
+    <button
+      type="button"
+      className={`mobile-settings-row ${row.danger ? "is-danger" : ""}`}
+      onClick={() => onAction(row)}
+    >
+      <span className="mobile-settings-row-icon">
+        <Icon name={row.icon} className="h-5 w-5" />
+      </span>
+      <span className="mobile-settings-row-copy">
+        <span>{row.title}</span>
+        <small>{row.subtitle}</small>
+      </span>
+      {row.toggle ? (
+        <span className="mobile-settings-toggle" aria-hidden="true">
+          <span />
+        </span>
+      ) : row.badge ? (
+        <span className="mobile-settings-badge">{row.badge}</span>
+      ) : row.value ? (
+        <span className="mobile-settings-value">{row.value}</span>
+      ) : null}
+      {!row.toggle ? <ChevronRight className="mobile-settings-chevron h-5 w-5" /> : null}
+    </button>
   );
 }
 
@@ -148,6 +190,14 @@ function AccountSettingsPage() {
     }
   };
 
+  const handleMobileSettingsAction = (row) => {
+    if (row.action === "edit") {
+      setProfileModalOpen(true);
+      return;
+    }
+    showToast(`${row.title} selected.`);
+  };
+
   const profileConnectedAccounts = connectedAccounts.map((account) =>
     account.provider === "Google" ? { ...account, email: profile.email || "" } : account
   );
@@ -165,70 +215,134 @@ function AccountSettingsPage() {
         </button>
       }
     >
-      <SecurityBanner profile={profile} />
-
-      <div className="grid gap-5 xl:grid-cols-2">
-        <ProfileInformation profile={profile} onEdit={() => setProfileModalOpen(true)} />
-        <ChangePassword onSubmit={handlePasswordSubmit} />
-      </div>
-
-      <div className="grid gap-5 xl:grid-cols-2">
-        <SecuritySettings onAction={(title) => showToast(`${title} selected.`)} />
-        <Preferences onAction={(title) => showToast(`${title} selected.`)} />
-      </div>
-
-      <section className="rounded-lg border border-green-100 bg-green-50/40 p-5 shadow-sm lg:p-6">
-        <h2 className="text-lg font-black text-upchar-green">Quick Actions</h2>
-        <p className="mt-1 text-sm font-semibold text-navy-700">Useful actions to manage your account</p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {quickSettings.map((item) => (
-            <button
-              type="button"
-              className={`flex items-center gap-3 rounded-md border p-4 text-left transition hover:-translate-y-0.5 ${toneClasses[item.tone]}`}
-              key={item.title}
-              onClick={() => showToast(`${item.title} selected.`)}
-            >
-              <Icon name={item.icon} className="h-8 w-8" />
-              <span>
-                <span className="block text-sm font-black">{item.title}</span>
-                <span className="mt-1 block text-xs font-semibold text-navy-700">{item.subtitle}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-black text-navy-900">Connected Accounts</h2>
-            <p className="mt-1 text-sm font-semibold text-navy-600">Manage third-party accounts connected with your profile</p>
+      <div className="mobile-settings-shell">
+        <section className="mobile-settings-hero">
+          <div className="mobile-settings-topbar">
+            <Link to="/my-account" aria-label="Back to profile">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <div>
+              <h1>Account Settings</h1>
+              <p>Manage your account preferences and security</p>
+            </div>
           </div>
-          <button type="button" className="rounded-md border border-blue-100 px-4 py-2 text-sm font-black text-upchar-blue hover:bg-blue-50">
-            Manage All
-          </button>
-        </div>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          {profileConnectedAccounts.map((account) => (
-            <div className="rounded-lg border border-blue-100 p-4" key={account.provider}>
-              <div className="flex items-center gap-3">
-                <span className={`flex h-11 w-11 items-center justify-center rounded-full text-lg font-black ${toneClasses[account.color] || toneClasses.blue}`}>
-                  {account.provider.slice(0, 1)}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-black text-navy-900">{account.provider}</h3>
-                  <p className="truncate text-xs font-semibold text-navy-600">{account.email}</p>
-                </div>
-              </div>
-              <button type="button" className="mt-4 h-9 w-full rounded-md border border-blue-100 text-sm font-black text-upchar-blue hover:bg-blue-50">
-                {account.status}
+
+          <div className="mobile-settings-profile-card">
+            <div className="mobile-settings-profile-main">
+              <span className="mobile-settings-avatar">{initialsFromProfile(profile) || "U"}</span>
+              <span className="mobile-settings-profile-copy">
+                <strong>{profile.fullName || "User"}</strong>
+                <small>{profile.email || ""}</small>
+                {(profile.verified ?? true) ? <span className="mobile-settings-verified">Verified</span> : null}
+              </span>
+              <button type="button" className="mobile-settings-edit" onClick={() => setProfileModalOpen(true)} aria-label="Edit profile">
+                <Pencil className="h-4 w-4" />
               </button>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="mobile-settings-profile-meta">
+              <div>
+                <Icon name="Phone" className="h-5 w-5" />
+                <span>
+                  <small>Phone Number</small>
+                  <strong>{profile.phone || "Not added"}</strong>
+                </span>
+              </div>
+              <div>
+                <Icon name="CalendarDays" className="h-5 w-5" />
+                <span>
+                  <small>Member Since</small>
+                  <strong>{profile.memberSince || "Not available"}</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <TrustStrip />
+        <section className="mobile-settings-section">
+          <h2>Account Settings</h2>
+          <div className="mobile-settings-list">
+            {mobileAccountRows.map((row) => (
+              <MobileSettingsRow row={row} onAction={handleMobileSettingsAction} key={row.title} />
+            ))}
+          </div>
+        </section>
+
+        <section className="mobile-settings-section">
+          <h2>Security & Activity</h2>
+          <div className="mobile-settings-list">
+            {mobileSecurityRows.map((row) => (
+              <MobileSettingsRow row={row} onAction={handleMobileSettingsAction} key={row.title} />
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div className="desktop-settings-content">
+        <SecurityBanner profile={profile} />
+
+        <div className="grid gap-5 xl:grid-cols-2">
+          <ProfileInformation profile={profile} onEdit={() => setProfileModalOpen(true)} />
+          <ChangePassword onSubmit={handlePasswordSubmit} />
+        </div>
+
+        <div className="grid gap-5 xl:grid-cols-2">
+          <SecuritySettings onAction={(title) => showToast(`${title} selected.`)} />
+          <Preferences onAction={(title) => showToast(`${title} selected.`)} />
+        </div>
+
+        <section className="rounded-lg border border-green-100 bg-green-50/40 p-5 shadow-sm lg:p-6">
+          <h2 className="text-lg font-black text-upchar-green">Quick Actions</h2>
+          <p className="mt-1 text-sm font-semibold text-navy-700">Useful actions to manage your account</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {quickSettings.map((item) => (
+              <button
+                type="button"
+                className={`flex items-center gap-3 rounded-md border p-4 text-left transition hover:-translate-y-0.5 ${toneClasses[item.tone]}`}
+                key={item.title}
+                onClick={() => showToast(`${item.title} selected.`)}
+              >
+                <Icon name={item.icon} className="h-8 w-8" />
+                <span>
+                  <span className="block text-sm font-black">{item.title}</span>
+                  <span className="mt-1 block text-xs font-semibold text-navy-700">{item.subtitle}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-blue-100 bg-white p-5 shadow-sm lg:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-black text-navy-900">Connected Accounts</h2>
+              <p className="mt-1 text-sm font-semibold text-navy-600">Manage third-party accounts connected with your profile</p>
+            </div>
+            <button type="button" className="rounded-md border border-blue-100 px-4 py-2 text-sm font-black text-upchar-blue hover:bg-blue-50">
+              Manage All
+            </button>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {profileConnectedAccounts.map((account) => (
+              <div className="rounded-lg border border-blue-100 p-4" key={account.provider}>
+                <div className="flex items-center gap-3">
+                  <span className={`flex h-11 w-11 items-center justify-center rounded-full text-lg font-black ${toneClasses[account.color] || toneClasses.blue}`}>
+                    {account.provider.slice(0, 1)}
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-black text-navy-900">{account.provider}</h3>
+                    <p className="truncate text-xs font-semibold text-navy-600">{account.email}</p>
+                  </div>
+                </div>
+                <button type="button" className="mt-4 h-9 w-full rounded-md border border-blue-100 text-sm font-black text-upchar-blue hover:bg-blue-50">
+                  {account.status}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <TrustStrip />
+      </div>
       {profileModalOpen ? (
         <EditProfileModal profile={profile} onClose={() => setProfileModalOpen(false)} onSave={handleProfileSave} />
       ) : null}

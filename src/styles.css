@@ -150,6 +150,10 @@
   display: none;
 }
 
+.mobile-settings-shell {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   html,
   body,
@@ -1384,6 +1388,352 @@
   .account-layout-reports .account-layout-content > section:last-of-type .block.text-xs {
     font-size: 0.48rem;
     line-height: 1.15;
+  }
+
+  .account-layout-settings {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    background: #f7fbff;
+  }
+
+  .account-layout-settings > header,
+  .account-layout-settings footer,
+  .account-layout-settings .account-layout-heading,
+  .account-layout-settings .account-layout-sidebar,
+  .account-layout-settings .desktop-settings-content {
+    display: none !important;
+  }
+
+  .account-layout-settings main,
+  .account-layout-settings main > section,
+  .account-layout-settings .container-page,
+  .account-layout-settings .account-layout-grid {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .account-layout-settings .account-layout-grid {
+    display: block !important;
+  }
+
+  .account-layout-settings .account-layout-content {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .mobile-settings-shell {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: #f7fbff;
+    color: #071744;
+  }
+
+  .mobile-settings-hero {
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0b63ff 0%, #0755d8 55%, #0644b5 100%);
+    padding: 0.75rem 0.625rem 1rem;
+    color: #ffffff;
+  }
+
+  .mobile-settings-topbar {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: start;
+  }
+
+  .mobile-settings-topbar a {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+  }
+
+  .mobile-settings-topbar h1 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 1000;
+    line-height: 1.15;
+  }
+
+  .mobile-settings-topbar p {
+    margin-top: 0.25rem;
+    color: #dbeafe;
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .mobile-settings-profile-card {
+    display: grid;
+    gap: 0.95rem;
+    margin-top: 0.8rem;
+    border-radius: 0.55rem;
+    background: #ffffff;
+    padding: 1rem;
+    color: #071744;
+    box-shadow: 0 12px 26px rgba(7, 23, 68, 0.14);
+  }
+
+  .mobile-settings-profile-main {
+    display: grid;
+    grid-template-columns: 3.7rem minmax(0, 1fr) 2.55rem;
+    gap: 0.8rem;
+    align-items: center;
+  }
+
+  .mobile-settings-avatar {
+    display: inline-flex;
+    width: 3.7rem;
+    height: 3.7rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #eaf2ff;
+    color: #0b63ff;
+    font-size: 1.35rem;
+    font-weight: 1000;
+  }
+
+  .mobile-settings-profile-copy {
+    min-width: 0;
+  }
+
+  .mobile-settings-profile-copy strong,
+  .mobile-settings-profile-copy small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-settings-profile-copy strong {
+    font-size: 1.05rem;
+    font-weight: 1000;
+    line-height: 1.15;
+  }
+
+  .mobile-settings-profile-copy small {
+    margin-top: 0.25rem;
+    color: #52617b;
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .mobile-settings-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.38rem;
+    border-radius: 999px;
+    background: #eaf2ff;
+    padding: 0.22rem 0.48rem;
+    color: #0b63ff;
+    font-size: 0.66rem;
+    font-weight: 1000;
+  }
+
+  .mobile-settings-verified::after {
+    content: "\2713";
+    display: inline-flex;
+    width: 0.85rem;
+    height: 0.85rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.55rem;
+  }
+
+  .mobile-settings-edit {
+    display: inline-flex;
+    width: 2.45rem;
+    height: 2.45rem;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    background: #edf5ff;
+    color: #0b63ff;
+  }
+
+  .mobile-settings-profile-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid #e5edf7;
+    padding-top: 0.9rem;
+  }
+
+  .mobile-settings-profile-meta > div {
+    display: grid;
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .mobile-settings-profile-meta > div + div {
+    border-left: 1px solid #e5edf7;
+    padding-left: 0.75rem;
+  }
+
+  .mobile-settings-profile-meta svg {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.55rem;
+    background: #edf5ff;
+    padding: 0.42rem;
+    color: #0b63ff;
+  }
+
+  .mobile-settings-profile-meta small,
+  .mobile-settings-profile-meta strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-settings-profile-meta small {
+    color: #64748b;
+    font-size: 0.58rem;
+    font-weight: 800;
+  }
+
+  .mobile-settings-profile-meta strong {
+    margin-top: 0.2rem;
+    font-size: 0.72rem;
+    font-weight: 1000;
+  }
+
+  .mobile-settings-section {
+    padding: 0.75rem 0.625rem 0;
+  }
+
+  .mobile-settings-section h2 {
+    margin: 0 0 0.55rem;
+    color: #071744;
+    font-size: 0.92rem;
+    font-weight: 1000;
+    line-height: 1.2;
+  }
+
+  .mobile-settings-list {
+    overflow: hidden;
+    border: 1px solid #e2ebf6;
+    border-radius: 0.55rem;
+    background: #ffffff;
+    box-shadow: 0 8px 22px rgba(7, 23, 68, 0.06);
+  }
+
+  .mobile-settings-row {
+    display: grid;
+    grid-template-columns: 2.45rem minmax(0, 1fr) auto auto;
+    gap: 0.65rem;
+    align-items: center;
+    width: 100%;
+    min-height: 4rem;
+    border: 0;
+    border-bottom: 1px solid #e9eff8;
+    background: #ffffff;
+    padding: 0.75rem;
+    text-align: left;
+  }
+
+  .mobile-settings-row:last-child {
+    border-bottom: 0;
+  }
+
+  .mobile-settings-row-icon {
+    display: inline-flex;
+    width: 2.25rem;
+    height: 2.25rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.55rem;
+    background: #edf5ff;
+    color: #0b63ff;
+  }
+
+  .mobile-settings-row.is-danger .mobile-settings-row-icon {
+    background: #fff0f0;
+    color: #ef3340;
+  }
+
+  .mobile-settings-row-copy {
+    min-width: 0;
+  }
+
+  .mobile-settings-row-copy span,
+  .mobile-settings-row-copy small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-settings-row-copy span {
+    color: #071744;
+    font-size: 0.78rem;
+    font-weight: 1000;
+  }
+
+  .mobile-settings-row-copy small {
+    margin-top: 0.2rem;
+    color: #52617b;
+    font-size: 0.66rem;
+    font-weight: 700;
+  }
+
+  .mobile-settings-badge,
+  .mobile-settings-value {
+    border-radius: 0.45rem;
+    background: #edf5ff;
+    padding: 0.28rem 0.48rem;
+    color: #0b63ff;
+    font-size: 0.64rem;
+    font-weight: 1000;
+    white-space: nowrap;
+  }
+
+  .mobile-settings-toggle {
+    display: inline-flex;
+    width: 2.25rem;
+    height: 1.35rem;
+    align-items: center;
+    border-radius: 999px;
+    background: #d6dce8;
+    padding: 0.15rem;
+  }
+
+  .mobile-settings-toggle span {
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(7, 23, 68, 0.16);
+  }
+
+  .mobile-settings-chevron {
+    color: #52617b;
   }
 
   .profile-mobile-page {
