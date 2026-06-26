@@ -173,6 +173,12 @@ function AccountSettingsPage() {
     window.setTimeout(() => navigate("/"), 700);
   };
 
+  const mobileLogout = () => {
+    clearAuthSession();
+    showToast("Logged out successfully");
+    window.setTimeout(() => navigate("/?auth=signin"), 700);
+  };
+
   const saveSessionProfile = (savedProfile) => {
     const currentUser = getStoredUser();
     if (!currentUser) return;
@@ -373,6 +379,13 @@ function AccountSettingsPage() {
               <MobileSettingsRow row={row} onAction={handleMobileSettingsAction} key={row.title} />
             ))}
           </div>
+        </section>
+
+        <section className="mobile-settings-section mobile-settings-logout-section">
+          <button type="button" className="mobile-settings-logout" onClick={mobileLogout}>
+            <LogOut className="h-5 w-5" />
+            Logout
+          </button>
         </section>
       </div>
 

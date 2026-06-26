@@ -1788,6 +1788,26 @@
     color: #52617b;
   }
 
+  .mobile-settings-logout-section {
+    padding-bottom: 1rem;
+  }
+
+  .mobile-settings-logout {
+    display: inline-flex;
+    width: 100%;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid #fecdd3;
+    border-radius: 0.75rem;
+    background: #fff5f5;
+    color: #ef3340;
+    font-size: 0.95rem;
+    font-weight: 1000;
+    box-shadow: 0 8px 18px rgba(239, 51, 64, 0.08);
+  }
+
   .mobile-settings-modal {
     position: fixed;
     inset: 0;
