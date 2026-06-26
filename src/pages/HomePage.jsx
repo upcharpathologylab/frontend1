@@ -763,9 +763,17 @@ function HomePage() {
 
         {mobileMenuOpen && (
           <nav className="mobile-home-menu">
-            {["Home", "About Us", "Packages", "Tests", "Contact Us"].map((label) => (
-              <Link key={label} to={label === "Home" ? "/" : `/${label.toLowerCase().replace(/\s+/g, "-")}`} onClick={() => setMobileMenuOpen(false)}>
-                {label}
+            {[
+              { label: "Home", href: "/" },
+              { label: "About Us", href: "/about-us" },
+              { label: "Packages", href: "/packages" },
+              { label: "Tests", href: "/tests" },
+              { label: "Contact Us", href: "/contact-us" },
+              { label: "Govt. Panel", href: "/#booking" },
+              { label: "Partnerships", href: "/#booking" }
+            ].map((item) => (
+              <Link key={item.label} to={item.href} onClick={() => setMobileMenuOpen(false)}>
+                {item.label}
               </Link>
             ))}
           </nav>
