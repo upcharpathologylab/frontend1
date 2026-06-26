@@ -51,7 +51,8 @@ export const adminContentPages = [
   { slug: "faqs", title: "FAQs", url: "/faqs", status: "Published", updatedAt: "Not updated", editUrl: "/admin/content-pages/faqs", previewUrl: "/" },
   { slug: "privacy-policy", title: "Privacy Policy", url: "/privacy-policy", status: "Published", updatedAt: "Not updated", editUrl: "/admin/content-pages/privacy-policy", previewUrl: "/" },
   { slug: "terms-conditions", title: "Terms & Conditions", url: "/terms-conditions", status: "Published", updatedAt: "Not updated", editUrl: "/admin/content-pages/terms-conditions", previewUrl: "/" },
-  { slug: "refund-policy", title: "Refund Policy", url: "/refund-policy", status: "Published", updatedAt: "Not updated", editUrl: "/admin/content-pages/refund-policy", previewUrl: "/" }
+  { slug: "refund-policy", title: "Refund Policy", url: "/refund-policy", status: "Published", updatedAt: "Not updated", editUrl: "/admin/content-pages/refund-policy", previewUrl: "/" },
+  { slug: "data-deletion-policy", title: "Data Deletion Policy", url: "/data-deletion-policy", status: "Published", updatedAt: "Not updated", editUrl: "/admin/content-pages/data-deletion-policy", previewUrl: "/data-deletion-policy" }
 ];
 
 const commonPageSections = [
@@ -78,6 +79,11 @@ export const policyPageDefaults = {
     title: "Refund Policy",
     description:
       "This Refund Policy explains how refunds are handled for bookings made through Upchar Pathology.\n\nA refund may be considered if a booking is cancelled before sample collection, if payment was deducted but the booking was not confirmed, if a duplicate payment was made, or if the requested service could not be fulfilled by our partner network.\n\nRefunds are generally not applicable after sample collection has been completed, after a test has been processed by the lab, or where incorrect information was provided by the customer and the service could not be completed for that reason.\n\nApproved refunds will be processed to the original payment method where possible. The time taken for the amount to reflect depends on the bank, card issuer, wallet, UPI provider, or payment gateway and may vary.\n\nIf you believe you are eligible for a refund, please contact our support team with your booking details, payment reference, registered mobile number, and reason for the request. Our team will review the request and share an update after checking booking and payment records.\n\nFor failed payments where money is deducted, the amount is usually reversed automatically by the payment provider. If it is not reversed within the expected banking timeline, please contact support with the transaction details.\n\nUpchar Pathology reserves the right to approve or decline refund requests based on booking status, service progress, partner lab confirmation, and applicable operational policies."
+  },
+  "data-deletion-policy": {
+    title: "Data Deletion Policy",
+    description:
+      "This Data Deletion Policy explains how users can request deletion of personal information held by Upchar Pathology.\n\nTo request deletion of your data, please email upcharpathologylab@gmail.com or call 8882753539 using the registered phone number or email address linked with your account. Please use the email subject line: Data Deletion Request.\n\nYour request should include your full name, registered mobile number, registered email address if available, and any relevant booking ID so our team can verify and process the request securely.\n\nWe aim to process verified data deletion requests within 7 working days. We may contact you for additional verification before deleting account or health-related information.\n\nData that may be deleted includes account details, booking details, uploaded prescription data, uploaded report data, and other personal information where deletion is legally allowed and operationally possible.\n\nSome records may be retained where required for payment, invoice, legal, tax, accounting, audit, dispute resolution, fraud prevention, or regulatory compliance purposes. This may include payment records, invoice details, transaction references, and compliance logs.\n\nOnce deletion is completed, the deleted information may not be recoverable. If you have an active booking or pending service request, deletion may affect our ability to provide that service.\n\nFor any questions about this policy or the status of your request, contact Upchar Pathology at upcharpathologylab@gmail.com or 8882753539."
   }
 };
 
@@ -343,7 +349,8 @@ export const pageSectionDefinitions = {
   faqs: commonPageSections,
   "privacy-policy": policyPageSections("privacy-policy"),
   "terms-conditions": policyPageSections("terms-conditions"),
-  "refund-policy": policyPageSections("refund-policy")
+  "refund-policy": policyPageSections("refund-policy"),
+  "data-deletion-policy": policyPageSections("data-deletion-policy")
 };
 
 export const homePageSections = pageSectionDefinitions.home.map((section) => section.label);

@@ -9,6 +9,7 @@ import { fallbackHomeData } from "../data/homeData.js";
 const pageTitles = {
   "privacy-policy": "Privacy Policy",
   "refund-policy": "Refund Policy",
+  "data-deletion-policy": "Data Deletion Policy",
   "terms-conditions": "Terms & Conditions"
 };
 

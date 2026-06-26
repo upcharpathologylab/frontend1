@@ -137,6 +137,7 @@ function App() {
         <Route path="/terms-conditions" element={<PolicyPage />} />
         <Route path="/privacy-policy" element={<PolicyPage />} />
         <Route path="/refund-policy" element={<PolicyPage />} />
+        <Route path="/data-deletion-policy" element={<PolicyPage />} />
         <Route path="/tests" element={<TestsPage />} />
         <Route path="/tests/:slug" element={<TestsPage />} />
       </Routes>

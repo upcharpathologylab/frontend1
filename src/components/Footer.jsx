@@ -20,7 +20,8 @@ const footerRoutes = {
   FAQs: "/faqs",
   "Terms & Conditions": "/terms-conditions",
   "Privacy Policy": "/privacy-policy",
-  "Refund Policy": "/refund-policy"
+  "Refund Policy": "/refund-policy",
+  "Data Deletion Policy": "/data-deletion-policy"
 };
 
 const allTestsLinks = [
@@ -189,7 +190,7 @@ function Footer({ data, serviceLocation: providedServiceLocation }) {
         <div className="mt-12 flex flex-col gap-5 border-t border-blue-300/20 pt-8 text-sm font-semibold text-blue-100 lg:flex-row lg:items-center lg:justify-between">
           <p>© 2024 Upchar Pathology. All rights reserved.</p>
           <div className="flex flex-wrap gap-5">
-            {["About Us", "Terms & Conditions", "Privacy Policy", "Refund Policy"].map((link) => (
+            {["About Us", "Terms & Conditions", "Privacy Policy", "Refund Policy", "Data Deletion Policy"].map((link) => (
               <Link to={footerRoutes[link]} className="cursor-pointer hover:text-upchar-green" key={link}>
                 {link}
               </Link>
