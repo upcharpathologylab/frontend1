@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, ChevronRight, LogOut, Pencil, ShieldCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, Camera, ChevronRight, LogOut, Pencil, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AccountLayout from "../components/account/AccountLayout.jsx";
 import AccountToast from "../components/account/AccountToast.jsx";
@@ -12,7 +12,7 @@ import StatusBadge from "../components/account/StatusBadge.jsx";
 import TrustStrip from "../components/account/TrustStrip.jsx";
 import Icon from "../components/Icon.jsx";
 import EditProfileModal from "../components/profile/EditProfileModal.jsx";
-import { assetUrl, changeUserPassword, getUserProfile, updateUserProfile } from "../api/api.js";
+import { assetUrl, changeUserPassword, getUserProfile, updateUserProfile, updateUserProfileImage } from "../api/api.js";
 import { AUTH_USER_KEY, clearAuthSession, getStoredUser } from "../components/auth/authStorage.js";
 import { connectedAccounts } from "../data/accountPagesData.js";
 import useAccountResource from "../hooks/useAccountResource.js";
@@ -142,10 +142,12 @@ function MobileChangePasswordPanel({ onClose, onSubmit }) {
 
 function AccountSettingsPage() {
   const navigate = useNavigate();
+  const imageInputRef = useRef(null);
   const [toast, setToast] = useState("");
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [passwordPanelOpen, setPasswordPanelOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const storedUser = getStoredUser();
   const { data: profile, setData: setProfile } = useAccountResource(
     getUserProfile,
@@ -188,6 +190,36 @@ function AccountSettingsPage() {
       showToast("Profile updated successfully.");
     } catch (error) {
       showToast(error?.response?.data?.message || "Could not update profile.");
+    }
+  };
+
+  const handleProfileImageChange = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      showToast("Only JPG, JPEG, PNG and WEBP images are allowed.");
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      showToast("Profile image must be 4 MB or smaller.");
+      return;
+    }
+
+    setImageUploading(true);
+    try {
+      const result = await updateUserProfileImage(file);
+      setProfile((current) => ({ ...current, profileImage: result.profileImage }));
+      const stored = getStoredUser();
+      if (stored) {
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify({ ...stored, profileImage: result.profileImage }));
+        window.dispatchEvent(new Event("upchar-auth-user-updated"));
+      }
+      showToast("Profile photo updated successfully.");
+    } catch (error) {
+      showToast(error?.response?.data?.message || "Could not upload profile photo.");
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -271,12 +303,30 @@ function AccountSettingsPage() {
 
           <div className="mobile-settings-profile-card">
             <div className="mobile-settings-profile-main">
-              <span className="mobile-settings-avatar">
-                {profile.profileImage ? (
-                  <img src={assetUrl(profile.profileImage)} alt={`${profile.fullName || "User"} profile`} />
-                ) : (
-                  initialsFromProfile(profile) || "U"
-                )}
+              <span className="mobile-settings-avatar-wrap">
+                <span className="mobile-settings-avatar">
+                  {profile.profileImage ? (
+                    <img src={assetUrl(profile.profileImage)} alt={`${profile.fullName || "User"} profile`} />
+                  ) : (
+                    initialsFromProfile(profile) || String(profile.fullName || "U").slice(0, 1).toUpperCase()
+                  )}
+                </span>
+                <button
+                  type="button"
+                  className="mobile-settings-camera"
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={imageUploading}
+                  aria-label="Change profile photo"
+                >
+                  <Camera className="h-4 w-4" />
+                </button>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleProfileImageChange}
+                />
               </span>
               <span className="mobile-settings-profile-copy">
                 <strong>{profile.fullName || "User"}</strong>
@@ -285,6 +335,7 @@ function AccountSettingsPage() {
               </span>
               <button type="button" className="mobile-settings-edit" onClick={() => setProfileModalOpen(true)} aria-label="Edit profile">
                 <Pencil className="h-4 w-4" />
+                <span>Edit</span>
               </button>
             </div>
             <div className="mobile-settings-profile-meta">
