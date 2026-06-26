@@ -15,6 +15,42 @@ import useAccountResource from "../hooks/useAccountResource.js";
 
 const reportTabs = ["All Reports", "Available", "Report Pending"];
 
+const cleanFilePart = (value, fallback = "report") =>
+  String(value || fallback)
+    .trim()
+    .replace(/[^a-z0-9_-]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase() || fallback;
+
+const reportDownloadName = (row = {}) => {
+  const bookingId = cleanFilePart(row.bookingId || row.id || row.title);
+  return `report-${bookingId}.pdf`;
+};
+
+const downloadWithAnchor = (url, filename) => {
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.rel = "noopener noreferrer";
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};
+
+const downloadReportFile = async (url, filename) => {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Report download failed.");
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    downloadWithAnchor(blobUrl, filename);
+    window.setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+  } catch {
+    downloadWithAnchor(url, filename);
+  }
+};
+
 function AccountReportsPage() {
   const [activeTab, setActiveTab] = useState(reportTabs[0]);
   const [query, setQuery] = useState("");
@@ -52,13 +88,20 @@ function AccountReportsPage() {
     ];
   }, [reports]);
 
-  const handleReportAction = (row) => {
+  const handleReportAction = async (row) => {
     if (!row.reportFile) {
       showToast("Report pending.");
       return;
     }
-    window.open(assetUrl(row.reportFile), "_blank", "noopener,noreferrer");
-    showToast(`Report opened for ${row.title}.`);
+    const reportUrl = assetUrl(row.reportFile);
+    if (!reportUrl) {
+      showToast("Report file is not available.");
+      return;
+    }
+
+    window.open(reportUrl, "_blank", "noopener,noreferrer");
+    await downloadReportFile(reportUrl, reportDownloadName(row));
+    showToast(`Report opened and download started for ${row.title}.`);
   };
 
   return (
