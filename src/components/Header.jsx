@@ -19,6 +19,7 @@ const navItems = [
   { label: "Contact Us", href: "/contact-us" }
 ];
 const headerContainer = "mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8";
+const AUTH_RETURN_TO_KEY = "upchar_auth_return_to";
 
 function Dropdown({ label, items, align = "left" }) {
   return (
@@ -80,9 +81,11 @@ function Header({ data, showMobileCartAction = false }) {
     setAuthModalOpen(false);
     setToast(message);
     window.setTimeout(() => setToast(""), 3000);
-    if (authReturnToRef.current) {
-      const returnTo = authReturnToRef.current;
+    const storedReturnTo = window.sessionStorage.getItem(AUTH_RETURN_TO_KEY) || "";
+    if (authReturnToRef.current || storedReturnTo) {
+      const returnTo = authReturnToRef.current || storedReturnTo;
       authReturnToRef.current = "";
+      window.sessionStorage.removeItem(AUTH_RETURN_TO_KEY);
       navigate(returnTo, { replace: true });
     }
   };
@@ -132,6 +135,9 @@ function Header({ data, showMobileCartAction = false }) {
     if (params.get("auth") !== "signin") return;
 
     authReturnToRef.current = params.get("returnTo") || "";
+    if (authReturnToRef.current) {
+      window.sessionStorage.setItem(AUTH_RETURN_TO_KEY, authReturnToRef.current);
+    }
     setAuthMode("signin");
     setAuthModalOpen(true);
     setOpen(false);

@@ -27,6 +27,7 @@ import { saveCheckoutData } from "../utils/checkout.js";
 
 const firstImage = (value) => (Array.isArray(value) ? value.find(Boolean) : "");
 const isMobileCartView = () => typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+const AUTH_RETURN_TO_KEY = "upchar_auth_return_to";
 
 const cartImageValue = (item = {}) => {
   if (item.type === "package") {
@@ -157,7 +158,10 @@ function CartPage() {
     showToast(`${item.name} added to cart.`);
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = (event) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+
     if (!items.length) {
       showToast("Your cart is empty. Add a package or test first.");
       return;
@@ -176,6 +180,9 @@ function CartPage() {
     saveCheckoutData(items, checkoutSummary, appliedCoupon);
     const paymentPath = "/payment?pay=1";
     if (!getStoredUser()) {
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(AUTH_RETURN_TO_KEY, paymentPath);
+      }
       navigate(`/?auth=signin&returnTo=${encodeURIComponent(paymentPath)}`);
       return;
     }
