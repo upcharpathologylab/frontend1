@@ -1411,6 +1411,120 @@
     line-height: 1.15;
   }
 
+  .account-layout-family,
+  .account-layout-bookings,
+  .account-layout-reports {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .mobile-family-header h1,
+  .mobile-bookings-header h1,
+  .mobile-reports-header h1 {
+    font-size: clamp(1.28rem, 5.4vw, 1.55rem);
+    line-height: 1.18;
+  }
+
+  .mobile-family-summary article span span:first-child,
+  .mobile-bookings-summary article span span:first-child,
+  .mobile-reports-summary article span span:first-child {
+    font-size: clamp(0.68rem, 2.7vw, 0.78rem);
+    line-height: 1.22;
+  }
+
+  .mobile-family-summary article span span:last-child,
+  .mobile-bookings-summary article span span:last-child,
+  .mobile-reports-summary article span span:last-child {
+    font-size: clamp(1.28rem, 5vw, 1.55rem);
+    line-height: 1.08;
+  }
+
+  .mobile-family-tabs button,
+  .mobile-bookings-panel button,
+  .mobile-reports-panel [role="tablist"] button,
+  .mobile-reports-filters label,
+  .mobile-reports-filters button {
+    font-size: clamp(0.82rem, 3vw, 0.92rem);
+    line-height: 1.25;
+  }
+
+  .mobile-reports-filters input {
+    font-size: clamp(0.84rem, 3vw, 0.95rem);
+    line-height: 1.35;
+  }
+
+  .mobile-bookings-summary h2,
+  .mobile-bookings-cta h2,
+  .mobile-reports-body > aside h2,
+  .mobile-family-list article h2,
+  .mobile-family-empty h2,
+  .mobile-family-info h2 {
+    font-size: clamp(1.08rem, 4.1vw, 1.28rem);
+    line-height: 1.25;
+  }
+
+  .mobile-family-list article span[class*="text-sm"],
+  .mobile-family-list article span[class*="text-xs"],
+  .mobile-family-list article button,
+  .mobile-bookings-list article span,
+  .mobile-bookings-list article p,
+  .mobile-bookings-list article button,
+  .mobile-bookings-list article [class*="text-sm"],
+  .mobile-bookings-list article [class*="text-xs"],
+  .mobile-reports-list .divide-y > div > span,
+  .mobile-reports-list .divide-y > div button,
+  .mobile-reports-list .divide-y > div [class*="text-sm"],
+  .mobile-reports-list .divide-y > div [class*="text-xs"] {
+    font-size: clamp(0.86rem, 3.2vw, 0.98rem);
+    line-height: 1.42;
+  }
+
+  .mobile-bookings-list article h3,
+  .mobile-reports-list .divide-y > div .block.text-sm {
+    font-size: clamp(1rem, 3.8vw, 1.16rem);
+    line-height: 1.28;
+  }
+
+  .mobile-bookings-list article .text-2xl {
+    font-size: clamp(1.35rem, 5vw, 1.65rem);
+    line-height: 1.12;
+  }
+
+  .mobile-bookings-empty > div h2,
+  .mobile-reports-empty > div h2 {
+    font-size: clamp(1.25rem, 4.9vw, 1.55rem);
+    line-height: 1.22;
+  }
+
+  .mobile-bookings-empty > div p,
+  .mobile-reports-empty > div p,
+  .mobile-family-empty p,
+  .mobile-family-info p,
+  .mobile-bookings-cta p,
+  .mobile-reports-body > aside > section:first-child .block.text-sm,
+  .mobile-reports-body > aside > section:first-child .block.text-xs,
+  .mobile-reports-body > aside > section:nth-child(2) p,
+  .mobile-reports-body > aside > section:nth-child(3) p,
+  .account-layout-family .account-layout-content > section:last-of-type .block.text-sm,
+  .account-layout-family .account-layout-content > section:last-of-type .block.text-xs,
+  .account-layout-bookings .account-layout-content > section:nth-last-of-type(2) .block.text-sm,
+  .account-layout-bookings .account-layout-content > section:nth-last-of-type(2) .block.text-xs,
+  .account-layout-bookings .account-layout-content > section:last-of-type .block.text-sm,
+  .account-layout-bookings .account-layout-content > section:last-of-type .block.text-xs,
+  .account-layout-reports .account-layout-content > section:last-of-type .block.text-sm,
+  .account-layout-reports .account-layout-content > section:last-of-type .block.text-xs {
+    font-size: clamp(0.82rem, 3vw, 0.95rem);
+    line-height: 1.45;
+  }
+
+  .mobile-bookings-empty-cta,
+  .mobile-bookings-cta a,
+  .mobile-reports-body > aside > section:nth-child(2) .inline-flex,
+  .mobile-reports-body > aside > section:nth-child(3) button {
+    font-size: clamp(0.82rem, 3vw, 0.94rem);
+    line-height: 1.2;
+  }
+
   .account-layout-settings {
     width: 100% !important;
     max-width: none !important;
