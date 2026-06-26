@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { createBookingLead, createRazorpayOrder, getUserAddresses, getUserProfile, verifyRazorpayPayment } from "../api/api.js";
+import AccountToast from "../components/account/AccountToast.jsx";
 import CardPaymentForm from "../components/payment/CardPaymentForm.jsx";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
@@ -16,6 +17,7 @@ import {
   createBookingData,
   customerDetails,
   getCheckoutData,
+  savePaymentFailureData,
   saveBookingData,
   saveCheckoutData
 } from "../utils/checkout.js";
@@ -77,6 +79,15 @@ function getPaymentErrorMessage(error) {
   return error?.response?.data?.message || error?.message || "Unable to process payment. Please try again.";
 }
 
+function validateBookingCustomer(customer = {}) {
+  if (!String(customer.name || "").trim()) return "Please update your profile name before payment.";
+  if (String(customer.phone || "").replace(/\D/g, "").slice(-10).length !== 10) return "Please update a valid phone number before payment.";
+  if (!String(customer.email || "").trim()) return "Please update your email before payment.";
+  if (!String(customer.address || "").trim()) return "Please add a primary address before payment.";
+  if (!String(customer.pincode || "").trim()) return "Please add pincode in your address before payment.";
+  return "";
+}
+
 function openBookingWhatsApp(booking, summary) {
   const whatsappNumber = String(fallbackHomeData.siteSettings.whatsappNumber || "8882753539").replace(/\D/g, "");
   const itemLines = booking.items.map((item) => `- ${item.name || item.title} x ${item.quantity}`).join("\n");
@@ -123,6 +134,7 @@ function PaymentPage() {
   const [selectedMethod, setSelectedMethod] = useState("razorpay");
   const [loading, setLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+  const [toast, setToast] = useState("");
   const [checkoutData, setCheckoutData] = useState({ items: [], summary: null });
   const [customer, setCustomer] = useState(() => getCheckoutCustomer());
 
@@ -151,7 +163,19 @@ function PaymentPage() {
     setLoading(true);
     setPaymentError("");
 
+    const showToast = (message) => {
+      setToast(message);
+      window.setTimeout(() => setToast(""), 2600);
+    };
+
+    let failureCustomer = customer;
+
     try {
+      const payableAmount = Number(checkoutData.summary?.totalPayable || 0);
+      if (!Number.isFinite(payableAmount) || payableAmount <= 0) {
+        throw new Error("A valid payable amount is required.");
+      }
+
       const [serverProfile, serverAddresses] = await Promise.all([
         getUserProfile(),
         getUserAddresses().catch(() => [])
@@ -168,6 +192,10 @@ function PaymentPage() {
         pincode: primaryAddress?.pincode || "",
         city: primaryAddress?.city || ""
       };
+      failureCustomer = bookingCustomer;
+      const validationMessage = validateBookingCustomer(bookingCustomer);
+      if (validationMessage) throw new Error(validationMessage);
+
       const selectedTestOrPackage = checkoutData.items.map((item) => `${item.name || item.title} x ${item.quantity}`).join(", ");
       const bookingPayload = {
         fullName: bookingCustomer.name,
@@ -194,6 +222,7 @@ function PaymentPage() {
 
       if (selectedMethod === "razorpay") {
         const order = await createRazorpayOrder({
+          amount: payableAmount,
           currency: "INR",
           receipt: `upchar_${Date.now()}`,
           notes: {
@@ -287,7 +316,19 @@ function PaymentPage() {
       navigate("/booking-confirmation");
       return;
     } catch (error) {
-      setPaymentError(getPaymentErrorMessage(error));
+      const errorMessage = getPaymentErrorMessage(error);
+      setPaymentError(errorMessage);
+      showToast(errorMessage);
+      if (error.failed || error.cancelled) {
+        savePaymentFailureData(createBookingData({
+          items: checkoutData.items,
+          summary: checkoutData.summary,
+          status: "failed",
+          paymentMode: "Razorpay Online Payment",
+          failureReason: errorMessage,
+          customer: failureCustomer
+        }));
+      }
       setLoading(false);
       return;
     }
@@ -375,6 +416,7 @@ function PaymentPage() {
         </section>
       </main>
       <Footer data={fallbackHomeData} />
+      <AccountToast message={toast} />
     </div>
   );
 }
