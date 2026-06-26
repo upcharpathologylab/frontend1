@@ -6,6 +6,7 @@ import { storeAuthSession } from "./authStorage.js";
 const initialValues = {
   fullName: "",
   password: "",
+  confirmPassword: "",
   phone: "",
   otp: Array(6).fill("")
 };
@@ -18,6 +19,8 @@ function validateBase(values) {
   if (!values.fullName.trim()) errors.fullName = "Full name is required.";
   if (!values.password) errors.password = "Password is required.";
   else if (values.password.length < 8) errors.password = "Password must be at least 8 characters.";
+  if (!values.confirmPassword) errors.confirmPassword = "Confirm password is required.";
+  else if (values.password && values.confirmPassword !== values.password) errors.confirmPassword = "Password and Confirm Password do not match.";
   if (!/^[6-9]\d{9}$/.test(cleanPhone(values.phone))) errors.phone = "Enter a valid Indian phone number.";
   return errors;
 }
@@ -39,26 +42,26 @@ function TextField({ label, name, value, onChange, placeholder, error, icon: Ico
   );
 }
 
-function PasswordField({ value, onChange, error }) {
+function PasswordField({ label = "Password", name = "password", value, onChange, error, placeholder = "Create password", hint }) {
   const [visible, setVisible] = useState(false);
   return (
     <label>
-      <FieldLabel>Password</FieldLabel>
+      <FieldLabel>{label}</FieldLabel>
       <div className={`auth-field ${error ? "border-red-300" : "border-blue-100"}`}>
         <LockKeyhole className="h-4 w-4 shrink-0 text-navy-600 md:h-5 md:w-5" />
         <input
-          name="password"
+          name={name}
           type={visible ? "text" : "password"}
           value={value}
           onChange={onChange}
-          placeholder="Create password"
+          placeholder={placeholder}
           className="auth-input"
         />
         <button type="button" onClick={() => setVisible((current) => !current)} className="grid h-8 w-8 place-items-center text-navy-700" aria-label="Toggle password">
           {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
-      {error ? <p className="mt-0.5 text-[11px] font-bold text-red-600">{error}</p> : <p className="mt-0.5 text-[11px] font-bold text-navy-500">Password must be at least 8 characters long</p>}
+      {error ? <p className="mt-0.5 text-[11px] font-bold text-red-600">{error}</p> : hint ? <p className="mt-0.5 text-[11px] font-bold text-navy-500">{hint}</p> : null}
     </label>
   );
 }
@@ -194,7 +197,15 @@ function SignUpForm({ onModeChange, onSuccess }) {
       <h2 className="signup-mobile-title">Sign Up</h2>
       <div className="grid gap-2 md:gap-2.5">
         <TextField label="Full Name" name="fullName" value={values.fullName} onChange={update} placeholder="Enter your full name" error={errors.fullName} icon={UserRound} />
-        <PasswordField value={values.password} onChange={update} error={errors.password} />
+        <PasswordField value={values.password} onChange={update} error={errors.password} hint="Password must be at least 8 characters long" />
+        <PasswordField
+          label="Confirm Password"
+          name="confirmPassword"
+          value={values.confirmPassword}
+          onChange={update}
+          error={errors.confirmPassword}
+          placeholder="Confirm password"
+        />
 
         <div className="signup-phone-row">
           <PhoneField value={values.phone} onChange={update} error={errors.phone} />
