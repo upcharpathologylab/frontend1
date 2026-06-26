@@ -238,6 +238,16 @@ function BookingMapSection({ data, content, modal = false, tests = [], packages 
                     placeholder="Search Tests or Packages"
                     className="w-full px-3 py-4 text-sm font-bold text-navy-900 outline-none"
                   />
+                  {query ? (
+                    <button
+                      type="button"
+                      className="mr-3 flex h-10 w-10 shrink-0 items-center justify-center self-center rounded-full text-navy-600 transition hover:bg-blue-50 hover:text-navy-950"
+                      onClick={() => setQuery("")}
+                      aria-label="Clear search"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  ) : null}
                 </div>
                 {query.trim() && (
                   <div className="absolute inset-x-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-lg bg-white p-2 text-navy-900 shadow-soft">
