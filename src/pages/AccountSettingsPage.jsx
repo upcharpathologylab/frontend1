@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AccountLayout from "../components/account/AccountLayout.jsx";
 import AccountToast from "../components/account/AccountToast.jsx";
 import ChangePassword from "../components/account/settings/ChangePassword.jsx";
+import ConfirmDeleteModal from "../components/account/ConfirmDeleteModal.jsx";
 import Preferences from "../components/account/settings/Preferences.jsx";
 import ProfileInformation from "../components/account/settings/ProfileInformation.jsx";
 import SecuritySettings from "../components/account/settings/SecuritySettings.jsx";
@@ -11,7 +12,7 @@ import StatusBadge from "../components/account/StatusBadge.jsx";
 import TrustStrip from "../components/account/TrustStrip.jsx";
 import Icon from "../components/Icon.jsx";
 import EditProfileModal from "../components/profile/EditProfileModal.jsx";
-import { changeUserPassword, getUserProfile, updateUserProfile } from "../api/api.js";
+import { assetUrl, changeUserPassword, getUserProfile, updateUserProfile } from "../api/api.js";
 import { AUTH_USER_KEY, clearAuthSession, getStoredUser } from "../components/auth/authStorage.js";
 import { connectedAccounts } from "../data/accountPagesData.js";
 import useAccountResource from "../hooks/useAccountResource.js";
@@ -46,16 +47,16 @@ const emptyProfile = {
 
 const mobileAccountRows = [
   { title: "Profile Information", subtitle: "View and update your personal information", icon: "UserRound", action: "edit" },
-  { title: "Change Password", subtitle: "Update your account password", icon: "LockKeyhole" },
-  { title: "Two-Factor Authentication", subtitle: "Add an extra layer of security", icon: "ShieldCheck", badge: "Inactive" },
-  { title: "Language Preference", subtitle: "Choose your preferred language", icon: "Search", value: "English" },
-  { title: "Dark Mode", subtitle: "Customize your app appearance", icon: "Palette", toggle: true },
-  { title: "Delete Account", subtitle: "Permanently delete your account", icon: "CircleX", danger: true }
+  { title: "Change Password", subtitle: "Update your account password", icon: "LockKeyhole", action: "password" },
+  { title: "Two-Factor Authentication", subtitle: "Add an extra layer of security", icon: "ShieldCheck", badge: "Inactive", action: "2fa" },
+  { title: "Language Preference", subtitle: "Choose your preferred language", icon: "Search", action: "language" },
+  { title: "Dark Mode", subtitle: "Customize your app appearance", icon: "Palette", toggle: true, action: "theme" },
+  { title: "Delete Account", subtitle: "Permanently delete your account", icon: "CircleX", danger: true, action: "delete" }
 ];
 
 const mobileSecurityRows = [
-  { title: "Login Activity", subtitle: "See your recent account activity", icon: "RotateCcw" },
-  { title: "Manage Devices", subtitle: "Manage devices connected to your account", icon: "Smartphone" }
+  { title: "Login Activity", subtitle: "See your recent account activity", icon: "RotateCcw", action: "login-activity" },
+  { title: "Manage Devices", subtitle: "Manage devices connected to your account", icon: "Smartphone", action: "devices" }
 ];
 
 const initialsFromProfile = (profile) =>
@@ -125,10 +126,26 @@ function MobileSettingsRow({ row, onAction }) {
   );
 }
 
+function MobileChangePasswordPanel({ onClose, onSubmit }) {
+  return (
+    <div className="mobile-settings-modal" role="dialog" aria-modal="true" aria-label="Change password">
+      <div className="mobile-settings-modal-card">
+        <div className="mobile-settings-modal-head">
+          <h2>Change Password</h2>
+          <button type="button" onClick={onClose}>Close</button>
+        </div>
+        <ChangePassword onSubmit={onSubmit} />
+      </div>
+    </div>
+  );
+}
+
 function AccountSettingsPage() {
   const navigate = useNavigate();
   const [toast, setToast] = useState("");
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [passwordPanelOpen, setPasswordPanelOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const storedUser = getStoredUser();
   const { data: profile, setData: setProfile } = useAccountResource(
     getUserProfile,
@@ -183,6 +200,7 @@ function AccountSettingsPage() {
     try {
       await changeUserPassword(values);
       showToast("Password updated successfully.");
+      setPasswordPanelOpen(false);
       return true;
     } catch (error) {
       showToast(error?.response?.data?.message || "Could not update password.");
@@ -195,8 +213,32 @@ function AccountSettingsPage() {
       setProfileModalOpen(true);
       return;
     }
-    showToast(`${row.title} selected.`);
+    if (row.action === "password") {
+      setPasswordPanelOpen(true);
+      return;
+    }
+    if (row.action === "delete") {
+      setDeleteConfirmOpen(true);
+      return;
+    }
+    if (row.action === "login-activity") {
+      showToast(profile.lastLogin ? `Last login: ${profile.lastLogin}` : "Login activity is not available yet.");
+      return;
+    }
+    const fallbackMessages = {
+      "2fa": "Two-factor authentication is not available yet.",
+      language: "Language preference saving is not available yet.",
+      theme: "Dark mode preference is not available yet.",
+      devices: "Device management is not available yet."
+    };
+    showToast(fallbackMessages[row.action] || "This setting is not available yet.");
   };
+
+  const mobileRows = mobileAccountRows.map((row) => (
+    row.action === "language"
+      ? { ...row, value: profile.language || profile.preferredLanguage || "Not set" }
+      : row
+  ));
 
   const profileConnectedAccounts = connectedAccounts.map((account) =>
     account.provider === "Google" ? { ...account, email: profile.email || "" } : account
@@ -229,11 +271,17 @@ function AccountSettingsPage() {
 
           <div className="mobile-settings-profile-card">
             <div className="mobile-settings-profile-main">
-              <span className="mobile-settings-avatar">{initialsFromProfile(profile) || "U"}</span>
+              <span className="mobile-settings-avatar">
+                {profile.profileImage ? (
+                  <img src={assetUrl(profile.profileImage)} alt={`${profile.fullName || "User"} profile`} />
+                ) : (
+                  initialsFromProfile(profile) || "U"
+                )}
+              </span>
               <span className="mobile-settings-profile-copy">
                 <strong>{profile.fullName || "User"}</strong>
                 <small>{profile.email || ""}</small>
-                {(profile.verified ?? true) ? <span className="mobile-settings-verified">Verified</span> : null}
+                {profile.verified ? <span className="mobile-settings-verified">Verified</span> : null}
               </span>
               <button type="button" className="mobile-settings-edit" onClick={() => setProfileModalOpen(true)} aria-label="Edit profile">
                 <Pencil className="h-4 w-4" />
@@ -261,7 +309,7 @@ function AccountSettingsPage() {
         <section className="mobile-settings-section">
           <h2>Account Settings</h2>
           <div className="mobile-settings-list">
-            {mobileAccountRows.map((row) => (
+            {mobileRows.map((row) => (
               <MobileSettingsRow row={row} onAction={handleMobileSettingsAction} key={row.title} />
             ))}
           </div>
@@ -345,6 +393,20 @@ function AccountSettingsPage() {
       </div>
       {profileModalOpen ? (
         <EditProfileModal profile={profile} onClose={() => setProfileModalOpen(false)} onSave={handleProfileSave} />
+      ) : null}
+      {passwordPanelOpen ? (
+        <MobileChangePasswordPanel onClose={() => setPasswordPanelOpen(false)} onSubmit={handlePasswordSubmit} />
+      ) : null}
+      {deleteConfirmOpen ? (
+        <ConfirmDeleteModal
+          title="Delete Account"
+          message="Account deletion is not available from this app yet because no delete account API is configured."
+          onCancel={() => setDeleteConfirmOpen(false)}
+          onConfirm={() => {
+            setDeleteConfirmOpen(false);
+            showToast("Delete account API is not available yet.");
+          }}
+        />
       ) : null}
       <AccountToast message={toast} />
     </AccountLayout>
