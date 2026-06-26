@@ -178,7 +178,7 @@ function CartPage() {
       : summary;
 
     saveCheckoutData(items, checkoutSummary, appliedCoupon);
-    const paymentPath = "/payment?pay=1";
+    const paymentPath = isMobileCartView() ? "/payment" : "/payment?pay=1";
     if (!getStoredUser()) {
       if (typeof window !== "undefined") {
         window.sessionStorage.setItem(AUTH_RETURN_TO_KEY, paymentPath);
