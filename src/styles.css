@@ -1061,17 +1061,31 @@
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
-    padding: 0 0.75rem 0.75rem !important;
+    padding: 0 0.625rem 0.625rem !important;
     box-sizing: border-box !important;
     overflow-x: hidden !important;
+  }
+
+  .account-layout-reports .account-layout-content > *,
+  .mobile-reports-summary,
+  .mobile-reports-body,
+  .mobile-reports-panel,
+  .mobile-reports-empty,
+  .mobile-reports-body > aside,
+  .mobile-reports-body > aside > section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .mobile-reports-header {
     display: grid;
     grid-template-columns: 2.5rem 1fr 2.5rem;
     align-items: center;
-    margin: 0 -0.75rem !important;
-    padding: 0.9rem 0.75rem 0.8rem !important;
+    margin: 0 -0.625rem !important;
+    padding: 0.9rem 0.625rem 0.8rem !important;
     border-bottom: 1px solid #dfe8f4;
     background: #ffffff;
   }
@@ -1161,8 +1175,14 @@
   }
 
   .mobile-reports-filters {
-    grid-template-columns: minmax(0, 1fr) minmax(8.2rem, 0.82fr) minmax(4.8rem, 0.38fr);
-    gap: 0.45rem;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.65rem;
+  }
+
+  .mobile-reports-filters label {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .mobile-reports-filters label,
@@ -1172,12 +1192,12 @@
     gap: 0.35rem;
     border-radius: 0.35rem;
     padding: 0 0.55rem;
-    font-size: 0.58rem;
+    font-size: 0.68rem;
     white-space: nowrap;
   }
 
   .mobile-reports-filters input {
-    font-size: 0.58rem;
+    font-size: 0.7rem;
   }
 
   .mobile-reports-filters svg {
@@ -1229,10 +1249,10 @@
   }
 
   .mobile-reports-body > aside {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.82fr);
+    display: flex !important;
+    flex-direction: column !important;
     gap: 0.75rem;
-    align-items: start;
+    align-items: stretch;
   }
 
   .mobile-reports-body > aside > section {
@@ -1241,7 +1261,7 @@
   }
 
   .mobile-reports-body > aside > section:first-child {
-    grid-row: span 2;
+    grid-row: auto;
   }
 
   .mobile-reports-body > aside h2 {
