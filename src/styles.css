@@ -204,12 +204,21 @@
 }
 
 @media (max-width: 768px) {
+  html,
+  body,
+  #root {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+  }
+
   .account-layout-addresses {
-    width: 100%;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
     background: #f8fbff;
   }
 
@@ -221,39 +230,44 @@
   }
 
   .account-layout-addresses main {
-    margin: 0;
-    padding-top: 0;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .account-layout-addresses .container-page {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    padding: 0;
-    padding-top: 0;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .account-layout-addresses .account-layout-grid {
-    display: block;
-    margin: 0;
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
   }
 
   .account-layout-addresses .account-layout-content {
-    display: grid;
+    display: grid !important;
     gap: 0.85rem;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0 0.75rem 1rem;
-    overflow-x: hidden;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 0.75rem 0.75rem !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .mobile-address-header {
     display: grid;
     grid-template-columns: 2.5rem 1fr 2.5rem;
     align-items: center;
-    margin: 0 -0.75rem;
-    padding: 0.95rem 0.75rem 0.85rem;
+    margin: 0 -0.75rem !important;
+    padding: 0.9rem 0.75rem 0.8rem !important;
     border-bottom: 1px solid #dfe8f4;
     background: #ffffff;
     box-shadow: 0 6px 18px rgba(7, 23, 68, 0.05);
