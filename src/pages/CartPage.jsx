@@ -23,7 +23,7 @@ import {
   setCartItems,
   updateCartItemQuantity
 } from "../utils/cart.js";
-import { saveCheckoutData } from "../utils/checkout.js";
+import { buildOrderSummary, saveCheckoutData } from "../utils/checkout.js";
 
 const firstImage = (value) => (Array.isArray(value) ? value.find(Boolean) : "");
 const AUTH_RETURN_TO_KEY = "upchar_auth_return_to";
@@ -89,6 +89,8 @@ function CartPage() {
     }
 
     const handleCartChange = () => {
+      setCouponDiscount(0);
+      setAppliedCoupon(null);
       setItems(getCartItems().map(normalizeCartItem));
     };
 
@@ -101,27 +103,7 @@ function CartPage() {
     };
   }, []);
 
-  const summary = useMemo(() => {
-    const finalSubtotal = items.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 1), 0);
-    const oldSubtotal = items.reduce((total, item) => total + Number(item.oldPrice || item.price || 0) * Number(item.quantity || 1), 0);
-    const discount = Math.max(0, oldSubtotal - finalSubtotal);
-    const safeCouponDiscount = Math.min(Number(couponDiscount || 0), finalSubtotal);
-    const totalPayable = Math.max(0, finalSubtotal - safeCouponDiscount);
-    const itemCount = items.reduce((total, item) => total + Number(item.quantity || 1), 0);
-
-    return {
-      subtotal: oldSubtotal,
-      oldSubtotal,
-      discount,
-      couponDiscount: safeCouponDiscount,
-      totalPayable,
-      totalSavings: discount + safeCouponDiscount,
-      mobileCouponDiscount: safeCouponDiscount,
-      mobileTotalPayable: totalPayable,
-      mobileTotalSavings: discount + safeCouponDiscount,
-      itemCount
-    };
-  }, [couponDiscount, items]);
+  const summary = useMemo(() => buildOrderSummary(items, couponDiscount), [couponDiscount, items]);
 
   const showToast = (message) => {
     setToast(message);
@@ -132,13 +114,20 @@ function CartPage() {
     setItems(getCartItems().map(normalizeCartItem));
   };
 
+  const resetCoupon = () => {
+    setCouponDiscount(0);
+    setAppliedCoupon(null);
+  };
+
   const handleQuantityChange = (item, quantity) => {
     updateCartItemQuantity(item.id, item.type, quantity);
+    resetCoupon();
     refreshItems();
   };
 
   const handleRemove = (item) => {
     removeCartItem(item.id, item.type);
+    resetCoupon();
     refreshItems();
     showToast(`${item.name} removed from cart.`);
   };
@@ -165,6 +154,7 @@ function CartPage() {
       return;
     }
     addCartItem({ ...item, quantity: 1 });
+    resetCoupon();
     refreshItems();
     showToast(`${item.name} added to cart.`);
   };
