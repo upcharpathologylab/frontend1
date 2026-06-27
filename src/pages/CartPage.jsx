@@ -26,7 +26,6 @@ import {
 import { saveCheckoutData } from "../utils/checkout.js";
 
 const firstImage = (value) => (Array.isArray(value) ? value.find(Boolean) : "");
-const isMobileCartView = () => typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
 const AUTH_RETURN_TO_KEY = "upchar_auth_return_to";
 
 const cartImageValue = (item = {}) => {
@@ -40,7 +39,7 @@ const cartImageValue = (item = {}) => {
 };
 
 const normalizeCartItem = (item) => {
-  const price = item.price ?? item.discountedPrice ?? item.finalPrice ?? 0;
+  const price = item.finalPrice ?? item.discountedPrice ?? item.price ?? 0;
   const oldPrice = item.oldPrice ?? item.originalPrice ?? item.price ?? price;
 
   return {
@@ -89,26 +88,23 @@ function CartPage() {
   }, []);
 
   const summary = useMemo(() => {
-    const subtotal = items.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 1), 0);
+    const finalSubtotal = items.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 1), 0);
     const oldSubtotal = items.reduce((total, item) => total + Number(item.oldPrice || item.price || 0) * Number(item.quantity || 1), 0);
-    const discount = items.length ? Math.floor(subtotal * 0.5) : 0;
-    const safeCouponDiscount = Math.min(couponDiscount, Math.max(0, subtotal - discount));
-    const totalPayable = Math.max(0, subtotal - discount - safeCouponDiscount);
-    const mobileSavings = Math.max(0, oldSubtotal - subtotal);
-    const mobileCouponDiscount = Math.min(couponDiscount, subtotal);
-    const mobileTotalPayable = Math.max(0, subtotal - mobileCouponDiscount);
+    const discount = Math.max(0, oldSubtotal - finalSubtotal);
+    const safeCouponDiscount = Math.min(Number(couponDiscount || 0), finalSubtotal);
+    const totalPayable = Math.max(0, finalSubtotal - safeCouponDiscount);
     const itemCount = items.reduce((total, item) => total + Number(item.quantity || 1), 0);
 
     return {
-      subtotal,
+      subtotal: oldSubtotal,
       oldSubtotal,
       discount,
       couponDiscount: safeCouponDiscount,
       totalPayable,
       totalSavings: discount + safeCouponDiscount,
-      mobileCouponDiscount,
-      mobileTotalPayable,
-      mobileTotalSavings: mobileSavings + mobileCouponDiscount,
+      mobileCouponDiscount: safeCouponDiscount,
+      mobileTotalPayable: totalPayable,
+      mobileTotalSavings: discount + safeCouponDiscount,
       itemCount
     };
   }, [couponDiscount, items]);
@@ -168,17 +164,7 @@ function CartPage() {
       return;
     }
 
-    const checkoutSummary = isMobileCartView()
-      ? {
-        ...summary,
-        discount: Math.max(0, summary.oldSubtotal - summary.subtotal),
-        couponDiscount: summary.mobileCouponDiscount,
-        totalPayable: summary.mobileTotalPayable,
-        totalSavings: summary.mobileTotalSavings
-      }
-      : summary;
-
-    saveCheckoutData(items, checkoutSummary, appliedCoupon);
+    saveCheckoutData(items, summary, appliedCoupon);
     const paymentPath = "/payment";
     if (!localStorage.getItem(AUTH_TOKEN_KEY) || !getStoredUser()) {
       if (typeof window !== "undefined") {

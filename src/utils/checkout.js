@@ -25,7 +25,7 @@ const writeStorageJson = (storage, key, value) => {
 const getSessionStorage = () => (typeof window === "undefined" ? null : window.sessionStorage);
 
 export const normalizeCheckoutItem = (item) => {
-  const price = item.price ?? item.discountedPrice ?? item.finalPrice ?? 0;
+  const price = item.finalPrice ?? item.discountedPrice ?? item.price ?? 0;
   const oldPrice = item.oldPrice ?? item.originalPrice ?? item.price ?? price;
 
   return {
@@ -43,23 +43,31 @@ export const normalizeCheckoutItem = (item) => {
 
 export const buildOrderSummary = (items, couponDiscount = 0) => {
   const normalizedItems = Array.isArray(items) ? items : [];
-  const subtotal = normalizedItems.reduce(
+  const finalSubtotal = normalizedItems.reduce(
     (total, item) => total + Number(item.price || 0) * Number(item.quantity || 1),
     0
   );
-  const discount = normalizedItems.length ? Math.floor(subtotal * 0.5) : 0;
+  const subtotal = normalizedItems.reduce(
+    (total, item) => total + Number(item.oldPrice || item.price || 0) * Number(item.quantity || 1),
+    0
+  );
+  const discount = Math.max(0, subtotal - finalSubtotal);
   const safeCouponDiscount = normalizedItems.length
-    ? Math.min(Number(couponDiscount || 0), Math.max(0, subtotal - discount))
+    ? Math.min(Number(couponDiscount || 0), finalSubtotal)
     : 0;
-  const totalPayable = Math.max(0, subtotal - discount - safeCouponDiscount);
+  const totalPayable = Math.max(0, finalSubtotal - safeCouponDiscount);
   const itemCount = normalizedItems.reduce((total, item) => total + Number(item.quantity || 1), 0);
 
   return {
     subtotal,
+    oldSubtotal: subtotal,
     discount,
     couponDiscount: safeCouponDiscount,
     totalPayable,
     totalSavings: discount + safeCouponDiscount,
+    mobileCouponDiscount: safeCouponDiscount,
+    mobileTotalPayable: totalPayable,
+    mobileTotalSavings: discount + safeCouponDiscount,
     itemCount
   };
 };
