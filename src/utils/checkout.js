@@ -23,6 +23,7 @@ const writeStorageJson = (storage, key, value) => {
 };
 
 const getSessionStorage = () => (typeof window === "undefined" ? null : window.sessionStorage);
+const COLLECTION_CHARGE = 200;
 
 export const normalizeCheckoutItem = (item) => {
   const price = item.finalPrice ?? item.discountedPrice ?? item.price ?? 0;
@@ -43,6 +44,7 @@ export const normalizeCheckoutItem = (item) => {
 
 export const buildOrderSummary = (items, couponDiscount = 0) => {
   const normalizedItems = Array.isArray(items) ? items : [];
+  const itemCount = normalizedItems.reduce((total, item) => total + Number(item.quantity || 1), 0);
   const finalSubtotal = normalizedItems.reduce(
     (total, item) => total + Number(item.price || 0) * Number(item.quantity || 1),
     0
@@ -51,16 +53,26 @@ export const buildOrderSummary = (items, couponDiscount = 0) => {
     (total, item) => total + Number(item.oldPrice || item.price || 0) * Number(item.quantity || 1),
     0
   );
-  const discount = Math.max(0, subtotal - finalSubtotal);
+  const includedCollectionCharge = itemCount * COLLECTION_CHARGE;
+  const collectionCharge = itemCount > 0 ? COLLECTION_CHARGE : 0;
+  const extraCollectionChargeDiscount = Math.max(0, includedCollectionCharge - collectionCharge);
+  const payableBeforeCoupon = Math.max(0, finalSubtotal - extraCollectionChargeDiscount);
+  const itemDiscount = Math.max(0, subtotal - finalSubtotal);
+  const discount = itemDiscount + extraCollectionChargeDiscount;
   const safeCouponDiscount = normalizedItems.length
-    ? Math.min(Number(couponDiscount || 0), finalSubtotal)
+    ? Math.min(Number(couponDiscount || 0), payableBeforeCoupon)
     : 0;
-  const totalPayable = Math.max(0, finalSubtotal - safeCouponDiscount);
-  const itemCount = normalizedItems.reduce((total, item) => total + Number(item.quantity || 1), 0);
+  const totalPayable = Math.max(0, payableBeforeCoupon - safeCouponDiscount);
 
   return {
     subtotal,
     oldSubtotal: subtotal,
+    rawFinalTotal: finalSubtotal,
+    payableBeforeCoupon,
+    itemDiscount,
+    collectionCharge,
+    includedCollectionCharge,
+    extraCollectionChargeDiscount,
     discount,
     couponDiscount: safeCouponDiscount,
     totalPayable,

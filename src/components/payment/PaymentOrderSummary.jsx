@@ -49,6 +49,7 @@ function PaymentOrderSummary({ items, summary }) {
           <SummaryRow label={`Subtotal (${summary.itemCount} items)`} value={price(summary.subtotal)} />
           <SummaryRow label="Discount" value={`- ${price(summary.discount)}`} highlight />
           <SummaryRow label="Coupon Discount" value={`- ${price(summary.couponDiscount)}`} highlight />
+          <SummaryRow label="Collection Charge" value={price(summary.collectionCharge || 0)} />
         </div>
 
         <div className="my-6 border-t border-blue-100" />

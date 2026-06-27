@@ -20,6 +20,7 @@ function CartSummary({ summary, onCheckout }) {
         <SummaryRow label={`Subtotal (${summary.itemCount} items)`} value={price(summary.subtotal)} />
         <SummaryRow label="Discount" value={`- ${price(summary.discount)}`} highlight />
         <SummaryRow label="Coupon Discount" value={`- ${price(summary.couponDiscount)}`} highlight />
+        <SummaryRow label="Collection Charge" value={price(summary.collectionCharge || 0)} />
       </div>
 
       <div className="hidden sm:my-6 sm:block sm:border-t sm:border-blue-100" />

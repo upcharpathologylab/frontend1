@@ -133,7 +133,8 @@ function CartPage() {
   };
 
   const handleCouponApply = async () => {
-    const subtotal = items.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 1), 0);
+    const couponBaseSummary = buildOrderSummary(items, 0);
+    const subtotal = couponBaseSummary.payableBeforeCoupon;
     const normalizedCouponCode = couponCode.trim().toUpperCase();
 
     try {

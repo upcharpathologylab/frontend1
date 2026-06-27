@@ -66,6 +66,7 @@ function BookedItemsTable({ items, summary, title = "Booked Items", totalLabel =
         <SummaryRow label={`Subtotal (${summary.itemCount} items)`} value={price(summary.subtotal)} />
         <SummaryRow label="Discount" value={`- ${price(summary.discount)}`} highlight />
         <SummaryRow label="Coupon Discount" value={`- ${price(summary.couponDiscount)}`} highlight />
+        <SummaryRow label="Collection Charge" value={price(summary.collectionCharge || 0)} />
         <div className="border-t border-blue-100 pt-3">
           <SummaryRow label={totalLabel} value={price(summary.totalPayable)} highlight />
         </div>
