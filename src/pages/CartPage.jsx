@@ -135,16 +135,17 @@ function CartPage() {
 
   const handleCouponApply = async () => {
     const subtotal = items.reduce((total, item) => total + Number(item.price || 0) * Number(item.quantity || 1), 0);
+    const normalizedCouponCode = couponCode.trim().toUpperCase();
 
     try {
-      const result = await applyCouponApi({ couponCode, subtotal, items });
+      const result = await applyCouponApi({ couponCode: normalizedCouponCode, subtotal, items });
       setCouponDiscount(Number(result.discountAmount || 0));
       setAppliedCoupon(result);
       showToast(result.message || "Coupon applied successfully");
-    } catch {
+    } catch (error) {
       setCouponDiscount(0);
       setAppliedCoupon(null);
-      showToast("Invalid coupon code");
+      showToast(error?.response?.data?.message || error?.message || "Could not apply coupon");
     }
   };
 
