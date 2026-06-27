@@ -56,6 +56,20 @@ const normalizeCartItem = (item) => {
   };
 };
 
+const couponPayloadItems = (items = []) =>
+  items.map((item) => ({
+    id: item.id || item._id || "",
+    _id: item._id || item.id || "",
+    name: item.name || item.title || item.testName || item.packageName || "",
+    title: item.title || item.name || "",
+    type: item.type || item.itemType || "",
+    finalPrice: Number(item.price || 0),
+    originalPrice: Number(item.oldPrice || item.price || 0),
+    price: Number(item.price || 0),
+    oldPrice: Number(item.oldPrice || item.price || 0),
+    quantity: Number(item.quantity || 1)
+  }));
+
 function CartPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
@@ -134,7 +148,7 @@ function CartPage() {
     const normalizedCouponCode = couponCode.trim().toUpperCase();
 
     try {
-      const result = await applyCouponApi({ couponCode: normalizedCouponCode, subtotal, items });
+      const result = await applyCouponApi({ couponCode: normalizedCouponCode, subtotal, items: couponPayloadItems(items) });
       setCouponDiscount(Number(result.discountAmount || 0));
       setAppliedCoupon(result);
       showToast(result.message || "Coupon applied successfully");
