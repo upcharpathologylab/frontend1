@@ -38,8 +38,17 @@ function FamilyMemberCard({ member, menuOpen, onToggleMenu, onEdit, onDelete }) 
   const name = member.fullName || member.name;
 
   return (
-    <article className="relative rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
-      <div className="grid gap-6 xl:grid-cols-[130px_1fr_150px] xl:items-start">
+    <article className="relative rounded-lg border border-blue-100 bg-white p-6 pr-20 shadow-sm xl:pr-6">
+      <button
+        type="button"
+        onClick={() => onToggleMenu(member.id)}
+        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-md border border-blue-100 bg-white text-upchar-blue shadow-sm transition hover:bg-blue-50"
+        aria-label={`Open menu for ${name}`}
+      >
+        <Ellipsis className="h-5 w-5" />
+      </button>
+
+      <div className="grid gap-6 xl:grid-cols-[130px_1fr_120px] xl:items-start">
         <MemberAvatar member={member} />
         <div>
           <h2 className="text-2xl font-black text-navy-900">{name}</h2>
@@ -61,19 +70,11 @@ function FamilyMemberCard({ member, menuOpen, onToggleMenu, onEdit, onDelete }) 
             <Pencil className="h-4 w-4" />
             Edit
           </button>
-          <button
-            type="button"
-            onClick={() => onToggleMenu(member.id)}
-            className="flex h-11 w-11 items-center justify-center rounded-md border border-blue-100 bg-white text-upchar-blue transition hover:bg-blue-50"
-            aria-label={`Open menu for ${name}`}
-          >
-            <Ellipsis className="h-5 w-5" />
-          </button>
         </div>
       </div>
 
       {menuOpen ? (
-        <div className="absolute right-6 top-20 z-20 w-48 rounded-lg border border-blue-100 bg-white p-2 shadow-soft">
+        <div className="absolute right-4 top-16 z-20 w-48 rounded-lg border border-blue-100 bg-white p-2 shadow-soft">
           <button
             type="button"
             onClick={() => onEdit(member)}
