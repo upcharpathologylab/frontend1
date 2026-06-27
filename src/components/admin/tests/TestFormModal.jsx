@@ -25,7 +25,7 @@ const blankTest = {
 
 const badgeTypes = ["green", "blue", "red", "orange", "purple", "teal"];
 const iconOptions = ["TestTube2", "Activity", "Droplet", "Leaf", "ShieldPlus", "Sun", "BadgeCheck", "HeartPulse", "FileCheck2", "Bone"];
-const maxAdminImageSize = 300 * 1024;
+const maxCardImageSize = 10 * 1024;
 
 function Field({ children, label }) {
   return (
@@ -83,14 +83,14 @@ function TestFormModal({ categories, test, onClose, onSave }) {
       setErrors((current) => ({ ...current, testImage: "Use jpg, jpeg, png or webp" }));
       return;
     }
-    if (file.size > maxAdminImageSize) {
-      setErrors((current) => ({ ...current, testImage: "Image size must be 300KB or less." }));
+    if (file.size > maxCardImageSize) {
+      setErrors((current) => ({ ...current, testImage: "Card image size must be 10KB or less." }));
       return;
     }
 
     try {
       setUploadingImage(true);
-      const result = await uploadContentImage(file);
+      const result = await uploadContentImage(file, "card");
       update("testImage", result.imageUrl || result.url || "");
     } catch (error) {
       setErrors((current) => ({ ...current, testImage: error?.response?.data?.message || error?.message || "Image upload failed." }));

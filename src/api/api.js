@@ -243,9 +243,13 @@ export async function savePageContent(pageSlug, sections) {
   return response.data?.data || response.data;
 }
 
-export async function uploadContentImage(file) {
-  if (file?.size > 300 * 1024) {
-    throw new Error("Image size must be 300KB or less.");
+export async function uploadContentImage(file, imageKind = "card") {
+  const isHomeBanner = imageKind === "homeBanner";
+  const maxSize = isHomeBanner ? 200 * 1024 : 10 * 1024;
+  const message = isHomeBanner ? "Banner image size must be 200KB or less." : "Card image size must be 10KB or less.";
+
+  if (file?.size > maxSize) {
+    throw new Error(message);
   }
 
   const payload = new FormData();
@@ -253,9 +257,7 @@ export async function uploadContentImage(file) {
 
   const authConfig = getAuthConfig();
   try {
-    const response = await api.post("/content/images", payload, {
-      ...authConfig
-    });
+    const response = await api.post(`/content/images?imageKind=${encodeURIComponent(imageKind)}`, payload, { ...authConfig });
 
     const data = response.data?.data || response.data;
     if (data?.imageUrl) return data;

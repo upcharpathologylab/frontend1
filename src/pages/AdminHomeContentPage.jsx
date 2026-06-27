@@ -27,7 +27,7 @@ const fieldLabels = {
 };
 
 const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
-const maxAdminImageSize = 300 * 1024;
+const maxCardImageSize = 10 * 1024;
 
 function createCard(card = {}) {
   return {
@@ -225,8 +225,8 @@ function AdminHomeContentPage() {
       showToast("Only JPG, JPEG, PNG and WEBP images are allowed.");
       return;
     }
-    if (file.size > maxAdminImageSize) {
-      showToast("Image size must be 300KB or less.");
+    if (file.size > maxCardImageSize) {
+      showToast("Card image size must be 10KB or less.");
       return;
     }
 
