@@ -128,12 +128,12 @@ const bannerImageValue = (banner = {}) =>
 
 const mobileImageValue = (item = {}, type = "") => {
   if (type === "package") {
-    return imageUrl(item.image || item.packageImage || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
+    return imageUrl(item.packageImage || item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
   }
   if (type === "test") {
-    return imageUrl(item.image || item.testImage || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
+    return imageUrl(item.testImage || item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
   }
-  return imageUrl(item.image || item.imageUrl || item.thumbnail || item.bannerImage || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
+  return imageUrl(item.bannerImage || item.image || item.imageUrl || item.thumbnail || item.coverImage || item.images?.[0] || "", item.updatedAt || item.createdAt);
 };
 
 const bannerToHero = (banner, fallbackHero) => {

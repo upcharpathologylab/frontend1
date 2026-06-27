@@ -114,6 +114,15 @@ function AdminManagementFormModal({ config, item, onClose, onSave }) {
       nextValues.discount = nextValues.discountType === "Flat" ? `Rs. ${nextValues.discountValue} OFF` : `${nextValues.discountValue}% OFF`;
       nextValues.type = nextValues.type || nextValues.discountType;
     }
+    if (Object.prototype.hasOwnProperty.call(nextValues, "packageImage")) {
+      nextValues.image = nextValues.packageImage || "";
+    }
+    if (Object.prototype.hasOwnProperty.call(nextValues, "testImage")) {
+      nextValues.image = nextValues.testImage || "";
+    }
+    if (Object.prototype.hasOwnProperty.call(nextValues, "bannerImage")) {
+      nextValues.image = nextValues.bannerImage || "";
+    }
     onSave(nextValues);
   };
 

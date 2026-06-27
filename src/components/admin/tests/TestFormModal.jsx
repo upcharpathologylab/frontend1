@@ -99,7 +99,7 @@ function TestFormModal({ categories, test, onClose, onSave }) {
     if (uploadingImage) return;
     if (!validate()) return;
 
-    const image = values.testImage || values.image || "";
+    const image = values.testImage || "";
 
     onSave({
       ...values,

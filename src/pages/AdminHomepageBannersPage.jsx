@@ -104,6 +104,7 @@ function BannerForm({ item, onClose, onSave }) {
     setSaving(true);
     await onSave({
       ...values,
+      image: values.bannerImage || "",
       sortOrder: Number(values.sortOrder || 0),
       bannerDescription: values.description,
       linkUrl: values.primaryButtonUrl,
@@ -148,6 +149,11 @@ function BannerForm({ item, onClose, onSave }) {
                             {uploading ? "Uploading..." : "Upload Image"}
                             <input className="hidden" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" onChange={(event) => uploadImage(event.target.files?.[0], key)} />
                           </label>
+                          {values[key] ? (
+                            <button type="button" className="h-10 rounded-md border border-red-100 px-4 text-sm font-black text-upchar-red" onClick={() => update(key, "")}>
+                              Delete Image
+                            </button>
+                          ) : null}
                           <input className={`${inputClass} min-w-[260px] flex-1`} value={values[key] || ""} onChange={(event) => update(key, event.target.value)} placeholder="Uploaded image URL" />
                         </div>
                       </div>
