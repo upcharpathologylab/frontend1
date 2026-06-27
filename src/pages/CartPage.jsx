@@ -10,7 +10,7 @@ import RecommendedItems from "../components/cart/RecommendedItems.jsx";
 import Footer from "../components/Footer.jsx";
 import Header from "../components/Header.jsx";
 import { applyCoupon as applyCouponApi } from "../api/api.js";
-import { getStoredUser } from "../components/auth/authStorage.js";
+import { AUTH_TOKEN_KEY, getStoredUser } from "../components/auth/authStorage.js";
 import { defaultCartItems, recommendedCartItems, trustStripItems } from "../data/cartData.js";
 import { fallbackHomeData } from "../data/homeData.js";
 import {
@@ -179,11 +179,11 @@ function CartPage() {
 
     saveCheckoutData(items, checkoutSummary, appliedCoupon);
     const paymentPath = isMobileCartView() ? "/payment" : "/payment?pay=1";
-    if (!getStoredUser()) {
+    if (!localStorage.getItem(AUTH_TOKEN_KEY) || !getStoredUser()) {
       if (typeof window !== "undefined") {
         window.sessionStorage.setItem(AUTH_RETURN_TO_KEY, paymentPath);
       }
-      navigate(`/?auth=signin&returnTo=${encodeURIComponent(paymentPath)}`);
+      navigate(`/cart?auth=signin&returnTo=${encodeURIComponent(paymentPath)}`);
       return;
     }
 
