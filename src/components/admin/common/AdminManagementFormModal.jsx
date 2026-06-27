@@ -24,6 +24,11 @@ function getCalculatedValues(values, calculation) {
   };
 }
 
+function shouldShowField(field, values) {
+  if (!field.showWhen) return true;
+  return values[field.showWhen.key] === field.showWhen.value;
+}
+
 function Field({ children, error, label }) {
   return (
     <label className="block">
@@ -71,6 +76,7 @@ function AdminManagementFormModal({ config, item, onClose, onSave }) {
   const validate = () => {
     const nextErrors = {};
     config.formFields.forEach((field) => {
+      if (!shouldShowField(field, values)) return;
       if (field.required && !String(values[field.key] || "").trim()) {
         nextErrors[field.key] = "Required";
       }
@@ -115,6 +121,11 @@ function AdminManagementFormModal({ config, item, onClose, onSave }) {
         nextValues[field.key] = Number(nextValues[field.key]);
       }
     });
+    config.formFields.forEach((field) => {
+      if (!shouldShowField(field, nextValues)) {
+        nextValues[field.key] = "";
+      }
+    });
     if (nextValues.discountType && nextValues.discountValue !== undefined) {
       nextValues.discount = nextValues.discountType === "Flat" ? `Rs. ${nextValues.discountValue} OFF` : `${nextValues.discountValue}% OFF`;
       nextValues.type = nextValues.type || nextValues.discountType;
@@ -148,6 +159,8 @@ function AdminManagementFormModal({ config, item, onClose, onSave }) {
     >
       <form id="admin-management-form" className="grid gap-5 md:grid-cols-2" onSubmit={submit}>
         {config.formFields.map((field) => {
+          if (!shouldShowField(field, values)) return null;
+
           if (field.type === "textarea") {
             return (
               <Field label={field.label} error={errors[field.key]} key={field.key}>
