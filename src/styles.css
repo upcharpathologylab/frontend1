@@ -3904,9 +3904,10 @@ footer li,
   }
 
   .mobile-hero-actions button:nth-child(2) {
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.92);
+    color: #061944;
+    box-shadow: 0 6px 16px rgba(6, 25, 68, 0.18);
   }
 
   .mobile-hero-actions button svg {
