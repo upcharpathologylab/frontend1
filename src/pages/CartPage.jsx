@@ -226,7 +226,7 @@ function CartPage() {
               </section>
             </div>
 
-            <aside className="fixed inset-x-0 bottom-0 z-[90] grid gap-5 border-t border-blue-100 bg-white/95 p-3 shadow-[0_-10px_30px_rgba(15,23,42,0.12)] backdrop-blur sm:static sm:border-t-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-0 xl:self-start">
+            <aside className="fixed inset-x-0 bottom-0 z-[90] grid gap-5 border-t border-blue-100 bg-white/95 p-3 shadow-[0_-10px_30px_rgba(15,23,42,0.12)] backdrop-blur sm:sticky sm:top-36 sm:self-start sm:border-t-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-0 lg:top-40">
               <CartSummary summary={summary} onCheckout={handleCheckout} />
             </aside>
           </div>

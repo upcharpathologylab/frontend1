@@ -13,7 +13,7 @@ function SummaryRow({ label, value, highlight = false }) {
 
 function CartSummary({ summary, onCheckout }) {
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-3 shadow-sm sm:p-6 lg:sticky lg:top-32">
+    <section className="rounded-lg border border-blue-100 bg-white p-3 shadow-sm sm:p-6">
       <h2 className="hidden text-2xl font-black text-navy-900 sm:block">Order Summary</h2>
 
       <div className="hidden sm:mt-6 sm:grid sm:gap-4">
