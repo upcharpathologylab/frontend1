@@ -25,6 +25,7 @@ const blankTest = {
 
 const badgeTypes = ["green", "blue", "red", "orange", "purple", "teal"];
 const iconOptions = ["TestTube2", "Activity", "Droplet", "Leaf", "ShieldPlus", "Sun", "BadgeCheck", "HeartPulse", "FileCheck2", "Bone"];
+const maxAdminImageSize = 300 * 1024;
 
 function Field({ children, label }) {
   return (
@@ -80,6 +81,10 @@ function TestFormModal({ categories, test, onClose, onSave }) {
     if (!file) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       setErrors((current) => ({ ...current, testImage: "Use jpg, jpeg, png or webp" }));
+      return;
+    }
+    if (file.size > maxAdminImageSize) {
+      setErrors((current) => ({ ...current, testImage: "Image size must be 300KB or less." }));
       return;
     }
 

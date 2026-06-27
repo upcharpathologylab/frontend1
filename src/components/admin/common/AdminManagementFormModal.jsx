@@ -3,6 +3,7 @@ import FormModal from "../../profile/FormModal.jsx";
 import { assetUrl, uploadContentImage } from "../../../api/api.js";
 
 const inputClass = "h-12 w-full rounded-md border border-blue-100 px-4 text-sm font-semibold text-navy-900 outline-none transition placeholder:text-navy-400 focus:border-upchar-blue";
+const maxAdminImageSize = 300 * 1024;
 
 function initialValues(fields, item) {
   return fields.reduce((values, field) => {
@@ -87,6 +88,10 @@ function AdminManagementFormModal({ config, item, onClose, onSave }) {
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       setErrors((current) => ({ ...current, [key]: "Use jpg, jpeg, png or webp" }));
+      return;
+    }
+    if (file.size > maxAdminImageSize) {
+      setErrors((current) => ({ ...current, [key]: "Image size must be 300KB or less." }));
       return;
     }
 

@@ -244,6 +244,10 @@ export async function savePageContent(pageSlug, sections) {
 }
 
 export async function uploadContentImage(file) {
+  if (file?.size > 300 * 1024) {
+    throw new Error("Image size must be 300KB or less.");
+  }
+
   const payload = new FormData();
   payload.append("image", file);
 

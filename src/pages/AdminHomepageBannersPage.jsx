@@ -72,6 +72,7 @@ const fieldGroups = [
 
 const inputClass = "h-11 w-full rounded-md border border-blue-100 bg-white px-3 text-sm font-semibold text-navy-900 outline-none transition focus:border-upchar-blue";
 const textAreaClass = "min-h-24 w-full rounded-md border border-blue-100 bg-white px-3 py-3 text-sm font-semibold text-navy-900 outline-none transition focus:border-upchar-blue";
+const maxAdminImageSize = 300 * 1024;
 
 function BannerForm({ item, onClose, onSave }) {
   const [values, setValues] = useState(() => ({ ...emptyBanner, ...(item || {}) }));
@@ -83,13 +84,17 @@ function BannerForm({ item, onClose, onSave }) {
 
   const uploadImage = async (file, key = "bannerImage") => {
     if (!file) return;
+    if (file.size > maxAdminImageSize) {
+      setError("Image size must be 300KB or less.");
+      return;
+    }
     try {
       setUploading(true);
       setError("");
       const result = await uploadContentImage(file);
       update(key, result.imageUrl || result.url || "");
     } catch (uploadError) {
-      setError(uploadError?.response?.data?.message || "Image upload failed.");
+      setError(uploadError?.response?.data?.message || uploadError?.message || "Image upload failed.");
     } finally {
       setUploading(false);
     }
