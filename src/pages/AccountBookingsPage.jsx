@@ -1,17 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clock3, XCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AccountLayout from "../components/account/AccountLayout.jsx";
 import AccountToast from "../components/account/AccountToast.jsx";
 import { AccountEmptyState, AccountLoadingState, AccountSyncNotice } from "../components/account/AccountState.jsx";
 import BookingCard from "../components/account/bookings/BookingCard.jsx";
 import ConfirmDeleteModal from "../components/account/ConfirmDeleteModal.jsx";
+import FormModal from "../components/profile/FormModal.jsx";
 import QuickActions from "../components/account/QuickActions.jsx";
 import SummaryCard from "../components/account/SummaryCard.jsx";
 import TabFilterBar from "../components/account/TabFilterBar.jsx";
 import TrustStrip from "../components/account/TrustStrip.jsx";
 import UserProfileCard from "../components/account/UserProfileCard.jsx";
-import { cancelUserBooking, getUserBookings } from "../api/api.js";
+import StatusBadge from "../components/account/StatusBadge.jsx";
+import { price } from "../utils.js";
+import { cancelUserBooking, getUserBooking, getUserBookings } from "../api/api.js";
 import { getStoredUser } from "../components/auth/authStorage.js";
 
 const bookingSummaryCards = [
@@ -31,6 +34,114 @@ const activeBookingStatuses = new Set([
   "Upcoming"
 ]);
 
+const bookingStatusStages = [
+  "Pending Confirmation",
+  "Confirmed",
+  "Sample Collection Scheduled",
+  "Sample Collection Confirmed",
+  "Testing In Progress",
+  "Report Ready",
+  "Completed",
+  "Cancelled"
+];
+
+function DetailRow({ label, value }) {
+  return (
+    <div className="rounded-md border border-blue-100 bg-blue-50/30 p-3">
+      <span className="block text-xs font-black uppercase text-navy-500">{label}</span>
+      <span className="mt-1 block text-sm font-bold text-navy-900">{value || "-"}</span>
+    </div>
+  );
+}
+
+function BookingStatusTimeline({ status }) {
+  const currentStatus = status || "Pending Confirmation";
+  const currentIndex = bookingStatusStages.indexOf(currentStatus);
+  const isCancelled = currentStatus === "Cancelled";
+
+  return (
+    <section className="rounded-lg border border-blue-100 bg-white p-4">
+      <h3 className="text-base font-black text-navy-900">Booking Status Stages</h3>
+      <div className="mt-4 max-w-full overflow-x-auto">
+        <div className="flex min-w-[900px] items-start justify-between gap-3">
+          {bookingStatusStages.map((stage, index) => {
+            const isDone = !isCancelled && currentIndex >= 0 && index <= currentIndex;
+            const isLineDone = !isCancelled && currentIndex > index;
+            const isCancelledStage = isCancelled && stage === "Cancelled";
+            const circleClass = isCancelledStage
+              ? "bg-red-50 text-upchar-red ring-2 ring-upchar-red ring-offset-2"
+              : isDone
+                ? "bg-green-50 text-upchar-green ring-2 ring-upchar-green ring-offset-2"
+                : "bg-slate-100 text-navy-400";
+
+            return (
+              <div className="flex flex-1 items-start gap-3" key={stage}>
+                <article className="min-w-[108px] text-center">
+                  <span className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full ${circleClass}`}>
+                    {isCancelledStage ? <XCircle className="h-5 w-5" /> : isDone ? <CheckCircle2 className="h-5 w-5" /> : <Clock3 className="h-5 w-5" />}
+                  </span>
+                  <h4 className={`mt-2 text-xs font-black leading-5 ${isCancelledStage ? "text-upchar-red" : isDone ? "text-upchar-green" : "text-navy-700"}`}>{stage}</h4>
+                </article>
+                {index < bookingStatusStages.length - 1 ? <span className={`mt-5 h-1 flex-1 rounded-full ${isLineDone ? "bg-upchar-green" : "bg-slate-200"}`} /> : null}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BookingDetailsModal({ booking, loading, onClose }) {
+  const customer = booking?.customer || {};
+  const summary = booking?.summary || {};
+  const items = Array.isArray(booking?.items) ? booking.items : [];
+  const status = booking?.currentStatus || booking?.bookingStatus || booking?.status || "Pending Confirmation";
+
+  return (
+    <FormModal title={booking?.bookingId ? `Booking ${booking.bookingId}` : "Booking Details"} onClose={onClose}>
+      {loading ? (
+        <AccountLoadingState />
+      ) : booking ? (
+        <div className="grid gap-5">
+          <BookingStatusTimeline status={status} />
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-100 bg-blue-50/40 p-4">
+            <span>
+              <span className="block text-xs font-black text-navy-500">Current Status</span>
+              <span className="mt-1 block text-lg font-black text-navy-900">{status}</span>
+            </span>
+            <StatusBadge label={status} />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <DetailRow label="Booking ID" value={booking.bookingId} />
+            <DetailRow label="Patient Name" value={customer.name} />
+            <DetailRow label="Phone Number" value={customer.phone} />
+            <DetailRow label="Quantity" value={summary.itemCount || items.reduce((total, item) => total + Number(item.quantity || 1), 0)} />
+            <DetailRow label="Booking Date/Time" value={booking.bookingDate} />
+            <DetailRow label="Collection Type" value={customer.collectionType} />
+            <DetailRow label="Address" value={customer.address} />
+            <DetailRow label="Payment Method" value={booking.paymentMode || booking.paymentMethod} />
+            <DetailRow label="Total Amount" value={price(summary.totalPayable || 0)} />
+          </div>
+          <section className="rounded-lg border border-blue-100 bg-white p-4">
+            <h3 className="text-base font-black text-navy-900">Tests / Packages</h3>
+            <div className="mt-3 grid gap-2">
+              {items.length ? items.map((item) => (
+                <div className="flex items-center justify-between gap-3 rounded-md bg-blue-50/40 px-3 py-2 text-sm font-bold text-navy-800" key={`${item.id}-${item.name}`}>
+                  <span>{item.name || item.title}</span>
+                  <span className="shrink-0">Qty {item.quantity || 1}</span>
+                </div>
+              )) : <p className="text-sm font-semibold text-navy-600">No items found.</p>}
+            </div>
+          </section>
+        </div>
+      ) : (
+        <AccountEmptyState title="Booking not found" text="Please close this window and try again." />
+      )}
+    </FormModal>
+  );
+}
+
 function AccountBookingsPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("All Bookings");
@@ -40,6 +151,8 @@ function AccountBookingsPage() {
   const [profile, setProfile] = useState(() => getStoredUser() || {});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [detailsBooking, setDetailsBooking] = useState(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -123,6 +236,19 @@ function AccountBookingsPage() {
     }
   };
 
+  const openBookingDetails = async (booking) => {
+    setDetailsBooking(booking);
+    setDetailsLoading(true);
+    try {
+      const data = await getUserBooking(booking._id || booking.id || booking.bookingId);
+      setDetailsBooking(data);
+    } catch (error) {
+      showToast(error?.response?.data?.message || "Could not load booking details.");
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
   return (
     <AccountLayout
       active="bookings"
@@ -173,7 +299,7 @@ function AccountBookingsPage() {
                 <BookingCard
                   key={booking.id}
                   booking={booking}
-                  onAction={(item) => showToast(`${item.action} selected for ${item.title}.`)}
+                  onAction={openBookingDetails}
                   onDelete={setDeleteTarget}
                 />
               ))}
@@ -229,6 +355,9 @@ function AccountBookingsPage() {
           onCancel={() => setDeleteTarget(null)}
           onConfirm={confirmDeleteBooking}
         />
+      ) : null}
+      {detailsBooking ? (
+        <BookingDetailsModal booking={detailsBooking} loading={detailsLoading} onClose={() => setDetailsBooking(null)} />
       ) : null}
       <AccountToast message={toast} />
     </AccountLayout>
