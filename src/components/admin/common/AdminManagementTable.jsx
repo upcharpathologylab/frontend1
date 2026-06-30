@@ -180,7 +180,7 @@ function CellValue({ column, row }) {
   return value;
 }
 
-function AdminManagementTable({ config, rows, totalCount, onCopy, onDelete, onDownload, onEdit, onMore, onPrint, onStatusChange, onView, onWhatsApp }) {
+function AdminManagementTable({ config, rows, selectedRowId, totalCount, onCopy, onDelete, onDownload, onEdit, onMore, onPrint, onRowSelect, onStatusChange, onView, onWhatsApp }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const filteredCount = rows.length;
@@ -235,8 +235,11 @@ function AdminManagementTable({ config, rows, totalCount, onCopy, onDelete, onDo
             </tr>
           </thead>
           <tbody className="text-sm font-semibold text-navy-900">
-            {visibleRows.map((row, index) => (
-              <tr className="transition hover:bg-blue-50/45" key={row._id || row.id}>
+            {visibleRows.map((row, index) => {
+              const rowId = row._id || row.id;
+              const isSelected = selectedRowId && String(rowId) === String(selectedRowId);
+              return (
+              <tr className={`${onRowSelect ? "cursor-pointer" : ""} transition hover:bg-blue-50/45 ${isSelected ? "bg-green-50/60 ring-1 ring-inset ring-green-100" : ""}`} key={rowId} onClick={() => onRowSelect?.(row)}>
                 {config.selectable ? (
                   <td className="border-b border-blue-100 px-4 py-4">
                     <input type="checkbox" className="h-4 w-4 rounded border-blue-200 accent-upchar-green" aria-label={`Select row ${startIndex + index + 1}`} />
@@ -291,7 +294,11 @@ function AdminManagementTable({ config, rows, totalCount, onCopy, onDelete, onDo
                     {config.actions.includes("statusUpdate") ? (
                       <select
                         value={row.currentStatus || row.status}
-                        onChange={(event) => onStatusChange(row, event.target.value)}
+                        onClick={() => onRowSelect?.(row)}
+                        onChange={(event) => {
+                          onRowSelect?.(row);
+                          onStatusChange(row, event.target.value);
+                        }}
                         className="h-9 rounded-md border border-blue-100 bg-white px-3 text-xs font-black text-navy-900 outline-none"
                         aria-label={`Update status row ${index + 1}`}
                       >
@@ -320,7 +327,8 @@ function AdminManagementTable({ config, rows, totalCount, onCopy, onDelete, onDo
                   </td>
                 ) : null}
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
 

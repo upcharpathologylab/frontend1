@@ -228,7 +228,7 @@ function AdminBookingOperationsPage({ config }) {
   const [formItem, setFormItem] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [reportUploading, setReportUploading] = useState(false);
-  const [timelineStatus, setTimelineStatus] = useState("Pending Confirmation");
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     document.title = `${config.title} | Upchar Admin`;
@@ -251,7 +251,7 @@ function AdminBookingOperationsPage({ config }) {
         if (mounted) {
           const nextRows = Array.isArray(data) ? data : [];
           setRows(nextRows);
-          setTimelineStatus(nextRows[0]?.currentStatus || nextRows[0]?.bookingStatus || "Pending Confirmation");
+          setSelectedBooking(nextRows[0] || null);
         }
       })
       .catch(() => {
@@ -287,6 +287,18 @@ function AdminBookingOperationsPage({ config }) {
       return matchesQuery && matchesSelects && matchesDates;
     });
   }, [adminDateRange.value, config, filters, rows]);
+  const selectedBookingId = selectedBooking?._id || selectedBooking?.id || "";
+  const selectedTimelineStatus = selectedBooking?.currentStatus || selectedBooking?.bookingStatus || "Pending Confirmation";
+
+  useEffect(() => {
+    if (!config.statusStages) return;
+    if (!filteredRows.length) {
+      setSelectedBooking(null);
+      return;
+    }
+    const selectedStillVisible = filteredRows.some((row) => String(row._id || row.id) === String(selectedBookingId));
+    if (!selectedStillVisible) setSelectedBooking(filteredRows[0]);
+  }, [config.statusStages, filteredRows, selectedBookingId]);
 
   const computedStats = useMemo(() => buildBookingStats(rows, config), [config, rows]);
   const computedWidgets = useMemo(() => {
@@ -336,7 +348,7 @@ function AdminBookingOperationsPage({ config }) {
       try {
         const saved = await updateAdminBookingStatus(item._id || item.id, status);
         setRows((current) => current.map((row) => ((row._id || row.id) === (item._id || item.id) ? saved : row)));
-        setTimelineStatus(saved.currentStatus || saved.bookingStatus || status);
+        setSelectedBooking(saved);
         showToast(`${item.bookingId} status changed to ${status}.`);
       } catch {
         showToast("Could not update booking status.");
@@ -344,8 +356,9 @@ function AdminBookingOperationsPage({ config }) {
       return;
     }
 
-    setRows((current) => current.map((row) => (row.id === item.id ? { ...row, currentStatus: status, bookingStatus: status, lastUpdated: "Updated just now" } : row)));
-    setTimelineStatus(status);
+    const saved = { ...item, currentStatus: status, bookingStatus: status, lastUpdated: "Updated just now" };
+    setRows((current) => current.map((row) => (row.id === item.id ? saved : row)));
+    setSelectedBooking(saved);
     showToast(`${item.bookingId} status changed to ${status}.`);
   };
 
@@ -361,6 +374,7 @@ function AdminBookingOperationsPage({ config }) {
   const updateRow = (saved) => {
     setRows((current) => current.map((row) => ((row._id || row.id) === (saved._id || saved.id) ? saved : row)));
     setViewItem(saved);
+    setSelectedBooking(saved);
   };
 
   const uploadReport = async (file) => {
@@ -437,7 +451,7 @@ function AdminBookingOperationsPage({ config }) {
         />
       </div>
 
-      <BookingStatusStages stages={config.statusStages} currentStatus={timelineStatus} />
+      <BookingStatusStages stages={config.statusStages} currentStatus={selectedTimelineStatus} />
 
       <div className="mt-6">
         {loading ? (
@@ -446,12 +460,17 @@ function AdminBookingOperationsPage({ config }) {
           <AdminManagementTable
             config={computedConfig}
             rows={filteredRows}
+            selectedRowId={selectedBookingId}
             onDelete={setDeleteTarget}
             onEdit={setFormItem}
             onPrint={(item) => showToast(`${item.bookingId} invoice print started.`)}
+            onRowSelect={setSelectedBooking}
             onStatusChange={updateStatus}
             onWhatsApp={sendWhatsAppUpdate}
-            onView={setViewItem}
+            onView={(item) => {
+              setSelectedBooking(item);
+              setViewItem(item);
+            }}
           />
         )}
       </div>
