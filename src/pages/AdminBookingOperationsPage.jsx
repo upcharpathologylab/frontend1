@@ -45,7 +45,7 @@ const toneClasses = {
 
 const stageIcons = [Clock3, CalendarCheck, CheckCircle2, FlaskConical, FileCheck2, CheckCircle2, XCircle];
 
-const inProgressStatuses = new Set(["Confirmed", "Sample Collection Scheduled", "Sample Collected", "Testing In Progress", "Report Ready"]);
+const inProgressStatuses = new Set(["Confirmed", "Sample Collection Scheduled", "Sample Collection Confirmed", "Testing In Progress", "Report Ready"]);
 
 const percentText = (value, total) => (total ? `${Math.round((value / total) * 100)}%` : "0%");
 
@@ -172,7 +172,7 @@ function BookingOverviewWidgets({ widgets }) {
   );
 }
 
-function BookingStatusStages({ stages }) {
+function BookingStatusStages({ stages, activeStatuses = new Set() }) {
   if (!stages) return null;
 
   return (
@@ -187,10 +187,11 @@ function BookingStatusStages({ stages }) {
         <div className="flex min-w-[980px] items-start justify-between gap-3">
           {stages.map((stage, index) => {
             const Icon = stageIcons[index] || CheckCircle2;
+            const isActive = activeStatuses.has(stage.title);
             return (
               <div className="flex flex-1 items-start gap-3" key={stage.title}>
                 <article className="min-w-[120px] text-center">
-                  <span className={`mx-auto flex h-11 w-11 items-center justify-center rounded-full ${toneClasses[stage.tone] || toneClasses.green}`}>
+                  <span className={`mx-auto flex h-11 w-11 items-center justify-center rounded-full ${toneClasses[stage.tone] || toneClasses.green} ${isActive ? "ring-2 ring-upchar-green ring-offset-2" : ""}`}>
                     <Icon className="h-6 w-6" />
                   </span>
                   <h3 className="mt-2 text-sm font-black text-navy-950">{stage.title}</h3>
@@ -277,6 +278,7 @@ function AdminBookingOperationsPage({ config }) {
     const widgets = buildBookingWidgets(rows, config.sideWidgets);
     return widgets ? { ...widgets, total: String(rows.length) } : null;
   }, [config.sideWidgets, rows]);
+  const activeStageStatuses = useMemo(() => new Set(rows.map((row) => row.currentStatus || row.bookingStatus).filter(Boolean)), [rows]);
   const computedConfig = useMemo(() => {
     const actions = canDeletePermanently && config.apiResource === "bookings"
       ? [...new Set([...(config.actions || []), "permanentDelete"])]
@@ -419,7 +421,7 @@ function AdminBookingOperationsPage({ config }) {
         />
       </div>
 
-      <BookingStatusStages stages={config.statusStages} />
+      <BookingStatusStages stages={config.statusStages} activeStatuses={activeStageStatuses} />
 
       <div className="mt-6">
         {loading ? (

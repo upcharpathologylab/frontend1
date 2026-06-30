@@ -19,6 +19,12 @@ const statusColorByLabel = {
   Ready: "green",
   Refunded: "blue",
   Resolved: "green",
+  "Pending Confirmation": "orange",
+  Confirmed: "blue",
+  "Sample Collection Scheduled": "blue",
+  "Sample Collection Confirmed": "purple",
+  "Testing In Progress": "orange",
+  "Report Ready": "green",
   Upcoming: "green",
   Verified: "green"
 };

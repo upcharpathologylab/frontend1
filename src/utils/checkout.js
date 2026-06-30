@@ -136,7 +136,7 @@ export const createBookingData = ({ items, summary, status = "paid", paymentMode
   bookingDate: new Date().toLocaleString("en-IN", { month: "short", day: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
   paymentMode,
   paymentStatus: status === "paid" ? "Paid" : status === "pending" ? "Pending" : "Failed",
-  bookingStatus: bookingStatus || (status === "pending" ? "Pending Confirmation" : "Confirmed"),
+  bookingStatus: bookingStatus || "Pending Confirmation",
   customer: customer || customerDetails,
   items: (Array.isArray(items) ? items : []).map(normalizeCheckoutItem),
   summary: summary || buildOrderSummary(items || []),

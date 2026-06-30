@@ -129,7 +129,7 @@ function BookingMapSection({ data, content, modal = false, tests = [], packages 
         quantity: selectedItems.length,
         paymentMethod: "Cash on Delivery",
         paymentStatus: "COD",
-        bookingStatus: "Confirmed"
+        bookingStatus: "Pending Confirmation"
       });
       const booking = saved?.data || saved;
       const prescriptionLink = assetUrl(booking?.prescriptionFile || "");

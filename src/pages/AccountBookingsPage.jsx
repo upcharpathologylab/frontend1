@@ -21,6 +21,16 @@ const bookingSummaryCards = [
   { title: "Cancelled", icon: "CircleX", color: "red" }
 ];
 
+const activeBookingStatuses = new Set([
+  "Pending Confirmation",
+  "Confirmed",
+  "Sample Collection Scheduled",
+  "Sample Collection Confirmed",
+  "Testing In Progress",
+  "Report Ready",
+  "Upcoming"
+]);
+
 function AccountBookingsPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("All Bookings");
@@ -64,7 +74,7 @@ function AccountBookingsPage() {
   }, []);
 
   const filteredBookings = useMemo(() => {
-    if (activeTab.startsWith("Upcoming")) return bookings.filter((item) => item.status === "Upcoming");
+    if (activeTab.startsWith("Upcoming")) return bookings.filter((item) => activeBookingStatuses.has(item.status));
     if (activeTab.startsWith("Completed")) return bookings.filter((item) => item.status === "Completed");
     if (activeTab.startsWith("Cancelled")) return bookings.filter((item) => item.status === "Cancelled");
     return bookings;
@@ -77,7 +87,7 @@ function AccountBookingsPage() {
 
   const summaryCards = useMemo(() => {
     const total = bookings.length;
-    const upcoming = bookings.filter((item) => item.status === "Upcoming").length;
+    const upcoming = bookings.filter((item) => activeBookingStatuses.has(item.status)).length;
     const completed = bookings.filter((item) => item.status === "Completed").length;
     const cancelled = bookings.filter((item) => item.status === "Cancelled").length;
     const values = [total, completed, upcoming, cancelled];
@@ -85,7 +95,7 @@ function AccountBookingsPage() {
   }, [bookings]);
 
   const tabs = useMemo(() => {
-    const upcoming = bookings.filter((item) => item.status === "Upcoming").length;
+    const upcoming = bookings.filter((item) => activeBookingStatuses.has(item.status)).length;
     const completed = bookings.filter((item) => item.status === "Completed").length;
     const cancelled = bookings.filter((item) => item.status === "Cancelled").length;
     return [

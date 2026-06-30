@@ -104,7 +104,7 @@ function openBookingWhatsApp(booking, summary) {
     `Total Payable: Rs. ${summary.totalPayable}`,
     "Payment Method: Cash on Delivery",
     "Payment Status: COD",
-    "Booking Status: Confirmed",
+    "Booking Status: Pending Confirmation",
     "Upchar Pathology Lab"
   ].join("\n");
   window.open(`https://wa.me/91${whatsappNumber.slice(-10)}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
@@ -278,7 +278,7 @@ function PaymentPage() {
           paymentId: verification.paymentId,
           razorpayOrderId: verification.orderId,
           bookingId: verification.booking?.bookingId,
-          bookingStatus: "Confirmed",
+          bookingStatus: verification.booking?.bookingStatus || "Pending Confirmation",
           customer: bookingCustomer
         });
 
@@ -291,7 +291,7 @@ function PaymentPage() {
           ...bookingPayload,
           paymentMethod: "Cash on Delivery",
           paymentStatus: "COD",
-          bookingStatus: "Confirmed",
+          bookingStatus: "Pending Confirmation",
           source: "cash-on-delivery-checkout"
         });
 
@@ -303,7 +303,7 @@ function PaymentPage() {
           paymentMode: "Cash on Delivery",
           paymentId: "COD",
           bookingId: response.data?.bookingId,
-          bookingStatus: "Confirmed",
+          bookingStatus: response.data?.bookingStatus || "Pending Confirmation",
           customer: bookingCustomer
         }),
         paymentStatus: "COD"

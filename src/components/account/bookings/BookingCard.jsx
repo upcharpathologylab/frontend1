@@ -10,7 +10,8 @@ const colorClasses = {
 };
 
 function BookingCard({ booking, onAction, onDelete }) {
-  const color = booking.status === "Cancelled" ? "red" : booking.status === "Upcoming" ? "blue" : "green";
+  const color = booking.status === "Cancelled" ? "red" : booking.status === "Completed" ? "green" : "blue";
+  const statusIcon = booking.status === "Cancelled" ? "CircleX" : booking.status === "Completed" ? "BadgeCheck" : "Clock3";
 
   return (
     <article className="overflow-hidden rounded-lg border border-blue-100 bg-white shadow-sm">
@@ -18,7 +19,7 @@ function BookingCard({ booking, onAction, onDelete }) {
         <div className={`flex items-center justify-center border-l-4 p-5 text-center ${colorClasses[color] || colorClasses.green}`}>
           <div>
             <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
-              <Icon name={booking.status === "Cancelled" ? "CircleX" : booking.status === "Upcoming" ? "Clock3" : "BadgeCheck"} className="h-7 w-7" />
+              <Icon name={statusIcon} className="h-7 w-7" />
             </span>
             <span className="mt-3 block text-sm font-black">{booking.status}</span>
           </div>
