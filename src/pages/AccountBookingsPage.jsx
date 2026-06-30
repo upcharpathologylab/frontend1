@@ -62,8 +62,8 @@ function BookingStatusTimeline({ status }) {
   return (
     <section className="rounded-lg border border-blue-100 bg-white p-3">
       <h3 className="text-sm font-black text-navy-900">Booking Status Stages</h3>
-      <div className="mt-3 max-w-full overflow-hidden">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
+      <div className="mt-4 max-w-full overflow-x-auto sm:mt-3 sm:overflow-hidden">
+        <div className="flex min-w-[760px] items-start gap-2 sm:grid sm:min-w-0 sm:grid-cols-4 lg:grid-cols-8">
           {bookingStatusStages.map((stage, index) => {
             const isDone = !isCancelled && currentIndex >= 0 && index <= currentIndex;
             const isLineDone = !isCancelled && currentIndex > index;
@@ -75,12 +75,12 @@ function BookingStatusTimeline({ status }) {
                 : "bg-slate-100 text-navy-400";
 
             return (
-              <article className="min-w-0 text-center" key={stage}>
+              <article className="w-24 shrink-0 text-center sm:w-auto sm:min-w-0 sm:shrink" key={stage}>
                 <div className="flex items-center">
                   <span className={`mx-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${circleClass}`}>
                     {isCancelledStage ? <XCircle className="h-4 w-4" /> : isDone ? <CheckCircle2 className="h-4 w-4" /> : <Clock3 className="h-4 w-4" />}
                   </span>
-                  {index < bookingStatusStages.length - 1 ? <span className={`hidden h-1 flex-1 rounded-full lg:block ${isLineDone ? "bg-upchar-green" : "bg-slate-200"}`} /> : null}
+                  {index < bookingStatusStages.length - 1 ? <span className={`h-1 flex-1 rounded-full sm:hidden lg:block ${isLineDone ? "bg-upchar-green" : "bg-slate-200"}`} /> : null}
                 </div>
                 <h4 className={`mt-1 text-[10px] font-black leading-4 ${isCancelledStage ? "text-upchar-red" : isDone ? "text-upchar-green" : "text-navy-700"}`}>{stage}</h4>
               </article>
