@@ -43,7 +43,7 @@ const toneClasses = {
   red: "bg-red-50 text-upchar-red"
 };
 
-const stageIcons = [Clock3, CalendarCheck, CheckCircle2, FlaskConical, FileCheck2, CheckCircle2, XCircle];
+const stageIcons = [Clock3, CalendarCheck, CalendarCheck, CheckCircle2, FlaskConical, FileCheck2, CheckCircle2, XCircle];
 
 const inProgressStatuses = new Set(["Confirmed", "Sample Collection Scheduled", "Sample Collection Confirmed", "Testing In Progress", "Report Ready"]);
 
@@ -172,8 +172,10 @@ function BookingOverviewWidgets({ widgets }) {
   );
 }
 
-function BookingStatusStages({ stages, activeStatuses = new Set() }) {
+function BookingStatusStages({ stages, currentStatus = "Pending Confirmation" }) {
   if (!stages) return null;
+  const currentIndex = stages.findIndex((stage) => stage.title === currentStatus);
+  const isCancelled = currentStatus === "Cancelled";
 
   return (
     <section className="mt-6 rounded-lg border border-green-100 bg-green-50/60 p-5 shadow-sm">
@@ -187,17 +189,25 @@ function BookingStatusStages({ stages, activeStatuses = new Set() }) {
         <div className="flex min-w-[980px] items-start justify-between gap-3">
           {stages.map((stage, index) => {
             const Icon = stageIcons[index] || CheckCircle2;
-            const isActive = activeStatuses.has(stage.title);
+            const isCurrent = index === currentIndex;
+            const isDone = !isCancelled && currentIndex >= 0 && index <= currentIndex;
+            const isCancelledStage = isCancelled && stage.title === "Cancelled";
+            const isLineDone = !isCancelled && currentIndex > index;
+            const circleClass = isCancelledStage
+              ? "bg-red-50 text-upchar-red ring-2 ring-upchar-red ring-offset-2"
+              : isDone
+                ? "bg-green-50 text-upchar-green ring-2 ring-upchar-green ring-offset-2"
+                : "bg-slate-100 text-navy-400";
             return (
               <div className="flex flex-1 items-start gap-3" key={stage.title}>
                 <article className="min-w-[120px] text-center">
-                  <span className={`mx-auto flex h-11 w-11 items-center justify-center rounded-full ${toneClasses[stage.tone] || toneClasses.green} ${isActive ? "ring-2 ring-upchar-green ring-offset-2" : ""}`}>
-                    <Icon className="h-6 w-6" />
+                  <span className={`mx-auto flex h-11 w-11 items-center justify-center rounded-full ${circleClass}`}>
+                    {isDone || isCancelledStage ? <CheckCircle2 className="h-6 w-6" /> : <Icon className="h-6 w-6" />}
                   </span>
-                  <h3 className="mt-2 text-sm font-black text-navy-950">{stage.title}</h3>
+                  <h3 className={`mt-2 text-sm font-black ${isCancelledStage ? "text-upchar-red" : isCurrent || isDone ? "text-upchar-green" : "text-navy-950"}`}>{stage.title}</h3>
                   <p className="mt-1 text-xs font-semibold leading-5 text-navy-700">{stage.text}</p>
                 </article>
-                {index < stages.length - 1 ? <span className="mt-5 text-lg font-black text-navy-500">&gt;</span> : null}
+                {index < stages.length - 1 ? <span className={`mt-5 h-1 flex-1 rounded-full ${isLineDone ? "bg-upchar-green" : "bg-slate-200"}`} /> : null}
               </div>
             );
           })}
@@ -218,6 +228,7 @@ function AdminBookingOperationsPage({ config }) {
   const [formItem, setFormItem] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [reportUploading, setReportUploading] = useState(false);
+  const [timelineStatus, setTimelineStatus] = useState("Pending Confirmation");
 
   useEffect(() => {
     document.title = `${config.title} | Upchar Admin`;
@@ -237,7 +248,11 @@ function AdminBookingOperationsPage({ config }) {
     setLoading(true);
     getAdminResource(config.apiResource)
       .then((data) => {
-        if (mounted) setRows(Array.isArray(data) ? data : []);
+        if (mounted) {
+          const nextRows = Array.isArray(data) ? data : [];
+          setRows(nextRows);
+          setTimelineStatus(nextRows[0]?.currentStatus || nextRows[0]?.bookingStatus || "Pending Confirmation");
+        }
       })
       .catch(() => {
         if (mounted) {
@@ -278,7 +293,6 @@ function AdminBookingOperationsPage({ config }) {
     const widgets = buildBookingWidgets(rows, config.sideWidgets);
     return widgets ? { ...widgets, total: String(rows.length) } : null;
   }, [config.sideWidgets, rows]);
-  const activeStageStatuses = useMemo(() => new Set(rows.map((row) => row.currentStatus || row.bookingStatus).filter(Boolean)), [rows]);
   const computedConfig = useMemo(() => {
     const actions = canDeletePermanently && config.apiResource === "bookings"
       ? [...new Set([...(config.actions || []), "permanentDelete"])]
@@ -322,6 +336,7 @@ function AdminBookingOperationsPage({ config }) {
       try {
         const saved = await updateAdminBookingStatus(item._id || item.id, status);
         setRows((current) => current.map((row) => ((row._id || row.id) === (item._id || item.id) ? saved : row)));
+        setTimelineStatus(saved.currentStatus || saved.bookingStatus || status);
         showToast(`${item.bookingId} status changed to ${status}.`);
       } catch {
         showToast("Could not update booking status.");
@@ -330,6 +345,7 @@ function AdminBookingOperationsPage({ config }) {
     }
 
     setRows((current) => current.map((row) => (row.id === item.id ? { ...row, currentStatus: status, bookingStatus: status, lastUpdated: "Updated just now" } : row)));
+    setTimelineStatus(status);
     showToast(`${item.bookingId} status changed to ${status}.`);
   };
 
@@ -421,7 +437,7 @@ function AdminBookingOperationsPage({ config }) {
         />
       </div>
 
-      <BookingStatusStages stages={config.statusStages} activeStatuses={activeStageStatuses} />
+      <BookingStatusStages stages={config.statusStages} currentStatus={timelineStatus} />
 
       <div className="mt-6">
         {loading ? (
