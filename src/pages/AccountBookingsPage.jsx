@@ -47,9 +47,9 @@ const bookingStatusStages = [
 
 function DetailRow({ label, value }) {
   return (
-    <div className="rounded-md border border-blue-100 bg-blue-50/30 p-3">
-      <span className="block text-xs font-black uppercase text-navy-500">{label}</span>
-      <span className="mt-1 block text-sm font-bold text-navy-900">{value || "-"}</span>
+    <div className="rounded-md border border-blue-100 bg-blue-50/30 px-3 py-2">
+      <span className="block text-[10px] font-black uppercase text-navy-500">{label}</span>
+      <span className="mt-0.5 block text-sm font-bold leading-5 text-navy-900">{value || "-"}</span>
     </div>
   );
 }
@@ -60,10 +60,10 @@ function BookingStatusTimeline({ status }) {
   const isCancelled = currentStatus === "Cancelled";
 
   return (
-    <section className="rounded-lg border border-blue-100 bg-white p-4">
-      <h3 className="text-base font-black text-navy-900">Booking Status Stages</h3>
-      <div className="mt-4 max-w-full overflow-x-auto">
-        <div className="flex min-w-[900px] items-start justify-between gap-3">
+    <section className="rounded-lg border border-blue-100 bg-white p-3">
+      <h3 className="text-sm font-black text-navy-900">Booking Status Stages</h3>
+      <div className="mt-3 max-w-full overflow-hidden">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
           {bookingStatusStages.map((stage, index) => {
             const isDone = !isCancelled && currentIndex >= 0 && index <= currentIndex;
             const isLineDone = !isCancelled && currentIndex > index;
@@ -75,15 +75,15 @@ function BookingStatusTimeline({ status }) {
                 : "bg-slate-100 text-navy-400";
 
             return (
-              <div className="flex flex-1 items-start gap-3" key={stage}>
-                <article className="min-w-[108px] text-center">
-                  <span className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full ${circleClass}`}>
-                    {isCancelledStage ? <XCircle className="h-5 w-5" /> : isDone ? <CheckCircle2 className="h-5 w-5" /> : <Clock3 className="h-5 w-5" />}
+              <article className="min-w-0 text-center" key={stage}>
+                <div className="flex items-center">
+                  <span className={`mx-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${circleClass}`}>
+                    {isCancelledStage ? <XCircle className="h-4 w-4" /> : isDone ? <CheckCircle2 className="h-4 w-4" /> : <Clock3 className="h-4 w-4" />}
                   </span>
-                  <h4 className={`mt-2 text-xs font-black leading-5 ${isCancelledStage ? "text-upchar-red" : isDone ? "text-upchar-green" : "text-navy-700"}`}>{stage}</h4>
-                </article>
-                {index < bookingStatusStages.length - 1 ? <span className={`mt-5 h-1 flex-1 rounded-full ${isLineDone ? "bg-upchar-green" : "bg-slate-200"}`} /> : null}
-              </div>
+                  {index < bookingStatusStages.length - 1 ? <span className={`hidden h-1 flex-1 rounded-full lg:block ${isLineDone ? "bg-upchar-green" : "bg-slate-200"}`} /> : null}
+                </div>
+                <h4 className={`mt-1 text-[10px] font-black leading-4 ${isCancelledStage ? "text-upchar-red" : isDone ? "text-upchar-green" : "text-navy-700"}`}>{stage}</h4>
+              </article>
             );
           })}
         </div>
@@ -99,20 +99,22 @@ function BookingDetailsModal({ booking, loading, onClose }) {
   const status = booking?.currentStatus || booking?.bookingStatus || booking?.status || "Pending Confirmation";
 
   return (
-    <FormModal title={booking?.bookingId ? `Booking ${booking.bookingId}` : "Booking Details"} onClose={onClose}>
+    <FormModal title={booking?.bookingId ? `Booking ${booking.bookingId}` : "Booking Details"} onClose={onClose} panelClassName="max-w-5xl" bodyClassName="p-3 sm:p-4">
       {loading ? (
         <AccountLoadingState />
       ) : booking ? (
-        <div className="grid gap-5">
-          <BookingStatusTimeline status={status} />
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-100 bg-blue-50/40 p-4">
+        <div className="grid gap-3">
+          <div className="grid gap-3 lg:grid-cols-[1fr_260px] lg:items-stretch">
+            <BookingStatusTimeline status={status} />
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-100 bg-blue-50/40 p-3 lg:flex-col lg:items-start lg:justify-center">
             <span>
               <span className="block text-xs font-black text-navy-500">Current Status</span>
               <span className="mt-1 block text-lg font-black text-navy-900">{status}</span>
             </span>
             <StatusBadge label={status} />
+            </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <DetailRow label="Booking ID" value={booking.bookingId} />
             <DetailRow label="Patient Name" value={customer.name} />
             <DetailRow label="Phone Number" value={customer.phone} />
@@ -123,11 +125,11 @@ function BookingDetailsModal({ booking, loading, onClose }) {
             <DetailRow label="Payment Method" value={booking.paymentMode || booking.paymentMethod} />
             <DetailRow label="Total Amount" value={price(summary.totalPayable || 0)} />
           </div>
-          <section className="rounded-lg border border-blue-100 bg-white p-4">
-            <h3 className="text-base font-black text-navy-900">Tests / Packages</h3>
-            <div className="mt-3 grid gap-2">
+          <section className="rounded-lg border border-blue-100 bg-white p-3">
+            <h3 className="text-sm font-black text-navy-900">Tests / Packages</h3>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
               {items.length ? items.map((item) => (
-                <div className="flex items-center justify-between gap-3 rounded-md bg-blue-50/40 px-3 py-2 text-sm font-bold text-navy-800" key={`${item.id}-${item.name}`}>
+                <div className="flex items-center justify-between gap-3 rounded-md bg-blue-50/40 px-3 py-2 text-xs font-bold text-navy-800 sm:text-sm" key={`${item.id}-${item.name}`}>
                   <span>{item.name || item.title}</span>
                   <span className="shrink-0">Qty {item.quantity || 1}</span>
                 </div>
